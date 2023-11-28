@@ -10,8 +10,8 @@ import app.csi3335F23 as myDb
 
 
 app = Flask(__name__)
-'''app.config.from_object(Config)
-db = SQLAlchemy(app)
+app.config.from_object(Config)
+'''db = SQLAlchemy(app)
 migrate = Migrate(app, db)'''
 # if using pymysql:
 conn = pymysql.connect(
@@ -32,7 +32,7 @@ cursor = conn.cursor()
 
 cursor = conn.cursor()
 
-login = LoginManager(app)
-login.login_view = 'login'
+# login = LoginManager(app)
+# login.login_view = 'login'
 
 from app import routes

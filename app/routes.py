@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app, cursor #README: cursor is what we will be using to execute stuff
 #, db) '''included earlier in tutorial'''
-#from app.forms import LoginForm, RegistrationForm, EditProfileForm
-from flask_login import current_user, login_user, logout_user, login_required
+from app.forms import SearchForm
+#from flask_login import current_user, login_user, logout_user, login_required
 #from app.models import User
 from datetime import datetime
 #from werkzeug.urls import url_parse
@@ -12,9 +12,9 @@ from datetime import datetime
 #@login_required
 def index():
     #just testing
-    cursor.execute("SELECT * from managers LIMIT 10") #README: i just added this to test!
-    res = cursor.fetchall()
-    return jsonify(res) #README: notice how i am using cursor which is defined in __init__.py
+    # cursor.execute("SELECT * from managers LIMIT 10") #README: i just added this to test!
+    # res = cursor.fetchall()
+    # return jsonify(res) #README: notice how i am using cursor which is defined in __init__.py
     #return "hello world"
     #return "Connected to mariadb"
     # user = {'username' : 'Misty_Kurien1'}
@@ -29,15 +29,25 @@ def index():
     #     }
     #
     # ]
-    # return render_template('index.html', title='Home Page', posts=posts)
+    #return render_template('index.html')
+    return render_template('index.html')
 
-@app.route('/<year>/<teamName>')
+@app.route('/details/<year>/<teamName>')
 #localhost:5000/2010/Chicago%20Cubs
 #README: %20 to signify space in URL
 def teams(year, teamName):
     query = "SELECT team_rank FROM teams WHERE yearid = %s AND team_name = %s"
     cursor.execute(query, (year, teamName))
     return jsonify(cursor.fetchall())
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    form = SearchForm()
+    if form.validate_on_submit():
+            return redirect(url_for('teams', year=form.year.data, teamName =form.teamName.data))
+
+    return render_template('search.html', title='Search', form=form)
+
 
 # @app.route('/login', methods=['GET','POST'])
 # def login():
