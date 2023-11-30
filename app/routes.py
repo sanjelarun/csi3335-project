@@ -11,6 +11,7 @@ from werkzeug.urls import url_parse
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import aliased
 from werkzeug.security import generate_password_hash
+from config import Config
 
 @app.route('/')
 @app.route('/index')
@@ -49,27 +50,30 @@ def index():
 #localhost:5000/2010/Chicago%20Cubs
 #README: %20 to signify space in URL
 def teams(year, teamName):
-    engine = create_engine('your_database_uri_here')  # Replace with your actual database URI
+    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)  # Replace with your actual database URI
     query = text(
-        "SELECT CONCAT(p.nameFirst, ' ', p.nameLast) AS manager, t.team_W, t.team_L, t.team_rank "
-        "FROM people p "
-        "JOIN managers m ON m.playerid = p.playerid "
-        "JOIN teams t ON t.teamid = m.teamid "
-        "WHERE t.yearid = :year AND t.team_name = :teamName"
+            "SELECT CONCAT(nameFirst, ' ', nameLast), "
+             "team_W, team_L, team_rank, playerid "
+             "FROM people p join managers m using (playerid)"
+             "JOIN teams t using (teamid, yearid)"
+             " WHERE yearid = :year AND team_name = :teamName"
     )
 
     with engine.connect() as con:
-        result = con.execute(query, year=year, teamName=teamName).fetchone()
+        record = con.execute(query, {"year": year, "teamName": teamName}).fetchone()
 
     # TODO: Add error checking for result
 
-    manager = result['manager']
-    teamW = result['team_W']
-    teamL = result['team_L']
-    teamRank = result['team_rank']
+    print("this is a record")
+    print(record)
+    manager = record[0]
+    teamW = record[1]
+    teamL = record[2]
+    teamRank = record[3]
+    playerid = record[4]
 
     return render_template('team.html', teamName=teamName, year=year,
-                           teamW=teamW, teamL=teamL, teamRank=teamRank, manager=manager)
+                           teamW=teamW, teamL=teamL, teamRank=teamRank, manager=manager, playerid=playerid)
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
