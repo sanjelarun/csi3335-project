@@ -1,9 +1,10 @@
+# config.py
+
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
+from app.csi3335F23 import mysql
 
 class Config(object):
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess' #need this for wtforms in forms.py
-    '''SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'app.db')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False'''
-    
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+                              f"mysql+pymysql://{mysql['user']}:{mysql['password']}@{mysql['host']}/{mysql['db']}"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
