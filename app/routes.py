@@ -50,30 +50,87 @@ def index():
 #localhost:5000/2010/Chicago%20Cubs
 #README: %20 to signify space in URL
 def teams(year, teamName):
-    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)  # Replace with your actual database URI
-    query = text(
-            "SELECT CONCAT(nameFirst, ' ', nameLast), "
-             "team_W, team_L, team_rank, playerid "
+    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
+
+    #requirements
+    query = text("SELECT CONCAT(nameFirst, ' ', nameLast), "
+             "team_W, team_L, team_rank, playerid, divid "
              "FROM people p join managers m using (playerid)"
              "JOIN teams t using (teamid, yearid)"
-             " WHERE yearid = :year AND team_name = :teamName"
-    )
+             " WHERE yearid = :year AND team_name = :teamName")
 
     with engine.connect() as con:
-        record = con.execute(query, {"year": year, "teamName": teamName}).fetchone()
+        record = con.execute(query, {"year": year, "teamName": teamName}).fetchall()[0]
 
-    # TODO: Add error checking for result
-
-    print("this is a record")
-    print(record)
+    #TODO: ERROR CHECKING REQUIRED
     manager = record[0]
     teamW = record[1]
     teamL = record[2]
     teamRank = record[3]
     playerid = record[4]
+    division = record[5]
+
+    if division == "W":
+        division = "West"
+    elif division == "E":
+        division = "East"
+    elif division == "C":
+        division = "Central"
+    else:
+        division = "Not Available"
+
+
+    #calculate pythagorean winning percentage for a year
+    query = text("SELECT ((team_R * 2) / ((team_R ^ 2) + (team_RA ^2))) * 100"
+             " as perc from teams where yearid = :year and team_name = :teamName")
+
+    with engine.connect() as con:
+        projection = con.execute(query, {"year": year, "teamName": teamName}).fetchone()[0]
 
     return render_template('team.html', teamName=teamName, year=year,
-                           teamW=teamW, teamL=teamL, teamRank=teamRank, manager=manager, playerid=playerid)
+                           teamW = teamW, teamL=teamL, teamRank = teamRank, manager=manager,
+                           playerid =playerid, projection=projection, division=division)
+
+#TODO fix this
+@app.route('/details/<playerid>')
+def manager(playerid):
+    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
+    query = text("select team_name, m.yearid "
+             "from managers m JOIN teams USING (teamid, yearid) "
+             "where playerid = :playerid")
+
+    with engine.connect() as con:
+        record = con.execute(query, {"playerid": playerid}).fetchall()
+        # TODO: ERROR CHECKING REQUIRED
+        query = text("select CONCAT(nameFirst, ' ', nameLast) "
+                 "from people m  "
+                 "where playerid = :playerid")
+        manager = con.execute(query, {"playerid": playerid}).fetchall()[0][0]
+    return render_template('manager.html', record=record, manager = manager)
+
+
+#TODO fix this
+@app.route('/division/<year>/<division>')
+def division(year, division):
+    divid = division[0]
+    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
+    query = text("select team_rank, team_name from teams "
+             "where team_rank < 4 and "
+             "divid = :divid and yearid = :year and lgid='AL' "
+             "order by team_rank")
+
+    with engine.connect() as con:
+        ALrecord = con.execute(query, {"divid": divid, "year": year}).fetchall()
+
+        query = text("select team_rank, team_name from teams "
+                 "where team_rank < 4 and "
+                 "divid = :divid and yearid = :year and lgid='NL' "
+                 "order by team_rank")
+
+        NLrecord = con.execute(query, {"divid": divid, "year": year}).fetchall()
+    return render_template('division.html',
+                           year=year, division=division,
+                           ALrecord=ALrecord, NLrecord=NLrecord)
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
