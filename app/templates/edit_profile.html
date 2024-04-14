@@ -18,6 +18,10 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        <p>
+            {{ form.favorite_team.label }}<br>
+            {{ form.favorite_team() }}
+        </p>
         <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}
