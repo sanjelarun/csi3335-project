@@ -28,9 +28,8 @@ def index():
     ]
     return render_template('index.html', title='Home', posts=posts)
 
-    return render_template('index.html', title='Home', user=user, posts=posts)
-
 @app.route('/roster')
+@login_required
 def roster():
     user = {'username': 'Spencer'}
     players = [
@@ -50,6 +49,7 @@ def roster():
     return render_template('roster.html', title='Roster', user=user, players=players, pitchers=pitchers, team=team)
 
 @app.route('/player/<int:player_id>')
+@login_required
 def player_stats(player_id):
     user = {'username': 'Spencer'}
     players = [
