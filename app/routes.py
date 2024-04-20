@@ -12,7 +12,7 @@ from app import db
 from app.forms import RegistrationForm
 from datetime import datetime, timezone
 from app.forms import EditProfileForm
-from app import RequestLog
+from app.models import RequestLog
 
 @app.route('/')
 @app.route('/index')
