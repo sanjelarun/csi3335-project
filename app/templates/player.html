@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% if title %}
+    <title>{{ title }} - Player Stats</title>
+    {% else %}
+    <title>Player Stats</title>
+    {% endif %}
+</head>
+<body>
+<div>
+    Helpful Links:
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('login') }}">Login</a>
+</div>
+<hr>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<h1>{{ player.Name }} Stats</h1>
+<h2>Position: {{ player.Position }}</h2>
+
+{% if player.BattingStats %}
+<h3>Batting Statistics</h3>
+<table>
+    <tr>
+        <th>Games Played</th>
+        <th>Slash Line</th>
+    </tr>
+    <tr>
+        <td>{{ player.BattingStats.GamesPlayed }}</td>
+        <td>{{ player.BattingStats.BattingAverage }} / {{ player.BattingStats.OnBasePercentage }} / {{ player.BattingStats.SluggingPercentage }}</td>
+    </tr>
+</table>
+{% endif %}
+
+{% if player.PitchingStats %}
+<h3>Pitching Statistics</h3>
+<table>
+    <tr>
+        <th>Games Pitched</th>
+        <th>Games Started</th>
+        <th>Innings Pitched</th>
+        <th>WHIP</th>
+        <th>Strikeouts/9</th>
+    </tr>
+    <tr>
+        <td>{{ player.PitchingStats.GamesPitched }}</td>
+        <td>{{ player.PitchingStats.GamesStarted }}</td>
+        <td>{{ player.PitchingStats.InningsPitched }}</td>
+        <td>{{ player.PitchingStats.WHIP }}</td>
+        <td>{{ player.PitchingStats.StrikeoutsPer9 }}</td>
+    </tr>
+</table>
+{% endif %}
+</body>
+</html>

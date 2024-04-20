@@ -1,0 +1,31 @@
+team_name,tm,team_color,primary_color,secondary_color
+Arizona Diamondbacks,ARI,#A71930,#A71930,#000000
+Atlanta Braves,ATL,#B71234,#002F5F,#B71234
+Baltimore Orioles,BAL,#ed4c09,#ed4c09,#000000
+Boston Red Sox,BOS,#C60C30,#C60C30,#002244
+Chicago Cubs,CHC,#003279,#003279,#CC0033
+Chicago White Sox,CHW,#000000,#C0C0C0,#000000
+Cincinnati Reds,CIN,#C6011F,#C6011F,#000000
+Cleveland Indians,CLE,#d30335,#003366,#d30335
+Colorado Rockies,COL,#333366,#000000,#333366
+Detroit Tigers,DET,#DE4406,#001742,#DE4406
+Houston Astros,HOU,#FF7F00,#072854,#FF7F00
+Kansas City Royals,KCR,#15317E,#15317E,#74B4FA
+Los Angeles Angels,LAA,#B71234,#B71234,#000000
+Los Angeles Dodgers,LAD,#083C6B,#083C6B,#000000
+Miami Marlins,FLA,#0077C8,#000000,#F9423A
+Milwaukee Brewers,MIL,#182B49,#182B49,#92754C
+Minnesota Twins,MIN,#072754,#072754,#C6011F
+New York Mets,NYM,#002C77,#002C77,#FB4F14
+New York Yankees,NYY,#1C2841,#1C2841,#808080
+Oakland Athletics,OAK,#003831,#003831,#FFD800
+Philadelphia Phillies,PHI,#BA0C2F,#BA0C2F,#003087
+Pittsburgh Pirates,PIT,#000000,#000000,#fdb829
+San Diego Padres,SDP,#B4A76C,#002147,#B4A76C
+San Francisco Giants,SFG,#F2552C,#000000,#F2552C
+Seattle Mariners,SEA,#0C2C56,#0C2C56,#005C5C
+St Louis Cardinals,STL,#c41e3a,#c41e3a,#0A2252
+Tampa Bay Rays,TBR,#9ECEEE,#00285D,#9ECEEE
+Texas Rangers,TEX,#BD1021,#BD1021,#003279
+Toronto Blue Jays,TOR,#003DA5,#003DA5,#041E42
+Washington Nationals,WSN,#BA122B,#BA122B,#11225B
