@@ -65,6 +65,7 @@
 <div>
     Helpful Links:
     <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
     <a href="{{ url_for('login') }}">Login</a>
 </div>
 <hr>
@@ -77,6 +78,31 @@
 </ul>
 {% endif %}
 {% endwith %}
+
+
+<!-- Dropdown form for selecting team -->
+<form action="{{ url_for('roster') }}" method="GET">
+    <label for="team">Select Team:</label>
+    <select id="team" name="team">
+        <!-- Populate with teams from your data -->
+        <option value="team1">Team 1</option>
+        <option value="team2">Team 2</option>
+        <!-- Add more options as needed -->
+    </select>
+
+    <!-- Dropdown form for selecting year -->
+    <label for="year">Select Year:</label>
+    <select id="year" name="year">
+        <!-- Populate with years from your data -->
+        <option value="2022">2022</option>
+        <option value="2023">2023</option>
+        <!-- Add more options as needed -->
+    </select>
+
+    <button type="submit">Submit</button>
+</form>
+
+
 <h1>{{ team.team }} Roster - {{ team.year }}</h1>
 <h2>Record: {{ team.record }}</h2>
 
