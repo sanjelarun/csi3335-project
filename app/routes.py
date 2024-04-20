@@ -90,7 +90,7 @@ def before_request():
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    form = EditProfileForm()
+    form = EditProfileForm(current_user.username)
 
     teams = [('Team A', 'Team A'), ('Team B', 'Team B'), ('Team C', 'Team C')]
 
