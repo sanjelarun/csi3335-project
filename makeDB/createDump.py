@@ -1,17 +1,34 @@
 import csv
 
+def is_float(element: any) -> bool:
+    #If you expect None to be passed:
+    if element is None:
+        return False
+    try:
+        float(element)
+        return True
+    except ValueError:
+        return False
+
 
 def rowDump(tableName: str, columns : str, row : list[str]):
     first = True
-    rowStr = "INSERT INTO %s (%s) VALUES\n(" % (tableName, columns)
+
+    rowStr = "("
     for value in row:
+        if value == "":
+            value = "NULL"
+        if not value.isnumeric() and not is_float(value) and not value == "NULL":
+            rowStr = rowStr + "'"
         rowStr = rowStr + value
+        if not value.isnumeric() and not is_float(value) and not value == "NULL":
+            rowStr = rowStr + "'"
 
         rowStr = rowStr + ','
 
 
     rowStr = rowStr[:-1]
-    rowStr = rowStr + ');\n'
+    rowStr = rowStr + '),\n'
     return rowStr
 
 
@@ -30,13 +47,15 @@ def tableDump(tableName: str, columns : list[str], values : list[list[str]]) -> 
         columnNamesStr = columnNamesStr + value
         if count2 < numCols:
             columnNamesStr = columnNamesStr + ','
-
+    outStr += "INSERT INTO %s (%s) VALUES" % (tableName, columnNamesStr)
     for row in values:
         if numCols != len(row):
             print("Incorrect number of Columns")
             continue
         rowStr = rowDump(tableName, columnNamesStr, row)
-        outStr = outStr + rowStr
+        outStr += rowStr
+    outStr = outStr[:-2]
+    outStr += ";\n"
     return outStr
 
 
@@ -46,6 +65,7 @@ def CSVToDump(fileName : str,
               custom_headers : list[str] = None
 
               ) -> str:
+    fileName = "readyTables/" + fileName
     file = open(fileName, 'r')
     reader = csv.reader(file)
     #hoping this actually works
