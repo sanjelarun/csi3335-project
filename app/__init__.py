@@ -6,6 +6,7 @@ from flask_login import LoginManager
 from logging.handlers import RotatingFileHandler
 import os
 import logging
+
 from logging.handlers import SMTPHandler
 
 app = Flask(__name__)

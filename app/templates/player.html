@@ -59,5 +59,33 @@
     </tr>
 </table>
 {% endif %}
+
+{% if batting %}
+<h3>Batting Information</h3>
+<table>
+    <tr>
+        <th>Year</th>
+        <th>Games Played</th>
+        <th>At Bats</th>
+        <th>Runs</th>
+        <th>Hits</th>
+        <th>Home Runs</th>
+        <th>RBI</th>
+        <th>Team</th>
+    </tr>
+    {% for entry in batting %}
+    <tr>
+        <td>{{ entry.yearID }}</td>
+        <td>{{ entry.b_G }}</td>
+        <td>{{ entry.b_AB }}</td>
+        <td>{{ entry.b_R }}</td>
+        <td>{{ entry.b_H }}</td>
+        <td>{{ entry.b_HR }}</td>
+        <td>{{ entry.b_RBI }}</td>
+        <td>{{ entry.teamID }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
 </body>
 </html>
