@@ -71,8 +71,10 @@ def player_stats(player_id):
     # Find the player in the list based on the player_id parameter
     selected_player = next((player for player in players if player['player_id'] == player_id), None)
 
+    color = current_user.favorite_team;
+
     if selected_player:
-        return render_template('player.html', title=f"Player ID {player_id}'s Stats", user=user, player=selected_player, team=team)
+        return render_template('player.html', title=f"Player ID {player_id}'s Stats", color=color, user=user, player=selected_player, team=team)
     else:
         return "Player not found", 404
 
@@ -136,9 +138,10 @@ def before_request():
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
+
     form = EditProfileForm(current_user.username)
 
-    teams = [('Team A', 'Team A'), ('Team B', 'Team B'), ('Team C', 'Team C')]
+    teams = [('0', 'Team A'), ('1', 'Team B'), ('2', 'Team C')]
 
     form.favorite_team.choices = teams
 
