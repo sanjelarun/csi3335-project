@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% if title %}
-    <title>{{ title }} - Player Stats</title>
-    {% else %}
-    <title>Player Stats</title>
-    {% endif %}
+    <style>
+        /* Your CSS styles */
+    </style>
+    <script>
+        /* Your JavaScript for collapsible sections */
+    </script>
 </head>
 <body>
 <div>
     Helpful Links:
     <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
     <a href="{{ url_for('login') }}">Login</a>
 </div>
 <hr>
@@ -23,69 +25,105 @@
 </ul>
 {% endif %}
 {% endwith %}
-<h1>{{ player.Name }} Stats</h1>
-<h2>Position: {{ player.Position }}</h2>
 
-{% if player.BattingStats %}
-<h3>Batting Statistics</h3>
-<table>
-    <tr>
-        <th>Games Played</th>
-        <th>Slash Line</th>
-    </tr>
-    <tr>
-        <td>{{ player.BattingStats.GamesPlayed }}</td>
-        <td>{{ player.BattingStats.BattingAverage }} / {{ player.BattingStats.OnBasePercentage }} / {{ player.BattingStats.SluggingPercentage }}</td>
-    </tr>
-</table>
-{% endif %}
 
-{% if player.PitchingStats %}
-<h3>Pitching Statistics</h3>
-<table>
-    <tr>
-        <th>Games Pitched</th>
-        <th>Games Started</th>
-        <th>Innings Pitched</th>
-        <th>WHIP</th>
-        <th>Strikeouts/9</th>
-    </tr>
-    <tr>
-        <td>{{ player.PitchingStats.GamesPitched }}</td>
-        <td>{{ player.PitchingStats.GamesStarted }}</td>
-        <td>{{ player.PitchingStats.InningsPitched }}</td>
-        <td>{{ player.PitchingStats.WHIP }}</td>
-        <td>{{ player.PitchingStats.StrikeoutsPer9 }}</td>
-    </tr>
-</table>
-{% endif %}
+<div class="collapsible" onclick="toggleSection('battingStats')">Batting Statistics</div>
+<div id="battingStats" class="content">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Year</th>
+            <th>Games Played</th>
+            <th>AB</th>
+            <th>Runs</th>
+            <th>Hits</th>
+            <th>HR</th>
+            <th>RBI</th>
+            <th>Team</th>
+        </tr>
+        {% for player in batting %}
+        <tr>
+            <td>{{ player.name }}</td>
+            <td>{{ player.yearID }}</td>
+            <td>{{ player.b_G }}</td>
+            <td>{{ player.b_AB }}</td>
+            <td>{{ player.b_R }}</td>
+            <td>{{ player.b_H }}</td>
+            <td>{{ player.b_HR }}</td>
+            <td>{{ player.b_RBI }}</td>
+            <td>{{ player.teamID }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 
-{% if batting %}
-<h3>Batting Information</h3>
-<table>
-    <tr>
-        <th>Year</th>
-        <th>Games Played</th>
-        <th>At Bats</th>
-        <th>Runs</th>
-        <th>Hits</th>
-        <th>Home Runs</th>
-        <th>RBI</th>
-        <th>Team</th>
-    </tr>
-    {% for entry in batting %}
-    <tr>
-        <td>{{ entry.yearID }}</td>
-        <td>{{ entry.b_G }}</td>
-        <td>{{ entry.b_AB }}</td>
-        <td>{{ entry.b_R }}</td>
-        <td>{{ entry.b_H }}</td>
-        <td>{{ entry.b_HR }}</td>
-        <td>{{ entry.b_RBI }}</td>
-        <td>{{ entry.teamID }}</td>
-    </tr>
-    {% endfor %}
-</table>
-{% endif %}
+<div class="collapsible" onclick="toggleSection('pitchingStats')">Pitching Statistics</div>
+<div id="pitchingStats" class="content">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Year</th>
+            <th>Wins</th>
+            <th>Losses</th>
+            <th>Games</th>
+            <th>Games Started</th>
+            <th>Hits</th>
+            <th>HR</th>
+            <th>Saves</th>
+            <th>Strikeouts</th>
+            <th>Team</th>
+        </tr>
+        {% for pitcher in pitching %}
+        <tr>
+            <td>{{ pitcher.name }}</td>
+            <td>{{ pitcher.yearID }}</td>
+            <td>{{ pitcher.p_W }}</td>
+            <td>{{ pitcher.p_L }}</td>
+            <td>{{ pitcher.p_G }}</td>
+            <td>{{ pitcher.p_GS }}</td>
+            <td>{{ pitcher.p_H }}</td>
+            <td>{{ pitcher.p_HR }}</td>
+            <td>{{ pitcher.p_SV }}</td>
+            <td>{{ pitcher.p_SO }}</td>
+            <td>{{ pitcher.teamID }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="collapsible" onclick="toggleSection('fieldingStats')">Fielding Statistics</div>
+<div id="fieldingStats" class="content">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Year</th>
+            <th>Position</th>
+            <th>Games</th>
+            <th>Games Started</th>
+            <th>InnOuts</th>
+            <th>Putouts</th>
+            <th>Assists</th>
+            <th>Errors</th>
+            <th>Double Plays</th>
+            <th>Team</th>
+        </tr>
+        {% for fielder in fielding %}
+        <tr>
+            <td>{{ fielder.name }}</td>
+            <td>{{ fielder.yearID }}</td>
+            <td>{{ fielder.position }}</td>
+            <td>{{ fielder.f_G }}</td>
+            <td>{{ fielder.f_GS }}</td>
+            <td>{{ fielder.f_InnOuts }}</td>
+            <td>{{ fielder.f_PO }}</td>
+            <td>{{ fielder.f_A }}</td>
+            <td>{{ fielder.f_E }}</td>
+            <td>{{ fielder.f_DP }}</td>
+            <td>{{ fielder.teamID }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
 </body>
 </html>
