@@ -1,0 +1,706 @@
+descCREATE DATABASE IF NOT EXISTS `finalProj`;
+use finalProj;
+
+
+-- Table structure for table `leagues`
+--
+
+DROP TABLE IF EXISTS `leagues`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `leagues` (
+  `lgID` char(2) NOT NULL,
+  `league_name` varchar(50) NOT NULL,
+  `league_active` char(1) NOT NULL,
+  PRIMARY KEY (`lgID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+
+
+--
+-- Table structure for table `parks`
+--
+
+DROP TABLE IF EXISTS `parks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `parks` (
+  `parkID` varchar(255) NOT NULL,
+  `park_alias` varchar(255) DEFAULT NULL,
+  `park_name` varchar(255) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `state` varchar(255) DEFAULT NULL,
+  `country` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`parkID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+--
+-- Table structure for table `people`
+--
+
+DROP TABLE IF EXISTS `people`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `people` (
+  `playerID` varchar(9) NOT NULL,
+  `birthYear` int(12) DEFAULT NULL,
+  `birthMonth` int(12) DEFAULT NULL,
+  `birthDay` int(12) DEFAULT NULL,
+  `birthCountry` varchar(255) DEFAULT NULL,
+  `birthState` varchar(255) DEFAULT NULL,
+  `birthCity` varchar(255) DEFAULT NULL,
+  `deathYear` int(12) DEFAULT NULL,
+  `deathMonth` int(12) DEFAULT NULL,
+  `deathDay` int(12) DEFAULT NULL,
+  `deathCountry` varchar(255) DEFAULT NULL,
+  `deathState` varchar(255) DEFAULT NULL,
+  `deathCity` varchar(255) DEFAULT NULL,
+  `nameFirst` varchar(255) DEFAULT NULL,
+  `nameLast` varchar(255) DEFAULT NULL,
+  `nameGiven` varchar(255) DEFAULT NULL,
+  `weight` int(10) DEFAULT NULL,
+  `height` int(10) DEFAULT NULL,
+  `bats` varchar(255) DEFAULT NULL,
+  `throws` varchar(255) DEFAULT NULL,
+  `debutDate` date DEFAULT NULL,
+  `finalGameDate` date DEFAULT NULL,
+  PRIMARY KEY (`playerID`),
+  KEY `people_nameLast_nameFirst` (`nameLast`,`nameFirst`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `schools`
+--
+
+DROP TABLE IF EXISTS `schools`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `schools` (
+  `schoolId` varchar(15) NOT NULL,
+  `school_name` varchar(255) DEFAULT NULL,
+  `school_city` varchar(55) DEFAULT NULL,
+  `school_state` varchar(55) DEFAULT NULL,
+  `school_country` varchar(55) DEFAULT NULL,
+  PRIMARY KEY (`schoolId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `franchises`
+--
+
+DROP TABLE IF EXISTS `franchises`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `franchises` (
+  `franchID` varchar(3) NOT NULL,
+  `franchName` varchar(50) DEFAULT NULL,
+  `active` char(1) DEFAULT NULL,
+  `NAassoc` varchar(3) DEFAULT NULL,
+  PRIMARY KEY (`franchID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+Drop TABLE IF EXISTS 'users'
+
+-- PERHAPS have a userID instead of userName as PK
+
+CREATE TABLE users(
+	userName VARCHAR(50) NOT NULL,
+	passwordHash VARCHAR(200) NOT NULL,
+	firstName VARCHAR(50),
+	lastName VARCHAR(50),
+	email VARCHAR(50),
+	PRIMARY KEY(userName) 
+);
+
+
+DROP TABLE IF EXISTS `allstarfull`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `allstarfull` (
+  `allstarfull_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `lgID` char(2) NOT NULL,
+  `teamID` char(3) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `gameID` varchar(12) DEFAULT NULL,
+  `GP` smallint(6) DEFAULT NULL,
+  `startingPos` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`allstarfull_ID`),
+  KEY `lgID` (`lgID`),
+  KEY `allstarfull_playerID` (`playerID`),
+  CONSTRAINT `allstarfull_ibfk_1` FOREIGN KEY (`lgID`) REFERENCES `leagues` (`lgID`),
+  CONSTRAINT `allstarfull_ibfk_2` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=5486 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+--
+-- Table structure for table `appearances`
+--
+
+DROP TABLE IF EXISTS `appearances`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `appearances` (
+  `appearances_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `teamId` char(3) NOT NULL,
+  `G_all` smallint(6) DEFAULT NULL,
+  `GS` smallint(6) DEFAULT NULL,
+  `G_batting` smallint(6) DEFAULT NULL,
+  `G_defense` smallint(6) DEFAULT NULL,
+  `G_p` smallint(6) DEFAULT NULL,
+  `G_c` smallint(6) DEFAULT NULL,
+  `G_1b` smallint(6) DEFAULT NULL,
+  `G_2b` smallint(6) DEFAULT NULL,
+  `G_3b` smallint(6) DEFAULT NULL,
+  `G_ss` smallint(6) DEFAULT NULL,
+  `G_lf` smallint(6) DEFAULT NULL,
+  `G_cf` smallint(6) DEFAULT NULL,
+  `G_rf` smallint(6) DEFAULT NULL,
+  `G_of` smallint(6) DEFAULT NULL,
+  `G_dh` smallint(6) DEFAULT NULL,
+  `G_ph` smallint(6) DEFAULT NULL,
+  `G_pr` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`appearances_ID`),
+  KEY `k_app_team` (`teamId`),
+  KEY `appearances_playerID_yearID` (`playerID`,`yearID`),
+  CONSTRAINT `appearances_ibfk_1` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=112107 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `awards`
+--
+
+DROP TABLE IF EXISTS `awards`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `awards` (
+  `awards_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `awardID` varchar(255) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `playerID` varchar(9) NOT NULL,
+  `lgID` char(2) NOT NULL,
+  `tie` varchar(1) DEFAULT NULL,
+  `notes` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`awards_ID`),
+  KEY `fk_awd_peo` (`playerID`),
+  CONSTRAINT `fk_awd_peo` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6875 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+DROP TABLE IF EXISTS `awardsshare`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `awardsshare` (
+  `awardsshare_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `awardID` varchar(255) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `playerID` varchar(9) NOT NULL,
+  `lgID` char(2) NOT NULL,
+  `pointsWon` double DEFAULT NULL,
+  `pointsMax` smallint(6) DEFAULT NULL,
+  `votesFirst` double DEFAULT NULL,
+  PRIMARY KEY (`awardsshare_ID`),
+  KEY `fk_awdshr_peo` (`playerID`),
+  CONSTRAINT `fk_awdshr_peo` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=7305 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `batting`
+--
+
+DROP TABLE IF EXISTS `batting`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `batting` (
+  `batting_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `yearId` smallint(6) NOT NULL,
+  `teamID` char(3) NOT NULL,
+  `stint` smallint(4) NOT NULL,
+  `b_G` smallint(6) DEFAULT NULL,
+   b_G_batting smallint(6) DEFAULT NULL,
+  `b_AB` smallint(6) DEFAULT NULL,
+  `b_R` smallint(6) DEFAULT NULL,
+  `b_H` smallint(6) DEFAULT NULL,
+  `b_2B` smallint(6) DEFAULT NULL,
+  `b_3B` smallint(6) DEFAULT NULL,
+  `b_HR` smallint(6) DEFAULT NULL,
+  `b_RBI` smallint(6) DEFAULT NULL,
+  `b_SB` smallint(6) DEFAULT NULL,
+  `b_CS` smallint(6) DEFAULT NULL,
+  `b_BB` smallint(6) DEFAULT NULL,
+  `b_SO` smallint(6) DEFAULT NULL,
+  `b_IBB` smallint(6) DEFAULT NULL,
+  `b_HBP` smallint(6) DEFAULT NULL,
+  `b_SH` smallint(6) DEFAULT NULL,
+  `b_SF` smallint(6) DEFAULT NULL,
+  `b_GIDP` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`batting_ID`),
+  KEY `k_bat_team` (`teamID`),
+  KEY `batting_playerID_yearID_teamID` (`playerID`,`yearId`,`teamID`),
+  CONSTRAINT `batting_ibfk_1` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=112185 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+--
+-- Table structure for table `battingpost`
+--
+
+DROP TABLE IF EXISTS `battingpost`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `battingpost` (
+  `battingpost_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `yearId` smallint(6) NOT NULL,
+  `teamID` char(3) NOT NULL,
+  `round` varchar(10) NOT NULL,
+  `b_G` smallint(6) DEFAULT NULL,
+  `b_AB` smallint(6) DEFAULT NULL,
+  `b_R` smallint(6) DEFAULT NULL,
+  `b_H` smallint(6) DEFAULT NULL,
+  `b_2B` smallint(6) DEFAULT NULL,
+  `b_3B` smallint(6) DEFAULT NULL,
+  `b_HR` smallint(6) DEFAULT NULL,
+  `b_RBI` smallint(6) DEFAULT NULL,
+  `b_SB` smallint(6) DEFAULT NULL,
+  `b_CS` smallint(6) DEFAULT NULL,
+  `b_BB` smallint(6) DEFAULT NULL,
+  `b_SO` smallint(6) DEFAULT NULL,
+  `b_IBB` smallint(6) DEFAULT NULL,
+  `b_HBP` smallint(6) DEFAULT NULL,
+  `b_SH` smallint(6) DEFAULT NULL,
+  `b_SF` smallint(6) DEFAULT NULL,
+  `b_GIDP` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`battingpost_ID`),
+  KEY `k_bp_team` (`teamID`),
+  KEY `battingpost_playerID_yearID_teamID` (`playerID`,`yearId`,`teamID`),
+  CONSTRAINT `battingpost_ibfk_1` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=16375 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+
+--
+-- Table structure for table `collegeplaying`
+--
+
+DROP TABLE IF EXISTS `collegeplaying`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `collegeplaying` (
+  `collegeplaying_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `schoolID` varchar(15) DEFAULT NULL,
+  `yearID` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`collegeplaying_ID`),
+  KEY `schoolID` (`schoolID`),
+  KEY `playerID` (`playerID`),
+  CONSTRAINT `collegeplaying_ibfk_1` FOREIGN KEY (`schoolID`) REFERENCES `schools` (`schoolId`),
+  CONSTRAINT `collegeplaying_ibfk_2` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=17349 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+--
+-- Table structure for table `divisions`
+--
+
+DROP TABLE IF EXISTS `divisions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `divisions` (
+  `divisions_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `divID` char(2) NOT NULL,
+  `lgID` char(2) NOT NULL,
+  `division_name` varchar(50) NOT NULL,
+  `division_active` char(1) NOT NULL,
+  PRIMARY KEY (`divisions_ID`),
+  UNIQUE KEY `divID` (`divID`,`lgID`),
+  KEY `lgID` (`lgID`),
+  KEY `divisions_divID` (`divID`),
+  CONSTRAINT `divisions_ibfk_1` FOREIGN KEY (`lgID`) REFERENCES `leagues` (`lgID`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+-- Table structure for table `fielding`
+--
+
+DROP TABLE IF EXISTS `fielding`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fielding` (
+  `fielding_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `teamID` char(3) NOT NULL,
+  `stint` smallint(4) NOT NULL,
+  `position` varchar(2) DEFAULT NULL,
+  `f_G` smallint(6) DEFAULT NULL,
+  `f_GS` smallint(6) DEFAULT NULL,
+  `f_InnOuts` smallint(6) DEFAULT NULL,
+  `f_PO` smallint(6) DEFAULT NULL,
+  `f_A` smallint(6) DEFAULT NULL,
+  `f_E` smallint(6) DEFAULT NULL,
+  `f_DP` smallint(6) DEFAULT NULL,
+  `f_PB` smallint(6) DEFAULT NULL,
+  `f_WP` smallint(6) DEFAULT NULL,
+  `f_SB` smallint(6) DEFAULT NULL,
+  `f_CS` smallint(6) DEFAULT NULL,
+  `f_ZR` double DEFAULT NULL,
+  PRIMARY KEY (`fielding_ID`),
+  KEY `k_fie_team` (`teamID`),
+  KEY `fielding_playerID_yearID_teamID` (`playerID`,`yearID`,`teamID`),
+  CONSTRAINT `fielding_ibfk_1` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=165856 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+--
+-- Table structure for table `fieldingpost`
+--
+
+DROP TABLE IF EXISTS `fieldingpost`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fieldingpost` (
+  `fieldingpost_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `teamID` char(3) NOT NULL,
+  `round` varchar(10) NOT NULL,
+  `position` varchar(2) DEFAULT NULL,
+  `f_G` smallint(6) DEFAULT NULL,
+  `f_GS` smallint(6) DEFAULT NULL,
+  `f_InnOuts` smallint(6) DEFAULT NULL,
+  `f_PO` smallint(6) DEFAULT NULL,
+  `f_A` smallint(6) DEFAULT NULL,
+  `f_E` smallint(6) DEFAULT NULL,
+  `f_DP` smallint(6) DEFAULT NULL,
+  `f_TP` smallint(6) DEFAULT NULL,
+  `f_PB` smallint(6) DEFAULT NULL,
+   f_SB smallint(6) DEFAULT NULL,
+   f_CS smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`fieldingpost_ID`),
+  KEY `k_fp_team` (`teamID`),
+  KEY `fielding_playerID_yearID_teamID` (`playerID`,`yearID`,`teamID`),
+  CONSTRAINT `fieldingpost_ibfk_1` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=15541 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+
+
+
+--
+-- Table structure for table `halloffame`
+--
+
+DROP TABLE IF EXISTS `halloffame`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `halloffame` (
+  `halloffame_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `votedBy` varchar(64) NOT NULL,
+  `ballots` smallint(6) DEFAULT NULL,
+  `needed` smallint(6) DEFAULT NULL,
+  `votes` smallint(6) DEFAULT NULL,
+  `inducted` varchar(1) DEFAULT NULL,
+  `category` varchar(20) DEFAULT NULL,
+  `note` varchar(25) DEFAULT NULL,
+  PRIMARY KEY (`halloffame_ID`),
+  KEY `halloffame_playerID` (`playerID`),
+  CONSTRAINT `fk_people` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4324 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `homegames`
+--
+
+DROP TABLE IF EXISTS `homegames`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `homegames` (
+  `homegames_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `teamID` char(3) NOT NULL,
+  `parkID` varchar(255) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `firstGame` date DEFAULT NULL,
+  `lastGame` date DEFAULT NULL,
+  `games` int(11) DEFAULT NULL,
+  `openings` int(11) DEFAULT NULL,
+  `attendance` int(11) DEFAULT NULL,
+  PRIMARY KEY (`homegames_ID`),
+  KEY `k_hg_park` (`parkID`),
+  CONSTRAINT `homegames_ibfk_1` FOREIGN KEY (`parkID`) REFERENCES `parks` (`parkID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3227 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `managers`
+--
+
+DROP TABLE IF EXISTS `managers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `managers` (
+  `managers_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `teamID` char(3) NOT NULL,
+  `inSeason` smallint(6) NOT NULL,
+  `manager_G` smallint(6) DEFAULT NULL,
+  `manager_W` smallint(6) DEFAULT NULL,
+  `manager_L` smallint(6) DEFAULT NULL,
+  `teamRank` smallint(6) DEFAULT NULL,
+  `plyrMgr` varchar(1) DEFAULT NULL,
+  `half` smallint(6) DEFAULT NULL CHECK (`half` in (1,2)),
+  PRIMARY KEY (`managers_ID`),
+  KEY `fk_man_person` (`playerID`),
+  KEY `managers_playerID` (`playerID`),
+  CONSTRAINT `fk_man_person` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3812 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+
+
+--
+-- Table structure for table `pitching`
+--
+
+DROP TABLE IF EXISTS `pitching`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pitching` (
+  `pitching_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `teamID` char(3) NOT NULL,
+  `stint` smallint(4) NOT NULL,
+  `p_W` smallint(6) DEFAULT NULL,
+  `p_L` smallint(6) DEFAULT NULL,
+  `p_G` smallint(6) DEFAULT NULL,
+  `p_GS` smallint(6) DEFAULT NULL,
+  `p_CG` smallint(6) DEFAULT NULL,
+  `p_SHO` smallint(6) DEFAULT NULL,
+  `p_SV` smallint(6) DEFAULT NULL,
+  `p_IPOuts` int(11) DEFAULT NULL,
+  `p_H` smallint(6) DEFAULT NULL,
+  `p_ER` smallint(6) DEFAULT NULL,
+  `p_HR` smallint(6) DEFAULT NULL,
+  `p_BB` smallint(6) DEFAULT NULL,
+  `p_SO` smallint(6) DEFAULT NULL,
+  `p_BAOpp` double DEFAULT NULL,
+  `p_ERA` double DEFAULT NULL,
+  `p_IBB` smallint(6) DEFAULT NULL,
+  `p_WP` smallint(6) DEFAULT NULL,
+  `p_HBP` smallint(6) DEFAULT NULL,
+  `p_BK` smallint(6) DEFAULT NULL,
+  `p_BFP` smallint(6) DEFAULT NULL,
+  `p_GF` smallint(6) DEFAULT NULL,
+  `p_R` smallint(6) DEFAULT NULL,
+  `p_SH` smallint(6) DEFAULT NULL,
+  `p_SF` smallint(6) DEFAULT NULL,
+  `p_GIDP` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`pitching_ID`),
+  KEY `k_pit_team` (`teamID`),
+  KEY `pitching_playerID_yearID_teamID` (`playerID`,`yearID`,`teamID`),
+  CONSTRAINT `pitching_ibfk_1` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=50403 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `pitchingpost`
+--
+
+DROP TABLE IF EXISTS `pitchingpost`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pitchingpost` (
+  `pitchingpost_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `teamID` char(3) NOT NULL,
+  `round` varchar(10) NOT NULL,
+  `p_W` smallint(6) DEFAULT NULL,
+  `p_L` smallint(6) DEFAULT NULL,
+  `p_G` smallint(6) DEFAULT NULL,
+  `p_GS` smallint(6) DEFAULT NULL,
+  `p_CG` smallint(6) DEFAULT NULL,
+  `p_SHO` smallint(6) DEFAULT NULL,
+  `p_SV` smallint(6) DEFAULT NULL,
+  `p_IPOuts` int(11) DEFAULT NULL,
+  `p_H` smallint(6) DEFAULT NULL,
+  `p_ER` smallint(6) DEFAULT NULL,
+  `p_HR` smallint(6) DEFAULT NULL,
+  `p_BB` smallint(6) DEFAULT NULL,
+  `p_SO` smallint(6) DEFAULT NULL,
+  `p_BAOpp` double DEFAULT NULL,
+  `p_ERA` double DEFAULT NULL,
+  `p_IBB` smallint(6) DEFAULT NULL,
+  `p_WP` smallint(6) DEFAULT NULL,
+  `p_HBP` smallint(6) DEFAULT NULL,
+  `p_BK` smallint(6) DEFAULT NULL,
+  `p_BFP` smallint(6) DEFAULT NULL,
+  `p_GF` smallint(6) DEFAULT NULL,
+  `p_R` smallint(6) DEFAULT NULL,
+  `p_SH` smallint(6) DEFAULT NULL,
+  `p_SF` smallint(6) DEFAULT NULL,
+  `p_GIDP` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`pitchingpost_ID`),
+  KEY `k_pp_team` (`teamID`),
+  KEY `pitchingpost_playerID_yearID_teamID` (`playerID`,`yearID`,`teamID`),
+  CONSTRAINT `pitchingpost_ibfk_1` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6539 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `salaries`
+--
+
+DROP TABLE IF EXISTS `salaries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `salaries` (
+  `salaries_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `playerID` varchar(9) NOT NULL,
+  `yearId` smallint(6) NOT NULL,
+  `teamID` char(3) NOT NULL,
+  `salary` double DEFAULT NULL,
+  PRIMARY KEY (`salaries_ID`),
+  KEY `key_team` (`teamID`),
+  KEY `salaries_playerID` (`playerID`),
+  CONSTRAINT `salaries_ibfk_1` FOREIGN KEY (`playerID`) REFERENCES `people` (`playerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=26429 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+--
+-- Table structure for table `seriespost`
+--
+
+DROP TABLE IF EXISTS `seriespost`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `seriespost` (
+  `seriespost_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `teamIDwinner` char(3) NOT NULL,
+  `teamIDloser` char(3) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `round` varchar(5) NOT NULL,
+  `wins` smallint(6) DEFAULT NULL,
+  `losses` smallint(6) DEFAULT NULL,
+  `ties` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`seriespost_ID`),
+  KEY `k_sp_tw` (`teamIDwinner`),
+  KEY `k_sp_tl` (`teamIDloser`),
+  KEY `seriespost_teamIDwinner_teamIDloser_yearid` (`teamIDwinner`,`teamIDloser`,`yearID`)
+) ENGINE=InnoDB AUTO_INCREMENT=379 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+--
+-- Table structure for table `teams`
+--
+
+DROP TABLE IF EXISTS `teams`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `teams` (
+  `teams_ID` int(12) NOT NULL AUTO_INCREMENT,
+  `teamID` char(3) NOT NULL,
+  `yearID` smallint(6) NOT NULL,
+  `lgID` char(2) DEFAULT NULL,
+  `divID` char(1) DEFAULT NULL,
+  `franchID` varchar(3) DEFAULT NULL,
+  `team_name` varchar(50) DEFAULT NULL,
+  `team_rank` smallint(6) DEFAULT NULL,
+  `team_G` smallint(6) DEFAULT NULL,
+  `team_G_home` smallint(6) DEFAULT NULL,
+  `team_W` smallint(6) DEFAULT NULL,
+  `team_L` smallint(6) DEFAULT NULL,
+  `DivWin` varchar(1) DEFAULT NULL,
+  `WCWin` varchar(1) DEFAULT NULL,
+  `LgWin` varchar(1) DEFAULT NULL,
+  `WSWin` varchar(1) DEFAULT NULL,
+  `team_R` smallint(6) DEFAULT NULL,
+  `team_AB` smallint(6) DEFAULT NULL,
+  `team_H` smallint(6) DEFAULT NULL,
+  `team_2B` smallint(6) DEFAULT NULL,
+  `team_3B` smallint(6) DEFAULT NULL,
+  `team_HR` smallint(6) DEFAULT NULL,
+  `team_BB` smallint(6) DEFAULT NULL,
+  `team_SO` smallint(6) DEFAULT NULL,
+  `team_SB` smallint(6) DEFAULT NULL,
+  `team_CS` smallint(6) DEFAULT NULL,
+  `team_HBP` smallint(6) DEFAULT NULL,
+  `team_SF` smallint(6) DEFAULT NULL,
+  `team_RA` smallint(6) DEFAULT NULL,
+  `team_ER` smallint(6) DEFAULT NULL,
+  `team_ERA` double DEFAULT NULL,
+  `team_CG` smallint(6) DEFAULT NULL,
+  `team_SHO` smallint(6) DEFAULT NULL,
+  `team_SV` smallint(6) DEFAULT NULL,
+  `team_IPouts` int(11) DEFAULT NULL,
+  `team_HA` smallint(6) DEFAULT NULL,
+  `team_HRA` smallint(6) DEFAULT NULL,
+  `team_BBA` smallint(6) DEFAULT NULL,
+  `team_SOA` smallint(6) DEFAULT NULL,
+  `team_E` smallint(6) DEFAULT NULL,
+  `team_DP` smallint(6) DEFAULT NULL,
+  `team_FP` double DEFAULT NULL,
+  `park_name` varchar(50) DEFAULT NULL,
+  `team_attendance` int(11) DEFAULT NULL,
+  `team_BPF` smallint(6) DEFAULT NULL,
+  `team_PPF` smallint(6) DEFAULT NULL,
+  `team_projW` smallint(6) DEFAULT NULL,
+  `team_projL` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`teams_ID`),
+  KEY `franchID` (`franchID`),
+  KEY `lgID` (`lgID`),
+  KEY `teams_teamID_yearID` (`teamID`,`yearID`),
+  CONSTRAINT `teams_ibfk_1` FOREIGN KEY (`franchID`) REFERENCES `franchises` (`franchID`),
+  CONSTRAINT `teams_ibfk_2` FOREIGN KEY (`lgID`) REFERENCES `leagues` (`lgID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3016 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;

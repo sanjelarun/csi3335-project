@@ -35,7 +35,7 @@ class registry:
             print("Error in table Schema line (first line)")
             return
 
-        tableFile = open(dataList[0][0], 'r')
+        tableFile = open("readyTables/" + dataList[0][0], 'r')
         if tableFile.closed:
             print("Error could not open table schema file")
             return
@@ -75,10 +75,11 @@ class registry:
         if file.closed:
             print("An error occurred when trying to open/create the output file")
             return
-
+        #do this manually
         #file.write(self.tableSchema + '\n\n\n')
-
+        #file.write(self.tableSchema + '\n\n\n')
         for fileName in self.fileNames:
+            print("C\n")
             useCustomHeaders = False
             if fileName in self.customHeaders.keys():
                 useCustomHeaders = True
@@ -92,8 +93,7 @@ class registry:
             else:
                 file.write(createDump.CSVToDump(fileName, table_name=self.tableNames.get(fileName)) +'\n\n\n')
 
-
-
+        file.close()
 
 
 

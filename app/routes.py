@@ -12,6 +12,7 @@ from app import db
 from app.forms import RegistrationForm
 from datetime import datetime, timezone
 from app.forms import EditProfileForm
+from app.models import RequestLog
 
 @app.route('/')
 @app.route('/index')
@@ -135,7 +136,7 @@ def before_request():
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    form = EditProfileForm()
+    form = EditProfileForm(current_user.username)
 
     teams = [('Team A', 'Team A'), ('Team B', 'Team B'), ('Team C', 'Team C')]
 
@@ -154,3 +155,15 @@ def edit_profile():
         form.favorite_team.data = current_user.favorite_team
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
+
+
+
+def log_request(user_id, request_data):
+    # Create a new log entry
+    log_entry = RequestLog(user_id=user_id,
+                           timestamp=datetime.datetime.utcnow(),
+                           request_data=str(request_data))
+    # Add the log entry to the database session
+    db.session.add(log_entry)
+    # Commit the transaction to save the log entry
+    db.session.commit()
