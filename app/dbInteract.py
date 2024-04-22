@@ -8,10 +8,10 @@ from app import csi3335
 
 def getPlayerBattingInfo(playerID: str) -> list[dict[str,str]]:
     output : list[dict[str,str]] = []
-    engine = sqlalchemy.create_engine("mariadb+mariadbconnector://%s:%s@%s/%s" % (csi3335.mysql["user"], csi3335.mysql["password"], csi3335.mysql["location"], csi3335.mysql["database"]), echo=False)
+    engine = sqlalchemy.create_engine("mysql+pymysql://%s:%s@%s/%s" % (csi3335.mysql["user"], csi3335.mysql["password"], csi3335.mysql["location"], csi3335.mysql["database"]), echo=False)
     with engine.connect() as con:
         sqlQuery = text("SELECT nameFirst, nameLast,yearID, b_G, b_AB, b_R, b_H, b_HR, b_RBI, teamID"
-                        "FROM batting join PEOPLE USING(playerID) WHERE playerID = :player_ID ORDER BY yearID DESC, stint DESC")
+                        " FROM batting join PEOPLE USING(playerID) WHERE playerID = :player_ID ORDER BY yearID DESC, stint DESC")
         rs = con.execute(sqlQuery, {"player_ID" : playerID})
 
         for row in rs:
@@ -31,11 +31,11 @@ def getPlayerBattingInfo(playerID: str) -> list[dict[str,str]]:
 
 def getPlayerPitchingInfo(playerID: str) -> list[dict[str,str]]:
     output: list[dict[str,str]] = []
-    engine = sqlalchemy.create_engine("mariadb+mariadbconnector://%s:%s@%s/%s" % (csi3335.mysql["user"], csi3335.mysql["password"], csi3335.mysql["location"], csi3335.mysql["database"]), echo=False)
+    engine = sqlalchemy.create_engine("mysql+pymysql://%s:%s@%s/%s" % (csi3335.mysql["user"], csi3335.mysql["password"], csi3335.mysql["location"], csi3335.mysql["database"]), echo=False)
 
     with engine.connect() as con:
         sqlQuery = text("SELECT nameFirst, nameLast,yearID, teamID, p_W, p_L, p_G, p_GS, p_H, p_HR, p_SV, p_SO"
-                        "FROM pitching join PEOPLE USING(playerID) WHERE playerID = :player_ID ORDER BY yearID DESC, stint DESC")
+                        " FROM pitching join PEOPLE USING(playerID) WHERE playerID = :player_ID ORDER BY yearID DESC, stint DESC")
         rs = con.execute(sqlQuery, {"player_ID" : playerID})
 
         for row in rs:
@@ -57,12 +57,12 @@ def getPlayerPitchingInfo(playerID: str) -> list[dict[str,str]]:
 
 def getPlayerFieldingInfo(playerID: str) -> list[dict[str, str]]:
     output: list[dict[str, str]] = []
-    engine = sqlalchemy.create_engine("mariadb+mariadbconnector://%s:%s@%s/%s" % (
+    engine = sqlalchemy.create_engine("mysql+pymysql://%s:%s@%s/%s" % (
     csi3335.mysql["user"], csi3335.mysql["password"], csi3335.mysql["location"], csi3335.mysql["database"]), echo=False)
 
     with engine.connect() as con:
         sqlQuery = text("SELECT nameFirst, nameLast,yearID, teamID, position, f_G, f_GS, f_InnOuts, f_PO, f_A, f_E, f_DP"
-                        "FROM fielding join PEOPLE USING(playerID) WHERE playerID = :player_ID ORDER BY yearID DESC, stint DESC")
+                        " FROM fielding join PEOPLE USING(playerID) WHERE playerID = :player_ID ORDER BY yearID DESC, stint DESC")
         rs = con.execute(sqlQuery, {"player_ID": playerID})
 
         for row in rs:
@@ -81,3 +81,5 @@ def getPlayerFieldingInfo(playerID: str) -> list[dict[str, str]]:
 
             output.append(line)
         return output
+
+
