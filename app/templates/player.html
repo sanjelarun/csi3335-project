@@ -2,10 +2,135 @@
 <html lang="en">
 <head>
     <style>
-        /* Your CSS styles */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px; /* Add margin between tables */
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .collapsible::after {
+            content: '\002B'; /* Unicode for plus sign */
+            font-weight: bolder;
+            position: absolute;
+            right: 10px;
+        }
+
+        .collapsible.active::after {
+            content: '\2212'; /* Unicode for minus sign */
+            font-weight: bolder;
+        }
+        .content {
+            display: block; /* Change from display: none; to display: block; */
+            overflow: hidden;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px; /* Add margin between tables */
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+            cursor: pointer; /* Add cursor pointer for sortable columns */
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .collapsible::after {
+            content: '\002B'; /* Unicode for plus sign */
+            font-weight: bolder;
+            position: absolute;
+            right: 10px;
+        }
+
+        .collapsible.active::after {
+            content: '\2212'; /* Unicode for minus sign */
+            font-weight: bolder;
+        }
+        .content {
+            display: block; /* Change from display: none; to display: block; */
+            overflow: hidden;
+        }
     </style>
     <script>
-        /* Your JavaScript for collapsible sections */
+        function toggleSection(sectionId) {
+            var section = document.getElementById(sectionId);
+            if (section.style.display === "none") {
+                section.style.display = "block";
+                section.classList.add('active');
+            } else {
+                section.style.display = "none";
+                section.classList.remove('active');
+            }
+        }
+
+        // Function to handle column sorting with ascending and descending order
+        function sortTable(tableId, columnIndex) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchCount = 0;
+            table = document.getElementById(tableId);
+            switching = true;
+            dir = "asc"; // Set initial sorting direction to ascending
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < rows.length - 1; i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("td")[columnIndex];
+                    y = rows[i + 1].getElementsByTagName("td")[columnIndex];
+                    if (dir === "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch= true;
+                            break;
+                        }
+                    } else if (dir === "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch= true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchCount++;
+                } else {
+                    if (switchCount === 0 && dir === "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
     </script>
 </head>
 <body>
@@ -29,17 +154,17 @@
 
 <div class="collapsible" onclick="toggleSection('battingStats')">Batting Statistics</div>
 <div id="battingStats" class="content">
-    <table>
+    <table id="battingTable">
         <tr>
-            <th>Name</th>
-            <th>Year</th>
-            <th>Games Played</th>
-            <th>AB</th>
-            <th>Runs</th>
-            <th>Hits</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>Team</th>
+            <th onclick="sortTable('battingTable', 0)">Name</th>
+            <th onclick="sortTable('battingTable', 1)">Year</th>
+            <th onclick="sortTable('battingTable', 2)">Games Played</th>
+            <th onclick="sortTable('battingTable', 3)">AB</th>
+            <th onclick="sortTable('battingTable', 4)">Runs</th>
+            <th onclick="sortTable('battingTable', 5)">Hits</th>
+            <th onclick="sortTable('battingTable', 6)">HR</th>
+            <th onclick="sortTable('battingTable', 7)">RBI</th>
+            <th onclick="sortTable('battingTable', 8)">Team</th>
         </tr>
         {% for player in batting %}
         <tr>
