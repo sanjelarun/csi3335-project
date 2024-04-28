@@ -1,5 +1,3 @@
-from sqlalchemy.dialects.mysql import pymysql
-
 from app import app
 from app.dbInteract import getPlayerBattingInfo, getPlayerFieldingInfo, getPlayerPitchingInfo
 from app.forms import LoginForm
@@ -17,11 +15,6 @@ from datetime import datetime, timezone
 from app.forms import EditProfileForm
 from app.models import RequestLog
 
-#import sys
-#sys.path.append('/config.py')
-import config
-from config import Config
-
 @app.route('/')
 @app.route('/index')
 @login_required
@@ -37,37 +30,6 @@ def index():
         }
     ]
     return render_template('index.html', title='Home', posts=posts)
-
-
-@app.route('roster2/')
-@login_required
-def rosterBackend(current_user,team,year):
-
-    #int(year) put to ensure it is interpreted as integer
-    params = [team, int(year)]
-    try:
-        # connect to db
-        con = pymysql.connect(**Config.MYSQL_DETAILS)
-        print("Connected!")
-
-        # create cursor for sql execution
-        cur = con.cursor()
-
-        # query to execute
-        sql = '''SELECT CONCAT(nameFirst,' ',nameLast) as Name, p_GS as starts,(p_IPouts / 3) as IP, ( (p_BB + p_H) / (p_IPouts / 3)) as WHIP , ((p_SO * 9) / (p_IPouts / 3)) as SOP9 FROM Pitching pi JOIN People pe USING(playerID) JOIN Fielding f USING(playerID,yearID,teamID) WHERE position = 'P' AND teamId = %s AND yearId = %d;'''
-        cur.execute(sql, params)
-        pitching = cur.fetchall()
-
-        sql = '''
-SELECT CONCAT(nameFirst,' ',nameLast) as Name, position, teamID as Team, (b_H/b_AB) as batAvg, (b_H + b_BB + b_HBP) / (b_AB + b_BB + b_HBP + b_SF) as OBP, ((b_H - b_2B - b_3B - b_HR) + (b_2B * 2) + (b_3B * 3) + (b_HR * 4)) / b_AB as slugPct FROM Batting b JOIN People p USING(playerID) JOIN Fielding f USING(playerID,yearID,teamID)  WHERE position != 'P' AND teamId =  %s AND yearID = %d  GROUP BY position, Name, Team, batAvg, OBP, slugPCT;'''
-        cur.execute(sql, params)
-        batting = cur.fetchall()
-
-    except pymysql.Error as e:
-        print(f"ERROR: Database not connected: {e}")
-    finally:
-        con.close()
-    return render_template('spencer.html', title ='WHATEVER YOU WANT', team=params[0], year = params[1], pitching = pitching, batting = batting)
 
 @app.route('/roster')
 @login_required
@@ -199,7 +161,6 @@ def edit_profile():
         form.favorite_team.data = current_user.favorite_team
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
-
 
 
 
