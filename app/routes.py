@@ -37,7 +37,7 @@ def index():
 def roster(teamid, yearid):
     team_info = getTeamInfo(teamid, yearid)
     battingRoster = getBattingInfoByTeamIDandYearID(teamid, yearid)
-    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster,yearid=yearid)
+    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster, yearid=yearid)
 
 @app.route('/player/<player_id>')
 @login_required

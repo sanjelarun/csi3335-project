@@ -16,7 +16,6 @@
                 <li><a href="{{ url_for('login') }}">Login</a></li>
             {% else %}
                 <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
-                <li><a href="{{ url_for('roster') }}">Roster</a></li>
                 {% if current_user.is_admin %}
                     <li><a href="{{ url_for('admin_request_logs') }}">Admin Request Logs</a></li>
                 {% endif %}
