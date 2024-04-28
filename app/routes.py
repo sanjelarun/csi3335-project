@@ -1,19 +1,22 @@
-from app import app
-from app.dbInteract import *
-from app.forms import LoginForm
-from flask import render_template, flash, redirect, url_for
-from flask_login import current_user, login_user
-import sqlalchemy as sa
-from app.models import User
-from flask_login import logout_user
-from flask_login import login_required
-from flask import request
-from urllib.parse import urlsplit
-from app import db
-from app.forms import RegistrationForm
 from datetime import datetime, timezone
+from urllib.parse import urlsplit
+
+import sqlalchemy as sa
+from flask import render_template, flash, redirect, url_for
+from flask import request
+from flask_login import current_user, login_user
+from flask_login import login_required
+from flask_login import logout_user
+
+from app import app
+from app import db
+from app.dbInteract import *
 from app.forms import EditProfileForm
+from app.forms import LoginForm
+from app.forms import RegistrationForm
 from app.models import RequestLog
+from app.models import User
+
 
 @app.route('/')
 @app.route('/index')
@@ -31,15 +34,15 @@ def index():
     ]
     return render_template('index.html', title='Home', posts=posts)
 
+
 @app.route('/roster/<teamid>/<yearid>')
 @login_required
 def roster(teamid, yearid):
-    # teamid = "ALT"
-    # yearid = int(1884)
-
     team_info = getTeamInfo(teamid, yearid)
     battingRoster = getBattingInfoByTeamIDandYearID(teamid, yearid)
-    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster, yearid=yearid)
+    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster,
+                           yearid=yearid)
+
 
 @app.route('/player/<player_id>')
 @login_required
@@ -49,7 +52,8 @@ def player_stats(player_id):
     batting_info = getPlayerBattingInfo(player_id)
     pitching_info = getPlayerPitchingInfo(player_id)
     fielding_info = getPlayerFieldingInfo(player_id)
-    return render_template('player.html', player_id=player_id, batting=batting_info, pitching=pitching_info, fielding=fielding_info, player=player_name)
+    return render_template('player.html', player_id=player_id, batting=batting_info, pitching=pitching_info,
+                           fielding=fielding_info, player=player_name)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -109,10 +113,10 @@ def before_request():
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
 
+
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-
     form = EditProfileForm(current_user.username)
 
     teams = [('0', 'Team A'), ('1', 'Team B'), ('2', 'Team C')]
@@ -132,7 +136,6 @@ def edit_profile():
         form.favorite_team.data = current_user.favorite_team
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
-
 
 
 def log_request(user_id, request_data):
