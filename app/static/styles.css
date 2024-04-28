@@ -1,0 +1,109 @@
+/* styles.css */
+
+.header {
+    padding: 20px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+}
+
+.helpful-links {
+    margin-bottom: 20px;
+}
+
+.helpful-links p {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.helpful-links ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.helpful-links ul li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.helpful-links ul li:last-child {
+    margin-right: 0;
+}
+
+.helpful-links a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.helpful-links a:hover {
+    text-decoration: underline;
+}
+
+/* Additional styles for table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+
+body {
+    font-family: Arial, sans-serif; /* Define a font family */
+    font-size: 16px; /* Define a font size */
+    color: #333; /* Define a text color */
+}
+
+/* Apply consistent styles to all links */
+a {
+    color: #007bff; /* Define link color */
+    text-decoration: none; /* Remove default underline */
+}
+
+/* Apply consistent styles to headings */
+h1, h2 {
+    font-size: 24px; /* Define heading font size */
+    color: #333; /* Define heading color */
+}
+
+/* Apply consistent styles to labels */
+label {
+    font-weight: bold; /* Make labels bold */
+}
+
+/* Apply consistent styles to form input fields */
+input[type="text"] {
+    padding: 8px; /* Add padding */
+    border: 1px solid #ccc; /* Add border */
+    border-radius: 4px; /* Add border radius */
+}
+
+/* Apply consistent styles to buttons */
+button {
+    padding: 8px 16px; /* Add padding */
+    background-color: #007bff; /* Define button background color */
+    color: #fff; /* Define button text color */
+    border: none; /* Remove button border */
+    border-radius: 4px; /* Add border radius */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+/* Apply consistent styles to table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+}

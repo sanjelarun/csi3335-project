@@ -89,6 +89,7 @@ def login():
 
 @app.route('/logout')
 def logout():
+
     logout_user()
     return redirect(url_for('index'))
 
@@ -103,6 +104,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
@@ -116,15 +118,15 @@ def user(username):
     return render_template('user.html', user=user)
 
 
-@app.before_request
-def before_request():
-    # Check if the current request is for logging SQL queries
-    if request.endpoint == 'log_sql_queries':
-        return
-
-    if current_user.is_authenticated:
-        current_user.last_seen = datetime.now(timezone.utc)
-        db.session.commit()
+# @app.before_request
+# def before_request():
+#     # Check if the current request is for logging SQL queries
+#     if request.endpoint == 'log_sql_queries':
+#         return
+#
+#     if current_user.is_authenticated:
+#         current_user.last_seen = datetime.now(timezone.utc)
+#         db.session.commit()
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -168,6 +170,9 @@ def admin_request_logs():
         select_query = sa.select(RequestLog)
         user_id_exists = False
 
+    # Log the query
+    log_sql_queries(select_query, current_user)
+
     result = db.session.execute(select_query)
     request_logs = []
 
@@ -180,35 +185,23 @@ def admin_request_logs():
     return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id,
                            user_id_exists=user_id_exists)
 
-    # # Render the template with the request logs
-    # return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id)
-
-
-# def log_request(user_id, request_data):
-#     # Create a new log entry
-#     log_entry = RequestLog(user_id=user_id,
-#                            timestamp=datetime.datetime.utcnow(),
-#                            request_data=str(request_data))
-#     # Add the log entry to the database session
-#     db.session.add(log_entry)
-#     # Commit the transaction to save the log entry
-#     db.session.commit()
-
 @app.before_request
 def log_request():
-    # Check if the current request is for logging SQL queries
-    if request.endpoint == 'log_sql_queries':
+    # Check if the current request is for logging SQL queries or during logout
+    if request.endpoint == 'log_sql_queries' or request.endpoint == 'logout' or request.endpoint == 'login' or request.endpoint == 'index' or request.endpoint == 'register':
         return
 
     # Retrieve user_id if the user is authenticated
     user_id = current_user.id if current_user.is_authenticated else None
+
+    current_user.last_seen = datetime.now(timezone.utc)
 
     # Construct the request data string
     request_data = (
         f"Method: {request.method}\n"
         f"Path: {request.path}\n"
         f"Args: {request.args}\n"
-        f"Form: {request.form}\n"
+        # f"Form: {request.form}\n"
         f"Headers: {dict(request.headers)}\n"
         f"Remote Addr: {request.remote_addr}\n"
     )
@@ -228,14 +221,26 @@ def log_request():
 
 # Define a function to log SQL queries
 def log_sql_queries(sql, current_user):
-    # Retrieve user_id if the user is authenticated
-    user_id = current_user.id if current_user.is_authenticated else None
+    # List of endpoints where user_id should not be extracted
+    excluded_endpoints = ['log_sql_queries'] #, 'logout', 'login', 'index', 'register']
+
+    # Check if the current request is for logging SQL queries or excluded endpoints
+    if request.endpoint in excluded_endpoints:
+        return
+
+    # Set user_id to None by default
+    user_id = None
+
+    # Set user_id for authenticated users
+    if current_user.is_authenticated:
+        user_id = current_user.id
+
 
     # Construct the request data string
     request_data = (
         f"Method: {request.method}\n"
         f"Path: {request.path}\n"
-        # f"Args: {request.args}\n"
+        f"Args: {request.args}\n"
         # f"Form: {request.form}\n"
         # f"Headers: {dict(request.headers)}\n"
         # f"Remote Addr: {request.remote_addr}\n"
@@ -257,4 +262,10 @@ def log_sql_queries(sql, current_user):
 # Register the event listener to log SQL queries
 @event.listens_for(Engine, "before_cursor_execute", once=True)
 def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-    log_sql_queries(statement, current_user)
+    if request.method == 'GET':
+        log_sql_queries(statement, current_user)
+
+@event.listens_for(Engine, "after_cursor_execute", once=True)
+def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    if request.method == 'POST':
+        log_sql_queries(statement, current_user)

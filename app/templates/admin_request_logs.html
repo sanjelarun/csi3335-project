@@ -4,88 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request Logs</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif; /* Define a font family */
-            font-size: 16px; /* Define a font size */
-            color: #333; /* Define a text color */
-        }
-
-        /* Apply consistent styles to all links */
-        a {
-            color: #007bff; /* Define link color */
-            text-decoration: none; /* Remove default underline */
-        }
-
-        /* Apply consistent styles to headings */
-        h1, h2 {
-            font-size: 24px; /* Define heading font size */
-            color: #333; /* Define heading color */
-        }
-
-        /* Apply consistent styles to labels */
-        label {
-            font-weight: bold; /* Make labels bold */
-        }
-
-        /* Apply consistent styles to form input fields */
-        input[type="text"] {
-            padding: 8px; /* Add padding */
-            border: 1px solid #ccc; /* Add border */
-            border-radius: 4px; /* Add border radius */
-        }
-
-        /* Apply consistent styles to buttons */
-        button {
-            padding: 8px 16px; /* Add padding */
-            background-color: #007bff; /* Define button background color */
-            color: #fff; /* Define button text color */
-            border: none; /* Remove button border */
-            border-radius: 4px; /* Add border radius */
-            cursor: pointer; /* Change cursor to pointer on hover */
-        }
-
-        /* Apply consistent styles to table */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid #ddd;
-        }
-
-        /* Apply consistent styles to table headers */
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        /* Apply consistent styles to table header */
-        th {
-            background-color: #f2f2f2;
-        }
-
-        /* Apply consistent styles to table rows on hover */
-        tbody tr:hover {
-            background-color: #f5f5f5;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
 </head>
 <body>
     <h1>Admin Request Logs</h1>
 
-    <div>
-        Helpful Links:
-        <a href="{{ url_for('index') }}">Home</a>
-        {% if current_user.is_anonymous %}
-            <a href="{{ url_for('login') }}">Login</a>
-        {% else %}
-            <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
-            <a href="{{ url_for('roster') }}">Roster</a>
-        {% if current_user.is_admin %}
-            <a href="{{ url_for('admin_request_logs') }}">Admin Request Logs</a>
-        {% endif %}
-            <a href="{{ url_for('logout') }}">Logout</a>
-        {% endif %}
+    <div class="helpful-links">
+        <p>Helpful Links:</p>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            {% if current_user.is_anonymous %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            {% else %}
+                <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
+                <li><a href="{{ url_for('roster') }}">Roster</a></li>
+                {% if current_user.is_admin %}
+                    <li><a href="{{ url_for('admin_request_logs') }}">Admin Request Logs</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% endif %}
+        </ul>
     </div>
 
     <!-- Divider -->
@@ -106,27 +44,6 @@
         <!-- Display the total number of requests -->
         <p>Total requests: {{ request_logs|length }}</p>
 
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        tbody tr:hover {
-            background-color: #f5f5f5;
-        }
-    </style>
 
         <table>
             <thead>
