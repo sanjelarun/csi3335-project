@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
     <style>
         table {
             border-collapse: collapse;
@@ -62,12 +63,20 @@
     {% endif %}
 </head>
 <body>
-<div>
-    Helpful Links:
-    <a href="{{ url_for('index') }}">Home</a>
-    <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
-    <a href="{{ url_for('login') }}">Login</a>
-</div>
+        <div>
+            Helpful Links:
+            <a href="{{ url_for('index') }}">Home</a>
+            {% if current_user.is_anonymous %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% else %}
+                <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
+                <a href="{{ url_for('roster') }}">Roster</a>
+                {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin_request_logs') }}">Admin Request Logs</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% endif %}
+        </div>
 <hr>
 {% with messages = get_flashed_messages() %}
 {% if messages %}
