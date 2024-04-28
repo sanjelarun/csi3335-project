@@ -1,5 +1,5 @@
 from app import app
-from app.dbInteract import getPlayerBattingInfo, getPlayerFieldingInfo, getPlayerPitchingInfo
+from app.dbInteract import *
 from app.forms import LoginForm
 from flask import render_template, flash, redirect, url_for
 from flask_login import current_user, login_user
@@ -34,52 +34,23 @@ def index():
 @app.route('/roster')
 @login_required
 def roster():
-    user = {'username': 'Spencer'}
-    players = [
-        {'Name': 'John Doe', 'Position': 'Catcher', 'GamesPlayed': 50, 'BattingAverage': 0.300, 'OnBasePercentage': 0.400, 'SluggingPercentage': 0.500},
-        {'Name': 'Jane Smith', 'Position': 'Shortstop', 'GamesPlayed': 45, 'BattingAverage': 0.280, 'OnBasePercentage': 0.350, 'SluggingPercentage': 0.450},
-        {'Name': 'Mike Johnson', 'Position': 'Outfielder', 'GamesPlayed': 55, 'BattingAverage': 0.320, 'OnBasePercentage': 0.420, 'SluggingPercentage': 0.550}
-    ]
-    pitchers = [
-        {'Name': 'Jake Anderson', 'GamesPitched': 30, 'GamesStarted': 25, 'InningsPitched': 150, 'WHIP': 1.20, 'StrikeoutsPer9': 8.5},
-        {'Name': 'Sarah Brown', 'GamesPitched': 35, 'GamesStarted': 30, 'InningsPitched': 170, 'WHIP': 1.15, 'StrikeoutsPer9': 9.0}
-    ]
-    team ={
-            'team': 'New York Yankees',
-            'record': '72-9',
-            'year': '2020'
-        }
-    return render_template('roster.html', title='Roster', user=user, players=players, pitchers=pitchers, team=team)
+    teamid = "ALT"
+    yearid = int(1884)
 
-@app.route('/player/<int:player_id>')
+    team_info = getTeamInfo(teamid, yearid)
+    battingRoster = getBattingInfoByTeamIDandYearID(teamid, yearid)
+    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster)
+
+@app.route('/player/<player_id>')
 @login_required
 def player_stats(player_id):
+    # player_id="aardsda01"
 
-    # players = [
-    #     {'player_id': 1, 'Name': 'John', 'Position': 'Catcher', 'GamesPlayed': 50, 'BattingAverage': 0.300, 'OnBasePercentage': 0.400, 'SluggingPercentage': 0.500},
-    #     {'player_id': 2, 'Name': 'Jane Smith', 'Position': 'Shortstop', 'GamesPlayed': 45, 'BattingAverage': 0.280, 'OnBasePercentage': 0.350, 'SluggingPercentage': 0.450},
-    #     {'player_id': 3, 'Name': 'Mike Johnson', 'Position': 'Outfielder', 'GamesPlayed': 55, 'BattingAverage': 0.320, 'OnBasePercentage': 0.420, 'SluggingPercentage': 0.550}
-    # ]
-
-    # Fetch player info based on player_id
-    # selected_player = next((player for player in players if player['player_id'] == player_id), None)
-
-    # if selected_player:
-    player_id="aardsda01"
-
-        # Call getPlayerBattingInfo to get batting data
-    batting_info = getPlayerBattingInfo(str(player_id))
-    # Fetch batting, pitching, and fielding info for the player
-    batting_info = getPlayerBattingInfo(str(player_id))
-    pitching_info = getPlayerPitchingInfo(str(player_id))
-    fielding_info = getPlayerFieldingInfo(str(player_id))
-# Render the template with player and info
+    batting_info = getPlayerBattingInfo(player_id)
+    pitching_info = getPlayerPitchingInfo(player_id)
+    fielding_info = getPlayerFieldingInfo(player_id)
     return render_template('player.html', player_id=player_id, batting=batting_info, pitching=pitching_info, fielding=fielding_info)
 
-        # Render the template with player and batting info
-        # return render_template('player.html', info=batting_info)
-    # else:
-    #     return "Player not found", 404
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
