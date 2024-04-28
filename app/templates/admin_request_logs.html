@@ -5,7 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request Logs</title>
     <style>
-        /* Your CSS styles here */
+        body {
+            font-family: Arial, sans-serif; /* Define a font family */
+            font-size: 16px; /* Define a font size */
+            color: #333; /* Define a text color */
+        }
+
+        /* Apply consistent styles to all links */
+        a {
+            color: #007bff; /* Define link color */
+            text-decoration: none; /* Remove default underline */
+        }
+
+        /* Apply consistent styles to headings */
+        h1, h2 {
+            font-size: 24px; /* Define heading font size */
+            color: #333; /* Define heading color */
+        }
+
+        /* Apply consistent styles to labels */
+        label {
+            font-weight: bold; /* Make labels bold */
+        }
+
+        /* Apply consistent styles to form input fields */
+        input[type="text"] {
+            padding: 8px; /* Add padding */
+            border: 1px solid #ccc; /* Add border */
+            border-radius: 4px; /* Add border radius */
+        }
+
+        /* Apply consistent styles to buttons */
+        button {
+            padding: 8px 16px; /* Add padding */
+            background-color: #007bff; /* Define button background color */
+            color: #fff; /* Define button text color */
+            border: none; /* Remove button border */
+            border-radius: 4px; /* Add border radius */
+            cursor: pointer; /* Change cursor to pointer on hover */
+        }
+
+        /* Apply consistent styles to table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+
+        /* Apply consistent styles to table headers */
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Apply consistent styles to table header */
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Apply consistent styles to table rows on hover */
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
     </style>
 </head>
 <body>
@@ -44,6 +106,28 @@
         <!-- Display the total number of requests -->
         <p>Total requests: {{ request_logs|length }}</p>
 
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+
         <table>
             <thead>
                 <tr>
@@ -59,7 +143,7 @@
                     <td>{{ log.id }}</td>
                     <td>{{ log.user_id }}</td>
                     <td>{{ log.timestamp }}</td>
-                    <td>{{ log.request_data }}</td>
+                    <td><pre>{{ log.request_data }}</pre></td>
                 </tr>
                 {% endfor %}
             </tbody>

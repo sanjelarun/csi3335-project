@@ -13,6 +13,8 @@ from app.forms import RegistrationForm
 from datetime import datetime, timezone
 from app.forms import EditProfileForm
 from app.models import RequestLog
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 
 @app.route('/')
 @app.route('/index')
@@ -116,6 +118,10 @@ def user(username):
 
 @app.before_request
 def before_request():
+    # Check if the current request is for logging SQL queries
+    if request.endpoint == 'log_sql_queries':
+        return
+
     if current_user.is_authenticated:
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
@@ -156,9 +162,11 @@ def admin_request_logs():
     if user_id:
         # Fetch request logs for a specific user_id
         select_query = sa.select(RequestLog).where(RequestLog.user_id == user_id)
+        user_id_exists = True
     else:
         # Fetch all request logs from the database if user_id is not provided
         select_query = sa.select(RequestLog)
+        user_id_exists = False
 
     result = db.session.execute(select_query)
     request_logs = []
@@ -166,19 +174,14 @@ def admin_request_logs():
     for row in result:
         # Extract the first element of the tuple (which is a RequestLog instance)
         request_log = row[0]
-        if request_log is not None and request_log.user_id is not None:
-            user_id_exists = True
-        else:
-            user_id_exists = False
-            break
         request_logs.append(request_log)
 
     # Render the template with the request logs and user_id_exists flag
     return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id,
                            user_id_exists=user_id_exists)
 
-    # Render the template with the request logs
-    return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id)
+    # # Render the template with the request logs
+    # return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id)
 
 
 # def log_request(user_id, request_data):
@@ -193,6 +196,10 @@ def admin_request_logs():
 
 @app.before_request
 def log_request():
+    # Check if the current request is for logging SQL queries
+    if request.endpoint == 'log_sql_queries':
+        return
+
     # Retrieve user_id if the user is authenticated
     user_id = current_user.id if current_user.is_authenticated else None
 
@@ -213,3 +220,41 @@ def log_request():
     db.session.add(log_entry)
     # Commit the transaction to save the log entry
     db.session.commit()
+
+
+
+
+
+
+# Define a function to log SQL queries
+def log_sql_queries(sql, current_user):
+    # Retrieve user_id if the user is authenticated
+    user_id = current_user.id if current_user.is_authenticated else None
+
+    # Construct the request data string
+    request_data = (
+        f"Method: {request.method}\n"
+        f"Path: {request.path}\n"
+        # f"Args: {request.args}\n"
+        # f"Form: {request.form}\n"
+        # f"Headers: {dict(request.headers)}\n"
+        # f"Remote Addr: {request.remote_addr}\n"
+        f"SQL Query: {sql}\n"
+    )
+
+    # Log the request
+    log_entry = RequestLog(user_id=user_id,
+                           timestamp=datetime.now(timezone.utc),
+                           request_data=request_data)
+
+    # Add the log entry to the database session
+    db.session.add(log_entry)
+    # Commit the transaction to save the log entry
+    db.session.commit()
+
+
+
+# Register the event listener to log SQL queries
+@event.listens_for(Engine, "before_cursor_execute", once=True)
+def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    log_sql_queries(statement, current_user)
