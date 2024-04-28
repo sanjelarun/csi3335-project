@@ -1,16 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% if title %}
-    <title>{{ title }} - Player Stats</title>
-    {% else %}
-    <title>Player Stats</title>
-    {% endif %}
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px; /* Add margin between tables */
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .collapsible::after {
+            content: '\002B'; /* Unicode for plus sign */
+            font-weight: bolder;
+            position: absolute;
+            right: 10px;
+        }
+
+        .collapsible.active::after {
+            content: '\2212'; /* Unicode for minus sign */
+            font-weight: bolder;
+        }
+        .content {
+            display: block; /* Change from display: none; to display: block; */
+            overflow: hidden;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px; /* Add margin between tables */
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+            cursor: pointer; /* Add cursor pointer for sortable columns */
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .collapsible::after {
+            content: '\002B'; /* Unicode for plus sign */
+            font-weight: bolder;
+            position: absolute;
+            right: 10px;
+        }
+
+        .collapsible.active::after {
+            content: '\2212'; /* Unicode for minus sign */
+            font-weight: bolder;
+        }
+        .content {
+            display: block; /* Change from display: none; to display: block; */
+            overflow: hidden;
+        }
+    </style>
+    <script>
+        function toggleSection(sectionId) {
+            var section = document.getElementById(sectionId);
+            if (section.style.display === "none") {
+                section.style.display = "block";
+                section.classList.add('active');
+            } else {
+                section.style.display = "none";
+                section.classList.remove('active');
+            }
+        }
+
+        // Function to handle column sorting with ascending and descending order
+        function sortTable(tableId, columnIndex) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchCount = 0;
+            table = document.getElementById(tableId);
+            switching = true;
+            dir = "asc"; // Set initial sorting direction to ascending
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < rows.length - 1; i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("td")[columnIndex];
+                    y = rows[i + 1].getElementsByTagName("td")[columnIndex];
+                    if (dir === "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch= true;
+                            break;
+                        }
+                    } else if (dir === "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch= true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchCount++;
+                } else {
+                    if (switchCount === 0 && dir === "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body>
 <div>
     Helpful Links:
     <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
     <a href="{{ url_for('login') }}">Login</a>
 </div>
 <hr>
@@ -23,41 +150,105 @@
 </ul>
 {% endif %}
 {% endwith %}
-<h1>{{ player.Name }} Stats</h1>
-<h2>Position: {{ player.Position }}</h2>
 
-{% if player.BattingStats %}
-<h3>Batting Statistics</h3>
-<table>
-    <tr>
-        <th>Games Played</th>
-        <th>Slash Line</th>
-    </tr>
-    <tr>
-        <td>{{ player.BattingStats.GamesPlayed }}</td>
-        <td>{{ player.BattingStats.BattingAverage }} / {{ player.BattingStats.OnBasePercentage }} / {{ player.BattingStats.SluggingPercentage }}</td>
-    </tr>
-</table>
-{% endif %}
 
-{% if player.PitchingStats %}
-<h3>Pitching Statistics</h3>
-<table>
-    <tr>
-        <th>Games Pitched</th>
-        <th>Games Started</th>
-        <th>Innings Pitched</th>
-        <th>WHIP</th>
-        <th>Strikeouts/9</th>
-    </tr>
-    <tr>
-        <td>{{ player.PitchingStats.GamesPitched }}</td>
-        <td>{{ player.PitchingStats.GamesStarted }}</td>
-        <td>{{ player.PitchingStats.InningsPitched }}</td>
-        <td>{{ player.PitchingStats.WHIP }}</td>
-        <td>{{ player.PitchingStats.StrikeoutsPer9 }}</td>
-    </tr>
-</table>
-{% endif %}
+<div class="collapsible" onclick="toggleSection('battingStats')">Batting Statistics</div>
+<div id="battingStats" class="content">
+    <table id="battingTable">
+        <tr>
+            <th onclick="sortTable('battingTable', 0)">Name</th>
+            <th onclick="sortTable('battingTable', 1)">Year</th>
+            <th onclick="sortTable('battingTable', 2)">Games Played</th>
+            <th onclick="sortTable('battingTable', 3)">AB</th>
+            <th onclick="sortTable('battingTable', 4)">Runs</th>
+            <th onclick="sortTable('battingTable', 5)">Hits</th>
+            <th onclick="sortTable('battingTable', 6)">HR</th>
+            <th onclick="sortTable('battingTable', 7)">RBI</th>
+            <th onclick="sortTable('battingTable', 8)">Team</th>
+        </tr>
+        {% for player in batting %}
+        <tr>
+            <td>{{ player.name }}</td>
+            <td>{{ player.yearID }}</td>
+            <td>{{ player.b_G }}</td>
+            <td>{{ player.b_AB }}</td>
+            <td>{{ player.b_R }}</td>
+            <td>{{ player.b_H }}</td>
+            <td>{{ player.b_HR }}</td>
+            <td>{{ player.b_RBI }}</td>
+            <td>{{ player.teamID }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="collapsible" onclick="toggleSection('pitchingStats')">Pitching Statistics</div>
+<div id="pitchingStats" class="content">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Year</th>
+            <th>Wins</th>
+            <th>Losses</th>
+            <th>Games</th>
+            <th>Games Started</th>
+            <th>Hits</th>
+            <th>HR</th>
+            <th>Saves</th>
+            <th>Strikeouts</th>
+            <th>Team</th>
+        </tr>
+        {% for pitcher in pitching %}
+        <tr>
+            <td>{{ pitcher.name }}</td>
+            <td>{{ pitcher.yearID }}</td>
+            <td>{{ pitcher.p_W }}</td>
+            <td>{{ pitcher.p_L }}</td>
+            <td>{{ pitcher.p_G }}</td>
+            <td>{{ pitcher.p_GS }}</td>
+            <td>{{ pitcher.p_H }}</td>
+            <td>{{ pitcher.p_HR }}</td>
+            <td>{{ pitcher.p_SV }}</td>
+            <td>{{ pitcher.p_SO }}</td>
+            <td>{{ pitcher.teamID }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="collapsible" onclick="toggleSection('fieldingStats')">Fielding Statistics</div>
+<div id="fieldingStats" class="content">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Year</th>
+            <th>Position</th>
+            <th>Games</th>
+            <th>Games Started</th>
+            <th>InnOuts</th>
+            <th>Putouts</th>
+            <th>Assists</th>
+            <th>Errors</th>
+            <th>Double Plays</th>
+            <th>Team</th>
+        </tr>
+        {% for fielder in fielding %}
+        <tr>
+            <td>{{ fielder.name }}</td>
+            <td>{{ fielder.yearID }}</td>
+            <td>{{ fielder.position }}</td>
+            <td>{{ fielder.f_G }}</td>
+            <td>{{ fielder.f_GS }}</td>
+            <td>{{ fielder.f_InnOuts }}</td>
+            <td>{{ fielder.f_PO }}</td>
+            <td>{{ fielder.f_A }}</td>
+            <td>{{ fielder.f_E }}</td>
+            <td>{{ fielder.f_DP }}</td>
+            <td>{{ fielder.teamID }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
 </body>
 </html>
