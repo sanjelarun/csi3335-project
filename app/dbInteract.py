@@ -25,12 +25,22 @@ def getTeamInfo(teamID: str, yearID: int) -> list[dict[str, str]]:
             output.append(line)
     return output
 
+def getName(playerID: int) -> str:
+    engine = sqlalchemy.create_engine("mysql+pymysql://%s:%s@%s/%s" % (csi3335.mysql["user"], csi3335.mysql["password"], csi3335.mysql["location"], csi3335.mysql["database"]), echo=False)
+    with engine.connect() as con:
+        sqlQuery = text("SELECT nameFirst, nameLast FROM people WHERE playerID = :player_ID")
+        rs = con.execute(sqlQuery, {"player_ID": playerID})
+        player_name: tuple = rs.fetchone()
+        if player_name:
+            return f"{player_name[0]} {player_name[1]}"
+        else:
+            return "Player not found"
 
 def getBattingInfoByTeamIDandYearID(teamID: str, yearID: int) -> list[dict[str, str]]:
     output: list[dict[str, str]] = []
     engine = sqlalchemy.create_engine("mysql+pymysql://%s:%s@%s/%s" % (csi3335.mysql["user"], csi3335.mysql["password"], csi3335.mysql["location"], csi3335.mysql["database"]), echo=False)
     with engine.connect() as con:
-        sqlQuery = text("SELECT playerid, nameFirst, nameLast,yearID, b_G, b_AB, b_R, b_H, b_HR, b_RBI, teamID, position FROM batting JOIN people USING(playerid) NATURAL JOIN fielding WHERE teamID = :team_ID AND yearID = :year_ID ORDER BY nameLast DESC, stint DESC")
+        sqlQuery = text("SELECT playerid, nameFirst, nameLast, yearID, b_G, b_AB, b_R, b_H, b_HR, b_RBI, teamID, position FROM batting JOIN people USING(playerid) NATURAL JOIN fielding WHERE teamID = :team_ID AND yearID = :year_ID ORDER BY nameLast DESC, stint DESC")
         rs = con.execute(sqlQuery, {"team_ID": teamID, "year_ID": yearID})
 
         for row in rs:
@@ -38,7 +48,8 @@ def getBattingInfoByTeamIDandYearID(teamID: str, yearID: int) -> list[dict[str, 
             line["playerid"] = row[0]
             line["nameFirst"] = str(row[1])
             line["nameLast"] = str(row[2])
-            line["b_G"] = str(row[3])
+            line["yearID"] = str(row[3])
+            line["b_G"] = row[4]
             line["b_AB"] = row[5]
             line["b_R"] = row[6]
             line["b_H"] = row[7]

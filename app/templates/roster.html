@@ -40,7 +40,12 @@
     <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
     <a href="{{ url_for('login') }}">Login</a>
 </div>
-    <h1>Team Stats</h1>
+{% for team in team %}
+<h1>{{team.team_name}} - {{yearid}}</h1>
+<h1>Record: {{team.team_W}} - {{team.team_L}}</h1>
+{% endfor %}
+
+    <h2>Team Stats</h2>
     <button onclick="toggleStats()">Toggle Advanced Stats</button>
     <div id="simpleStats" style="display: block">
         <table>
@@ -145,17 +150,17 @@
         </table>
     </div>
     <div>
-        <h1>Roster</h1>
+        <h2>Roster</h2>
         <table>
             <tr>
                 <th>Player Name</th>
                 <th>Position</th>
+                <th>Games Played</th>
                 <th>At Bats</th>
-                <th>Runs</th>
                 <th>Hits</th>
+                <th>Runs</th>
                 <th>Home Runs</th>
                 <th>RBI</th>
-                <th>Team ID</th>
             </tr>
             {% set processed_players = [] %}
             {% for player in battingRoster %}
@@ -167,12 +172,12 @@
             <tr>
                 <td><a href="{{ url_for('player_stats', player_id=player.playerid) }}">{{ player.nameFirst }} {{ player.nameLast }}</a></td>
                 <td>{{ positions | join(', ') }}</td>
+                <td>{{ player.b_G }}</td>
                 <td>{{ player.b_AB }}</td>
                 <td>{{ player.b_R }}</td>
                 <td>{{ player.b_H }}</td>
                 <td>{{ player.b_HR }}</td>
                 <td>{{ player.b_RBI }}</td>
-                <td>{{ player.teamID }}</td>
             </tr>
             {% set _ = processed_players.append(player.nameFirst) %}
             {% endif %}

@@ -31,25 +31,25 @@ def index():
     ]
     return render_template('index.html', title='Home', posts=posts)
 
-@app.route('/roster')
+@app.route('/roster/<teamid>/<yearid>')
 @login_required
-def roster():
-    teamid = "ALT"
-    yearid = int(1884)
+def roster(teamid, yearid):
+    # teamid = "ALT"
+    # yearid = int(1884)
 
     team_info = getTeamInfo(teamid, yearid)
     battingRoster = getBattingInfoByTeamIDandYearID(teamid, yearid)
-    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster)
+    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster, yearid=yearid)
 
 @app.route('/player/<player_id>')
 @login_required
 def player_stats(player_id):
     # player_id="aardsda01"
-
+    player_name = getName(player_id)
     batting_info = getPlayerBattingInfo(player_id)
     pitching_info = getPlayerPitchingInfo(player_id)
     fielding_info = getPlayerFieldingInfo(player_id)
-    return render_template('player.html', player_id=player_id, batting=batting_info, pitching=pitching_info, fielding=fielding_info)
+    return render_template('player.html', player_id=player_id, batting=batting_info, pitching=pitching_info, fielding=fielding_info, player=player_name)
 
 
 @app.route('/login', methods=['GET', 'POST'])
