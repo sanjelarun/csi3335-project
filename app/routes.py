@@ -181,11 +181,34 @@ def admin_request_logs():
     return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id)
 
 
-def log_request(user_id, request_data):
-    # Create a new log entry
+# def log_request(user_id, request_data):
+#     # Create a new log entry
+#     log_entry = RequestLog(user_id=user_id,
+#                            timestamp=datetime.datetime.utcnow(),
+#                            request_data=str(request_data))
+#     # Add the log entry to the database session
+#     db.session.add(log_entry)
+#     # Commit the transaction to save the log entry
+#     db.session.commit()
+
+@app.before_request
+def log_request():
+    # Retrieve user_id if the user is authenticated
+    user_id = current_user.id if current_user.is_authenticated else None
+
+    # Construct the request data string
+    request_data = (
+        f"Method: {request.method}\n"
+        f"Path: {request.path}\n"
+        f"Args: {request.args}\n"
+        f"Form: {request.form}\n"
+        f"Headers: {dict(request.headers)}\n"
+        f"Remote Addr: {request.remote_addr}\n"
+    )
+    # Log the request
     log_entry = RequestLog(user_id=user_id,
-                           timestamp=datetime.datetime.utcnow(),
-                           request_data=str(request_data))
+                           timestamp=datetime.now(timezone.utc),
+                           request_data=request_data)
     # Add the log entry to the database session
     db.session.add(log_entry)
     # Commit the transaction to save the log entry
