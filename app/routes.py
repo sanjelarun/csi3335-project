@@ -164,11 +164,16 @@ def admin_request_logs():
     user_id = request.args.get('user_id')
     show_all = request.args.get('show_all')  # Check if "Show All Requests" button is clicked
 
+    username = None  # Initialize username variable
+
     if user_id:
         try:
             # Check if the user_id exists in the database
             user = User.query.filter_by(id=user_id).one()
             user_id_exists = True
+
+            # Get the username associated with the user_id
+            username = user.username
 
             # Log the query
             log_sql_queries(str(User.query.filter_by(id=user_id).statement), current_user)
@@ -211,10 +216,17 @@ def admin_request_logs():
         request_log = row[0]
         request_logs.append(request_log)
 
+    # Retrieve usernames based on request_log IDs
+    user_ids = [log.user_id for log in request_logs]
+    user_id_to_username = {user.id: user.username for user in User.query.filter(User.id.in_(user_ids)).all()}
+
+    # Map usernames to request_logs
+    for log in request_logs:
+        log.username = user_id_to_username.get(log.user_id)
 
     # Render the template with the request logs and user_id_exists flag
     return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id,
-                           user_id_exists=user_id_exists, show_all=show_all)
+                           user_id_exists=user_id_exists, show_all=show_all, username=username)
 
 @app.before_request
 def log_request():

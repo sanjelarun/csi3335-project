@@ -51,6 +51,7 @@
     <!-- Check if user ID exists -->
     {% if user_id_exists %}
         <h2>User ID: {{ user_id }}</h2>
+        <h3>Username: {{ username }}</h3>
         <!-- Display the total number of requests -->
         <p>Total requests: {{ request_logs|length }}</p>
 
@@ -60,6 +61,7 @@
                 <tr>
                     <th>ID</th>
                     <th>User ID</th>
+                    <th>Username</th>
                     <th>Timestamp</th>
                     <th>Request Data</th>
                 </tr>
@@ -69,6 +71,7 @@
                 <tr>
                     <td>{{ log.id }}</td>
                     <td>{{ log.user_id }}</td>
+                    <td>{{ log.username }}</td>
                     <td>{{ log.timestamp }}</td>
                     <td><pre>{{ log.request_data }}</pre></td>
                 </tr>
@@ -89,8 +92,9 @@
                     var rowData = {
                         id: cells[0].innerText,
                         user_id: cells[1].innerText,
-                        timestamp: cells[2].innerText,
-                        request_data: cells[3].innerText
+                        username: cells[2].innerText,
+                        timestamp: cells[3].innerText,
+                        request_data: cells[4].innerText
                     };
                     data.push(rowData);
                 }
@@ -120,8 +124,9 @@
                     var row = table.insertRow(i);
                     row.insertCell(0).innerText = data[i].id;
                     row.insertCell(1).innerText = data[i].user_id;
-                    row.insertCell(2).innerText = data[i].timestamp;
-                    row.insertCell(3).innerText = data[i].request_data;
+                    row.insertCell(2).innerText = data[i].username;
+                    row.insertCell(3).innerText = data[i].timestamp;
+                    row.insertCell(4).innerText = data[i].request_data;
                 }
             });
         </script>
@@ -136,6 +141,7 @@
                 <tr>
                     <th>ID</th>
                     <th>User ID</th>
+                    <th>Username</th>
                     <th>Timestamp</th>
                     <th>Request Data</th>
                 </tr>
@@ -145,6 +151,7 @@
                 <tr>
                     <td>{{ log.id }}</td>
                     <td>{{ log.user_id }}</td>
+                    <td>{{ log.username }}</td>
                     <td>{{ log.timestamp }}</td>
                     <td><pre>{{ log.request_data }}</pre></td>
                 </tr>
@@ -165,8 +172,9 @@
                         var rowData = {
                             id: cells[0].innerText,
                             user_id: cells[1].innerText,
-                            timestamp: cells[2].innerText,
-                            request_data: cells[3].innerText
+                            username: cells[2].innerText,
+                            timestamp: cells[3].innerText,
+                            request_data: cells[4].innerText
                         };
                         data.push(rowData);
                     }
@@ -196,8 +204,9 @@
                         var row = table.insertRow(i);
                         row.insertCell(0).innerText = data[i].id;
                         row.insertCell(1).innerText = data[i].user_id;
-                        row.insertCell(2).innerText = data[i].timestamp;
-                        row.insertCell(3).innerText = data[i].request_data;
+                        row.insertCell(2).innerText = data[i].username;
+                        row.insertCell(3).innerText = data[i].timestamp;
+                        row.insertCell(4).innerText = data[i].request_data;
                     }
                 });
             </script>
