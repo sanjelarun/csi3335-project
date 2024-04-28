@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Logs</title>
+    <style>
+        /* Your CSS styles here */
+    </style>
+</head>
+<body>
+    <h1>Admin Request Logs</h1>
+
+    <div>
+        Helpful Links:
+        <a href="{{ url_for('index') }}">Home</a>
+        {% if current_user.is_anonymous %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% else %}
+            <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
+            <a href="{{ url_for('roster') }}">Roster</a>
+        {% if current_user.is_admin %}
+            <a href="{{ url_for('admin_request_logs') }}">Admin Request Logs</a>
+        {% endif %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
+    </div>
+
+<!-- Divider -->
+<hr>
+
+<!-- Form to input user ID -->
+<form method="GET" action="/admin/request_logs">
+    <label for="user_id">User ID:</label>
+    <input type="text" id="user_id" name="user_id" required>
+    <button type="submit">View Request Logs</button>
+</form>
+
+
+    <!-- Form to input user ID -->
+    <form method="GET" action="/admin/request_logs">
+        <label for="user_id">User ID:</label>
+        <input type="text" id="user_id" name="user_id" required>
+        <button type="submit">View Request Logs</button>
+    </form>
+
+    <!-- Check if user ID exists -->
+    {% if user_id_exists %}
+        <h2>User ID: {{ user_id }}</h2>
+        <!-- Display the total number of requests -->
+        <p>Total requests: {{ request_logs|length }}</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Timestamp</th>
+                    <th>Request Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in request_logs %}
+                <tr>
+                    <td>{{ log.id }}</td>
+                    <td>{{ log.user_id }}</td>
+                    <td>{{ log.timestamp }}</td>
+                    <td>{{ log.request_data }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>User ID does not exist.</p>
+    {% endif %}
+
+</body>
+</html>

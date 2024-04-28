@@ -13,9 +13,12 @@
             {% if current_user.is_anonymous %}
             <a href="{{ url_for('login') }}">Login</a>
             {% else %}
-            <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
-            <a href="{{ url_for('roster') }}">Roster</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
+                <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
+                <a href="{{ url_for('roster') }}">Roster</a>
+                {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin_request_logs') }}">Admin Request Logs</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">Logout</a>
             {% endif %}
         </div>
         <hr>

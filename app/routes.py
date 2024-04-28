@@ -18,17 +18,7 @@ from app.models import RequestLog
 @app.route('/index')
 @login_required
 def index():
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html', title='Home', posts=posts)
+    return render_template('index.html', title='Home')
 
 @app.route('/roster')
 @login_required
@@ -120,11 +110,8 @@ def register():
 @login_required
 def user(username):
     user = db.first_or_404(sa.select(User).where(User.username == username))
-    posts = [
-        {'author': user, 'body': 'Test post #1'},
-        {'author': user, 'body': 'Test post #2'}
-    ]
-    return render_template('user.html', user=user, posts=posts)
+
+    return render_template('user.html', user=user)
 
 
 @app.before_request
@@ -156,6 +143,42 @@ def edit_profile():
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
 
+
+@app.route('/admin/request_logs')
+@login_required
+def admin_request_logs():
+    if not current_user.is_admin:
+        # Optionally, you can handle non-admin access here
+        return "Access denied. Only admins are allowed to view this page."
+
+    user_id = request.args.get('user_id')
+
+    if user_id:
+        # Fetch request logs for a specific user_id
+        select_query = sa.select(RequestLog).where(RequestLog.user_id == user_id)
+    else:
+        # Fetch all request logs from the database if user_id is not provided
+        select_query = sa.select(RequestLog)
+
+    result = db.session.execute(select_query)
+    request_logs = []
+
+    for row in result:
+        # Extract the first element of the tuple (which is a RequestLog instance)
+        request_log = row[0]
+        if request_log is not None and request_log.user_id is not None:
+            user_id_exists = True
+        else:
+            user_id_exists = False
+            break
+        request_logs.append(request_log)
+
+    # Render the template with the request logs and user_id_exists flag
+    return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id,
+                           user_id_exists=user_id_exists)
+
+    # Render the template with the request logs
+    return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id)
 
 
 def log_request(user_id, request_data):
