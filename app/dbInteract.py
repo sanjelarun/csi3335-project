@@ -72,14 +72,14 @@ def getPlayerBattingInfo(playerID: str) -> list[dict[str,str]]:
         for row in rs:
             line :dict[str,str] = {}
             line["name"] = row[0] + ' ' + row[1]
-            line["yearID"] = row[2]
+            line["yearId"] = row[2]
             line["b_G"] = row[3]
             line["b_AB"] = row[4]
             line["b_R"] = row[5]
             line["b_H"] = row[6]
             line["b_HR"] = row[7]
             line["b_RBI"] = row[8]
-            line["teamID"] = row[9]
+            line["teamId"] = row[9]
             output.append(line)
 
         return output
