@@ -99,7 +99,21 @@ button {
     border: none; /* Remove button border */
     border-radius: 4px; /* Add border radius */
     cursor: pointer; /* Change cursor to pointer on hover */
+    margin-left: 10px;
 }
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/*.button-container form {*/
+/*    margin-right: 10px;*/
+/*}*/
 
 /* Apply consistent styles to table */
 table {

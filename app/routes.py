@@ -192,6 +192,14 @@ def admin_request_logs():
         select_query = sa.select(RequestLog)
         user_id_exists = False
 
+
+
+    # # Handle sorting based on the provided sort order
+    # if sort_order == 'timestamp_asc':
+    #     select_query = select_query.order_by(RequestLog.timestamp.asc())
+    # elif sort_order == 'timestamp_desc':
+    #     select_query = select_query.order_by(RequestLog.timestamp.desc())
+
     # Log the query
     log_sql_queries(select_query, current_user)
 
@@ -202,6 +210,7 @@ def admin_request_logs():
         # Extract the first element of the tuple (which is a RequestLog instance)
         request_log = row[0]
         request_logs.append(request_log)
+
 
     # Render the template with the request logs and user_id_exists flag
     return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id,
