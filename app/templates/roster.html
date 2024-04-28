@@ -5,7 +5,8 @@
         table {
             border-collapse: collapse;
             width: 100%;
-            margin-bottom: 20px; /* Add margin between tables */
+            margin-bottom: 20px;
+            overflow-x: auto; /* Enable horizontal scrolling */
         }
         th, td {
             border: 1px solid black;
@@ -15,52 +16,23 @@
         th {
             background-color: #f2f2f2;
         }
-
-        .collapsible {
-            cursor: pointer;
-            padding: 10px;
-            background-color: #f7f7f7;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            position: relative;
-        }
-
-        .collapsible::after {
-            content: '\002B'; /* Unicode for plus sign */
-            font-weight: bolder;
-            position: absolute;
-            right: 10px;
-        }
-
-        .collapsible.active::after {
-            content: '\2212'; /* Unicode for minus sign */
-            font-weight: bolder;
-        }
-        .content {
-            display: block; /* Change from display: none; to display: block; */
-            overflow: hidden;
-        }
     </style>
     <script>
-        function toggleSection(sectionId) {
-            var section = document.getElementById(sectionId);
-            if (section.style.display === "none") {
-                section.style.display = "block";
-                section.classList.add('active');
+        function toggleStats() {
+            var simpleStats = document.getElementById('simpleStats');
+            var detailedStats = document.getElementById('detailedStats');
+
+            if (simpleStats.style.display === 'block') {
+                simpleStats.style.display = 'none';
+                detailedStats.style.display = 'block';
             } else {
-                section.style.display = "none";
-                section.classList.remove('active');
+                simpleStats.style.display = 'block';
+                detailedStats.style.display = 'none';
             }
         }
     </script>
-    <h1>Hi, {{ current_user.username }}!</h1>
-    {% if title %}
-    <title>{{ title }} - Roster</title>
-    {% else %}
-    <title>Roster</title>
-    {% endif %}
 </head>
+
 <body>
 <div>
     Helpful Links:
@@ -68,91 +40,149 @@
     <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
     <a href="{{ url_for('login') }}">Login</a>
 </div>
-<hr>
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
+{% for team in team %}
+<h1>{{team.team_name}} - {{yearid}}</h1>
+<h1>Record: {{team.team_W}} - {{team.team_L}}</h1>
+{% endfor %}
 
-
-<!-- Dropdown form for selecting team -->
-<form action="{{ url_for('roster') }}" method="GET">
-    <label for="team">Select Team:</label>
-    <select id="team" name="team">
-        <!-- Populate with teams from your data -->
-        <option value="team1">Team 1</option>
-        <option value="team2">Team 2</option>
-        <!-- Add more options as needed -->
-    </select>
-
-    <!-- Dropdown form for selecting year -->
-    <label for="year">Select Year:</label>
-    <select id="year" name="year">
-        <!-- Populate with years from your data -->
-        <option value="2022">2022</option>
-        <option value="2023">2023</option>
-        <!-- Add more options as needed -->
-    </select>
-
-    <button type="submit">Submit</button>
-</form>
-
-
-<h1>{{ team.team }} Roster - {{ team.year }}</h1>
-<h2>Record: {{ team.record }}</h2>
-
-<div class="collapsible" onclick="toggleSection('battingStats')">Batting Statistics</div>
-<div id="battingStats" class="content">
-    <table>
+    <h2>Team Stats</h2>
+    <button onclick="toggleStats()">Toggle Advanced Stats</button>
+    <div id="simpleStats" style="display: block">
+        <table>
+            <tr>
+                <th>Team Name</th>
+                <th>Wins</th>
+                <th>Losses</th>
+                <th>Home Runs</th>
+            </tr>
+            {% for team in team %}
+            <tr>
+                <td>{{ team.team_name }}</td>
+                <td>{{ team.team_W }}</td>
+                <td>{{ team.team_L }}</td>
+                <td>{{ team.team_HR }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="detailedStats" style="display: none;">
+        <table>
         <tr>
-            <th>Name</th>
-            <th>Position</th>
-            <th>Games Played</th>
-            <th>Batting Average</th>
-            <th>On Base Percentage</th>
-            <th>Slugging Percentage</th>
+            <th>Team Name</th>
+            <th>Wins</th>
+            <th>Losses</th>
+            <th>Runs Scored</th>
+            <th>Home Runs</th>
+            <th>Walks</th>
+            <th>Strikeouts</th>
+            <th>At Bats</th>
+            <th>Hits</th>
+            <th>Doubles</th>
+            <th>Triples</th>
+            <th>Home Runs</th>
+            <th>Walks</th>
+            <th>Strikeouts</th>
+            <th>Stolen Bases</th>
+            <th>Caught Stealing</th>
+            <th>Hit by Pitch</th>
+            <th>Sacrifice Flies</th>
+            <th>Runs Allowed</th>
+            <th>Earned Runs</th>
+            <th>ERA</th>
+            <th>Complete Games</th>
+            <th>Shutouts</th>
+            <th>Saves</th>
+            <th>IP Outs</th>
+            <th>Hits Allowed</th>
+            <th>Home Runs Allowed</th>
+            <th>Walks Allowed</th>
+            <th>Strikeouts by Pitchers</th>
+            <th>Errors</th>
+            <th>Double Plays</th>
+            <th>Fielding Percentage</th>
+            <th>Attendance</th>
+            <th>Park BPF</th>
+            <th>Park PPF</th>
+            <th>Projected Wins</th>
+            <th>Projected Losses</th>
         </tr>
-        {% for player in players %}
+        {% for team in team %}
         <tr>
-            <td>{{ player.Name }}</td>
-            <td>{{ player.Position }}</td>
-            <td>{{ player.GamesPlayed }}</td>
-            <td>{{ player.BattingAverage }}</td>
-            <td>{{ player.OnBasePercentage }}</td>
-            <td>{{ player.SluggingPercentage }}</td>
+            <td>{{ team.team_name }}</td>
+            <td>{{ team.team_W }}</td>
+            <td>{{ team.team_L }}</td>
+            <td>{{ team.team_R }}</td>
+            <td>{{ team.team_HR }}</td>
+            <td>{{ team.team_BB }}</td>
+            <td>{{ team.team_SO }}</td>
+            <td>{{ team.team_AB }}</td>
+            <td>{{ team.team_H }}</td>
+            <td>{{ team.team_2B }}</td>
+            <td>{{ team.team_3B }}</td>
+            <td>{{ team.team_HR }}</td>
+            <td>{{ team.team_BB }}</td>
+            <td>{{ team.team_SO }}</td>
+            <td>{{ team.team_SB }}</td>
+            <td>{{ team.team_CS }}</td>
+            <td>{{ team.team_HBP }}</td>
+            <td>{{ team.team_SF }}</td>
+            <td>{{ team.team_RA }}</td>
+            <td>{{ team.team_ER }}</td>
+            <td>{{ team.team_ERA }}</td>
+            <td>{{ team.team_CG }}</td>
+            <td>{{ team.team_SHO }}</td>
+            <td>{{ team.team_SV }}</td>
+            <td>{{ team.team_IPouts }}</td>
+            <td>{{ team.team_HA }}</td>
+            <td>{{ team.team_HRA }}</td>
+            <td>{{ team.team_BBA }}</td>
+            <td>{{ team.team_SOA }}</td>
+            <td>{{ team.team_E }}</td>
+            <td>{{ team.team_DP }}</td>
+            <td>{{ team.team_FP }}</td>
+            <td>{{ team.team_attendance }}</td>
+            <td>{{ team.team_BPF }}</td>
+            <td>{{ team.team_PPF }}</td>
+            <td>{{ team.team_projW }}</td>
+            <td>{{ team.team_projL }}</td>
         </tr>
         {% endfor %}
-    </table>
-</div>
-
-<div class="collapsible" onclick="toggleSection('pitchingStats')">Pitching Statistics</div>
-<div id="pitchingStats" class="content">
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Games Pitched</th>
-            <th>Games Started</th>
-            <th>Innings Pitched</th>
-            <th>WHIP</th>
-            <th>Strikeouts/9</th>
-        </tr>
-        {% for pitcher in pitchers %}
-        <tr>
-            <td>{{ pitcher.Name }}</td>
-            <td>{{ pitcher.GamesPitched }}</td>
-            <td>{{ pitcher.GamesStarted }}</td>
-            <td>{{ pitcher.InningsPitched }}</td>
-            <td>{{ pitcher.WHIP }}</td>
-            <td>{{ pitcher.StrikeoutsPer9 }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-
+        </table>
+    </div>
+    <div>
+        <h2>Roster</h2>
+        <table>
+            <tr>
+                <th>Player Name</th>
+                <th>Position</th>
+                <th>Games Played</th>
+                <th>At Bats</th>
+                <th>Hits</th>
+                <th>Runs</th>
+                <th>Home Runs</th>
+                <th>RBI</th>
+            </tr>
+            {% set processed_players = [] %}
+            {% for player in battingRoster %}
+            {% if player.nameFirst not in processed_players %}
+            {% set positions = [] %}
+            {% for p in battingRoster if p.nameFirst == player.nameFirst %}
+            {% set _ = positions.append(p.position) %}
+            {% endfor %}
+            <tr>
+                <td><a href="{{ url_for('player_stats', player_id=player.playerid) }}">{{ player.nameFirst }} {{ player.nameLast }}</a></td>
+                <td>{{ positions | join(', ') }}</td>
+                <td>{{ player.b_G }}</td>
+                <td>{{ player.b_AB }}</td>
+                <td>{{ player.b_R }}</td>
+                <td>{{ player.b_H }}</td>
+                <td>{{ player.b_HR }}</td>
+                <td>{{ player.b_RBI }}</td>
+            </tr>
+            {% set _ = processed_players.append(player.nameFirst) %}
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
 </body>
 </html>

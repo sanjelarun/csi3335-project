@@ -1,26 +1,22 @@
-from sqlalchemy.dialects.mysql import pymysql
+from datetime import datetime, timezone
+from urllib.parse import urlsplit
+
+import sqlalchemy as sa
+from flask import render_template, flash, redirect, url_for
+from flask import request
+from flask_login import current_user, login_user
+from flask_login import login_required
+from flask_login import logout_user
 
 from app import app
-from app.dbInteract import getPlayerBattingInfo, getPlayerFieldingInfo, getPlayerPitchingInfo
-from app.forms import LoginForm
-from flask import render_template, flash, redirect, url_for
-from flask_login import current_user, login_user
-import sqlalchemy as sa
-from app.models import User
-from flask_login import logout_user
-from flask_login import login_required
-from flask import request
-from urllib.parse import urlsplit
 from app import db
-from app.forms import RegistrationForm
-from datetime import datetime, timezone
+from app.dbInteract import *
 from app.forms import EditProfileForm
+from app.forms import LoginForm
+from app.forms import RegistrationForm
 from app.models import RequestLog
+from app.models import User
 
-#import sys
-#sys.path.append('/config.py')
-import config
-from config import Config
 
 @app.route('/')
 @app.route('/index')
@@ -39,85 +35,26 @@ def index():
     return render_template('index.html', title='Home', posts=posts)
 
 
-@app.route('roster2/')
+@app.route('/roster/<teamid>/<yearid>')
 @login_required
-def rosterBackend(current_user,team,year):
+def roster(teamid, yearid):
+    team_info = getTeamInfo(teamid, yearid)
+    battingRoster = getBattingInfoByTeamIDandYearID(teamid, yearid)
+    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster,
+                           yearid=yearid)
 
-    #int(year) put to ensure it is interpreted as integer
-    params = [team, int(year)]
-    try:
-        # connect to db
-        con = pymysql.connect(**Config.MYSQL_DETAILS)
-        print("Connected!")
 
-        # create cursor for sql execution
-        cur = con.cursor()
-
-        # query to execute
-        sql = '''SELECT CONCAT(nameFirst,' ',nameLast) as Name, p_GS as starts,(p_IPouts / 3) as IP, ( (p_BB + p_H) / (p_IPouts / 3)) as WHIP , ((p_SO * 9) / (p_IPouts / 3)) as SOP9 FROM Pitching pi JOIN People pe USING(playerID) JOIN Fielding f USING(playerID,yearID,teamID) WHERE position = 'P' AND teamId = %s AND yearId = %d;'''
-        cur.execute(sql, params)
-        pitching = cur.fetchall()
-
-        sql = '''
-SELECT CONCAT(nameFirst,' ',nameLast) as Name, position, teamID as Team, (b_H/b_AB) as batAvg, (b_H + b_BB + b_HBP) / (b_AB + b_BB + b_HBP + b_SF) as OBP, ((b_H - b_2B - b_3B - b_HR) + (b_2B * 2) + (b_3B * 3) + (b_HR * 4)) / b_AB as slugPct FROM Batting b JOIN People p USING(playerID) JOIN Fielding f USING(playerID,yearID,teamID)  WHERE position != 'P' AND teamId =  %s AND yearID = %d  GROUP BY position, Name, Team, batAvg, OBP, slugPCT;'''
-        cur.execute(sql, params)
-        batting = cur.fetchall()
-
-    except pymysql.Error as e:
-        print(f"ERROR: Database not connected: {e}")
-    finally:
-        con.close()
-    return render_template('spencer.html', title ='WHATEVER YOU WANT', team=params[0], year = params[1], pitching = pitching, batting = batting)
-
-@app.route('/roster')
-@login_required
-def roster():
-    user = {'username': 'Spencer'}
-    players = [
-        {'Name': 'John Doe', 'Position': 'Catcher', 'GamesPlayed': 50, 'BattingAverage': 0.300, 'OnBasePercentage': 0.400, 'SluggingPercentage': 0.500},
-        {'Name': 'Jane Smith', 'Position': 'Shortstop', 'GamesPlayed': 45, 'BattingAverage': 0.280, 'OnBasePercentage': 0.350, 'SluggingPercentage': 0.450},
-        {'Name': 'Mike Johnson', 'Position': 'Outfielder', 'GamesPlayed': 55, 'BattingAverage': 0.320, 'OnBasePercentage': 0.420, 'SluggingPercentage': 0.550}
-    ]
-    pitchers = [
-        {'Name': 'Jake Anderson', 'GamesPitched': 30, 'GamesStarted': 25, 'InningsPitched': 150, 'WHIP': 1.20, 'StrikeoutsPer9': 8.5},
-        {'Name': 'Sarah Brown', 'GamesPitched': 35, 'GamesStarted': 30, 'InningsPitched': 170, 'WHIP': 1.15, 'StrikeoutsPer9': 9.0}
-    ]
-    team ={
-            'team': 'New York Yankees',
-            'record': '72-9',
-            'year': '2020'
-        }
-    return render_template('roster.html', title='Roster', user=user, players=players, pitchers=pitchers, team=team)
-
-@app.route('/player/<int:player_id>')
+@app.route('/player/<player_id>')
 @login_required
 def player_stats(player_id):
+    # player_id="aardsda01"
+    player_name = getName(player_id)
+    batting_info = getPlayerBattingInfo(player_id)
+    pitching_info = getPlayerPitchingInfo(player_id)
+    fielding_info = getPlayerFieldingInfo(player_id)
+    return render_template('player.html', player_id=player_id, batting=batting_info, pitching=pitching_info,
+                           fielding=fielding_info, player=player_name)
 
-    # players = [
-    #     {'player_id': 1, 'Name': 'John', 'Position': 'Catcher', 'GamesPlayed': 50, 'BattingAverage': 0.300, 'OnBasePercentage': 0.400, 'SluggingPercentage': 0.500},
-    #     {'player_id': 2, 'Name': 'Jane Smith', 'Position': 'Shortstop', 'GamesPlayed': 45, 'BattingAverage': 0.280, 'OnBasePercentage': 0.350, 'SluggingPercentage': 0.450},
-    #     {'player_id': 3, 'Name': 'Mike Johnson', 'Position': 'Outfielder', 'GamesPlayed': 55, 'BattingAverage': 0.320, 'OnBasePercentage': 0.420, 'SluggingPercentage': 0.550}
-    # ]
-
-    # Fetch player info based on player_id
-    # selected_player = next((player for player in players if player['player_id'] == player_id), None)
-
-    # if selected_player:
-    player_id="aardsda01"
-
-        # Call getPlayerBattingInfo to get batting data
-    batting_info = getPlayerBattingInfo(str(player_id))
-    # Fetch batting, pitching, and fielding info for the player
-    batting_info = getPlayerBattingInfo(str(player_id))
-    pitching_info = getPlayerPitchingInfo(str(player_id))
-    fielding_info = getPlayerFieldingInfo(str(player_id))
-# Render the template with player and info
-    return render_template('player.html', player_id=player_id, batting=batting_info, pitching=pitching_info, fielding=fielding_info)
-
-        # Render the template with player and batting info
-        # return render_template('player.html', info=batting_info)
-    # else:
-    #     return "Player not found", 404
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -176,10 +113,10 @@ def before_request():
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
 
+
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-
     form = EditProfileForm(current_user.username)
 
     teams = [('0', 'Team A'), ('1', 'Team B'), ('2', 'Team C')]
@@ -199,8 +136,6 @@ def edit_profile():
         form.favorite_team.data = current_user.favorite_team
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
-
-
 
 
 def log_request(user_id, request_data):

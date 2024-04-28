@@ -141,53 +141,45 @@
     <a href="{{ url_for('login') }}">Login</a>
 </div>
 <hr>
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
 
+<h1>{{ player }}'s Stats</h1>
 
+<h1>Batting Stats</h1>
 <div class="collapsible" onclick="toggleSection('battingStats')">Batting Statistics</div>
 <div id="battingStats" class="content">
-    <table id="battingTable">
+    <table id="">
         <tr>
-            <th onclick="sortTable('battingTable', 0)">Name</th>
-            <th onclick="sortTable('battingTable', 1)">Year</th>
+            <th onclick="sortTable('battingTable', 0)">Year</th>
+            <th onclick="sortTable('battingTable', 1)">Team</th>
             <th onclick="sortTable('battingTable', 2)">Games Played</th>
             <th onclick="sortTable('battingTable', 3)">AB</th>
             <th onclick="sortTable('battingTable', 4)">Runs</th>
             <th onclick="sortTable('battingTable', 5)">Hits</th>
             <th onclick="sortTable('battingTable', 6)">HR</th>
             <th onclick="sortTable('battingTable', 7)">RBI</th>
-            <th onclick="sortTable('battingTable', 8)">Team</th>
         </tr>
         {% for player in batting %}
         <tr>
-            <td>{{ player.name }}</td>
             <td>{{ player.yearID }}</td>
+            <td><a href="{{ url_for('roster', teamid=player.teamID, yearid=player.yearID) }}">{{ player.teamID }}</a></td>
             <td>{{ player.b_G }}</td>
             <td>{{ player.b_AB }}</td>
             <td>{{ player.b_R }}</td>
             <td>{{ player.b_H }}</td>
             <td>{{ player.b_HR }}</td>
             <td>{{ player.b_RBI }}</td>
-            <td>{{ player.teamID }}</td>
         </tr>
         {% endfor %}
     </table>
 </div>
 
+<h1>Pitching Stats</h1>
 <div class="collapsible" onclick="toggleSection('pitchingStats')">Pitching Statistics</div>
 <div id="pitchingStats" class="content">
     <table>
         <tr>
-            <th>Name</th>
             <th>Year</th>
+            <th>Team</th>
             <th>Wins</th>
             <th>Losses</th>
             <th>Games</th>
@@ -196,12 +188,11 @@
             <th>HR</th>
             <th>Saves</th>
             <th>Strikeouts</th>
-            <th>Team</th>
         </tr>
         {% for pitcher in pitching %}
         <tr>
-            <td>{{ pitcher.name }}</td>
             <td>{{ pitcher.yearID }}</td>
+            <td><a href="{{ url_for('roster', teamid=pitcher.teamID, yearid=pitcher.yearID) }}">{{ pitcher.teamID }}</a></td>
             <td>{{ pitcher.p_W }}</td>
             <td>{{ pitcher.p_L }}</td>
             <td>{{ pitcher.p_G }}</td>
@@ -210,18 +201,18 @@
             <td>{{ pitcher.p_HR }}</td>
             <td>{{ pitcher.p_SV }}</td>
             <td>{{ pitcher.p_SO }}</td>
-            <td>{{ pitcher.teamID }}</td>
         </tr>
         {% endfor %}
     </table>
 </div>
 
+<h1>Fielding Stats</h1>
 <div class="collapsible" onclick="toggleSection('fieldingStats')">Fielding Statistics</div>
 <div id="fieldingStats" class="content">
     <table>
         <tr>
-            <th>Name</th>
             <th>Year</th>
+            <th>Team</th>
             <th>Position</th>
             <th>Games</th>
             <th>Games Started</th>
@@ -230,24 +221,37 @@
             <th>Assists</th>
             <th>Errors</th>
             <th>Double Plays</th>
-            <th>Team</th>
         </tr>
+        {% set processed_fielders = [] %}
         {% for fielder in fielding %}
+        {% if (fielder.yearID, fielder.teamID) not in processed_fielders %}
+        {% set positions = [] %}
+        {% set stats = {'f_G': 0, 'f_GS': 0, 'f_InnOuts': 0, 'f_PO': 0, 'f_A': 0, 'f_E': 0, 'f_DP': 0} %}
+        {% for f in fielding if f.yearID == fielder.yearID and f.teamID == fielder.teamID %}
+        {% set _ = positions.append(f.position) %}
+        {% for key, value in f.items() if key.startswith('f_') %}
+        {% if stats.get(key) is not none %}
+        {% set _ = stats.update({key: stats.get(key) + value}) %}
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
         <tr>
-            <td>{{ fielder.name }}</td>
             <td>{{ fielder.yearID }}</td>
-            <td>{{ fielder.position }}</td>
-            <td>{{ fielder.f_G }}</td>
-            <td>{{ fielder.f_GS }}</td>
-            <td>{{ fielder.f_InnOuts }}</td>
-            <td>{{ fielder.f_PO }}</td>
-            <td>{{ fielder.f_A }}</td>
-            <td>{{ fielder.f_E }}</td>
-            <td>{{ fielder.f_DP }}</td>
-            <td>{{ fielder.teamID }}</td>
+            <td><a href="{{ url_for('roster', teamid=fielder.teamID, yearid=fielder.yearID) }}">{{ fielder.teamID }}</a></td>
+            <td>{{ positions | join(', ') }}</td>
+            <td>{{ stats['f_G'] }}</td>
+            <td>{{ stats['f_GS'] }}</td>
+            <td>{{ stats['f_InnOuts'] }}</td>
+            <td>{{ stats['f_PO'] }}</td>
+            <td>{{ stats['f_A'] }}</td>
+            <td>{{ stats['f_E'] }}</td>
+            <td>{{ stats['f_DP'] }}</td>
         </tr>
+        {% set _ = processed_fielders.append((fielder.yearID, fielder.teamID)) %}
+        {% endif %}
         {% endfor %}
     </table>
+
 </div>
 
 </body>
