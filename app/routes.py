@@ -1,6 +1,12 @@
+from sqlalchemy.exc import NoResultFound
+
+from sqlalchemy.dialects.mysql import pymysql
 from datetime import datetime, timezone
 from urllib.parse import urlsplit
 
+from app import app
+from app.dbInteract import getPlayerBattingInfo, getPlayerFieldingInfo, getPlayerPitchingInfo, getTeamInfo
+from app.forms import LoginForm
 import sqlalchemy as sa
 from flask import render_template, flash, redirect, url_for
 from flask import request
@@ -15,6 +21,8 @@ from app.forms import EditProfileForm
 from app.forms import LoginForm
 from app.forms import RegistrationForm
 from app.models import RequestLog
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 from app.models import User
 
 
@@ -22,27 +30,14 @@ from app.models import User
 @app.route('/index')
 @login_required
 def index():
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html', title='Home', posts=posts)
-
+    return render_template('index.html', title='Home')
 
 @app.route('/roster/<teamid>/<yearid>')
 @login_required
 def roster(teamid, yearid):
     team_info = getTeamInfo(teamid, yearid)
     battingRoster = getBattingInfoByTeamIDandYearID(teamid, yearid)
-    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster,
-                           yearid=yearid)
-
+    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster, yearid=yearid)
 
 @app.route('/player/<player_id>')
 @login_required
@@ -100,18 +95,19 @@ def register():
 @login_required
 def user(username):
     user = db.first_or_404(sa.select(User).where(User.username == username))
-    posts = [
-        {'author': user, 'body': 'Test post #1'},
-        {'author': user, 'body': 'Test post #2'}
-    ]
-    return render_template('user.html', user=user, posts=posts)
+
+    return render_template('user.html', user=user)
 
 
-@app.before_request
-def before_request():
-    if current_user.is_authenticated:
-        current_user.last_seen = datetime.now(timezone.utc)
-        db.session.commit()
+# @app.before_request
+# def before_request():
+#     # Check if the current request is for logging SQL queries
+#     if request.endpoint == 'log_sql_queries':
+#         return
+#
+#     if current_user.is_authenticated:
+#         current_user.last_seen = datetime.now(timezone.utc)
+#         db.session.commit()
 
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -119,7 +115,7 @@ def before_request():
 def edit_profile():
     form = EditProfileForm(current_user.username)
 
-    teams = [('0', 'Team A'), ('1', 'Team B'), ('2', 'Team C')]
+    teams = [('Team A', 'Team A'), ('Team B', 'Team B'), ('Team C', 'Team C')]
 
     form.favorite_team.choices = teams
 
@@ -138,12 +134,161 @@ def edit_profile():
                            form=form)
 
 
-def log_request(user_id, request_data):
-    # Create a new log entry
+@app.route('/admin/request_logs')
+@login_required
+def admin_request_logs():
+    if not current_user.is_admin:
+        # Optionally, you can handle non-admin access here
+        return "Access denied. Only admins are allowed to view this page."
+
+    user_id = request.args.get('user_id')
+    show_all = request.args.get('show_all')  # Check if "Show All Requests" button is clicked
+
+    username = None  # Initialize username variable
+
+    if user_id:
+        try:
+            # Check if the user_id exists in the database
+            user = User.query.filter_by(id=user_id).one()
+            user_id_exists = True
+
+            # Get the username associated with the user_id
+            username = user.username
+
+            # Log the query
+            log_sql_queries(str(User.query.filter_by(id=user_id).statement), current_user)
+
+        except NoResultFound:
+            # If user_id does not exist, set user_id_exists to False
+            user_id_exists = False
+
+        if user_id_exists:
+            # Fetch request logs for the specific user_id
+            select_query = sa.select(RequestLog).where(RequestLog.user_id == user_id)
+        else:
+            # Fetch all request logs from the database if user_id does not exist
+            select_query = sa.select(RequestLog)
+    elif show_all == 'true':  # Handle the case when "Show All Requests" button is clicked
+        # Fetch all request logs from the database
+        select_query = sa.select(RequestLog)
+        user_id_exists = False
+    else:
+        # Fetch all request logs from the database if user_id is not provided
+        select_query = sa.select(RequestLog)
+        user_id_exists = False
+
+
+
+    # # Handle sorting based on the provided sort order
+    # if sort_order == 'timestamp_asc':
+    #     select_query = select_query.order_by(RequestLog.timestamp.asc())
+    # elif sort_order == 'timestamp_desc':
+    #     select_query = select_query.order_by(RequestLog.timestamp.desc())
+
+    # Log the query
+    log_sql_queries(select_query, current_user)
+
+    result = db.session.execute(select_query)
+    request_logs = []
+
+    for row in result:
+        # Extract the first element of the tuple (which is a RequestLog instance)
+        request_log = row[0]
+        request_logs.append(request_log)
+
+    # Retrieve usernames based on request_log IDs
+    user_ids = [log.user_id for log in request_logs]
+    user_id_to_username = {user.id: user.username for user in User.query.filter(User.id.in_(user_ids)).all()}
+
+    # Map usernames to request_logs
+    for log in request_logs:
+        log.username = user_id_to_username.get(log.user_id)
+
+    # Render the template with the request logs and user_id_exists flag
+    return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id,
+                           user_id_exists=user_id_exists, show_all=show_all, username=username)
+
+@app.before_request
+def log_request():
+    # Check if the current request is for logging SQL queries or during logout
+    if request.endpoint == 'log_sql_queries' or request.endpoint == 'logout' or request.endpoint == 'login' or request.endpoint == 'index' or request.endpoint == 'register':
+        return
+
+    # Retrieve user_id if the user is authenticated
+    user_id = current_user.id if current_user.is_authenticated else None
+
+    current_user.last_seen = datetime.now(timezone.utc)
+
+    # Construct the request data string
+    request_data = (
+        f"Method: {request.method}\n"
+        f"Path: {request.path}\n"
+        f"Args: {request.args}\n"
+        # f"Form: {request.form}\n"
+        f"Headers: {dict(request.headers)}\n"
+        f"Remote Addr: {request.remote_addr}\n"
+    )
+    # Log the request
     log_entry = RequestLog(user_id=user_id,
-                           timestamp=datetime.datetime.utcnow(),
-                           request_data=str(request_data))
+                           timestamp=datetime.now(timezone.utc),
+                           request_data=request_data)
     # Add the log entry to the database session
     db.session.add(log_entry)
     # Commit the transaction to save the log entry
     db.session.commit()
+
+
+
+
+
+
+# Define a function to log SQL queries
+def log_sql_queries(sql, current_user):
+    # List of endpoints where user_id should not be extracted
+    excluded_endpoints = ['log_sql_queries'] #, 'logout', 'login', 'index', 'register']
+
+    # Check if the current request is for logging SQL queries or excluded endpoints
+    if request.endpoint in excluded_endpoints:
+        return
+
+    # Set user_id to None by default
+    user_id = None
+
+    # Set user_id for authenticated users
+    if current_user.is_authenticated:
+        user_id = current_user.id
+
+
+    # Construct the request data string
+    request_data = (
+        f"Method: {request.method}\n"
+        f"Path: {request.path}\n"
+        f"Args: {request.args}\n"
+        # f"Form: {request.form}\n"
+        # f"Headers: {dict(request.headers)}\n"
+        # f"Remote Addr: {request.remote_addr}\n"
+        f"SQL Query: {sql}\n"
+    )
+
+    # Log the request
+    log_entry = RequestLog(user_id=user_id,
+                           timestamp=datetime.now(timezone.utc),
+                           request_data=request_data)
+
+    # Add the log entry to the database session
+    db.session.add(log_entry)
+    # Commit the transaction to save the log entry
+    db.session.commit()
+
+
+
+# Register the event listener to log SQL queries
+@event.listens_for(Engine, "before_cursor_execute", once=True)
+def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    if request.method == 'GET':
+        log_sql_queries(statement, current_user)
+
+@event.listens_for(Engine, "after_cursor_execute", once=True)
+def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    if request.method == 'POST':
+        log_sql_queries(statement, current_user)

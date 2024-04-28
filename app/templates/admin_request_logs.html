@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Logs</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+</head>
+<body>
+    <h1>Admin Request Logs</h1>
+
+    <div class="helpful-links">
+        <p>Helpful Links:</p>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            {% if current_user.is_anonymous %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            {% else %}
+                <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
+                {% if current_user.is_admin %}
+                    <li><a href="{{ url_for('admin_request_logs') }}">Admin Request Logs</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Divider -->
+    <hr>`
+
+
+    <div class="button-container">
+        <!-- Form to input user ID -->
+        <form method="GET" action="/admin/request_logs">
+            <label for="user_id">User ID:</label>
+            <input type="text" id="user_id" name="user_id" required>
+            <button type="submit">View Request Logs</button>
+        </form>
+
+        <!-- Form to show all requests -->
+        <form method="GET" action="/admin/request_logs">
+            <button type="submit" name="show_all" value="true">Show All Requests</button>
+        </form>
+
+        <!-- Toggle button for sorting -->
+        <button id="sort-button">ASC Order</button>
+    </div>
+
+
+    <!-- Check if user ID exists -->
+    {% if user_id_exists %}
+        <h2>User ID: {{ user_id }}</h2>
+        <h3>Username: {{ username }}</h3>
+        <!-- Display the total number of requests -->
+        <p>Total requests: {{ request_logs|length }}</p>
+
+
+        <table id="request-logs-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Username</th>
+                    <th>Timestamp</th>
+                    <th>Request Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in request_logs %}
+                <tr>
+                    <td>{{ log.id }}</td>
+                    <td>{{ log.user_id }}</td>
+                    <td>{{ log.username }}</td>
+                    <td>{{ log.timestamp }}</td>
+                    <td><pre>{{ log.request_data }}</pre></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <script>
+            // JavaScript for sorting request logs
+            document.getElementById("sort-button").addEventListener("click", function() {
+                var table = document.getElementById("request-logs-table").getElementsByTagName("tbody")[0];
+                var rows = table.rows;
+                var data = [];
+
+                // Convert table rows to array
+                for (var i = 0; i < rows.length; i++) {
+                    var cells = rows[i].cells;
+                    var rowData = {
+                        id: cells[0].innerText,
+                        user_id: cells[1].innerText,
+                        username: cells[2].innerText,
+                        timestamp: cells[3].innerText,
+                        request_data: cells[4].innerText
+                    };
+                    data.push(rowData);
+                }
+
+                // Toggle sorting direction
+                var sortOrder = this.getAttribute("data-sort-order") || "asc";
+                sortOrder = sortOrder === "asc" ? "desc" : "asc";
+                this.setAttribute("data-sort-order", sortOrder);
+                this.textContent = sortOrder.toUpperCase() + " Order";
+
+
+                // Sort data array
+                data.sort(function(a, b) {
+                    if (sortOrder === "asc") {
+                        return a.id - b.id;
+                    } else {
+                        return b.id - a.id;
+                    }
+                });
+
+                // Update table with sorted data
+                while (table.firstChild) {
+                    table.removeChild(table.firstChild);
+                }
+
+                for (var i = 0; i < data.length; i++) {
+                    var row = table.insertRow(i);
+                    row.insertCell(0).innerText = data[i].id;
+                    row.insertCell(1).innerText = data[i].user_id;
+                    row.insertCell(2).innerText = data[i].username;
+                    row.insertCell(3).innerText = data[i].timestamp;
+                    row.insertCell(4).innerText = data[i].request_data;
+                }
+            });
+        </script>
+    {% else %}
+        {% if show_all != 'true' %}
+            <p>User ID does not exist.</p>
+        {% endif %}
+        <h2>All Request Logs</h2>
+        <p>Total requests: {{ request_logs|length }}</p>
+        <table id="all-request-logs-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Username</th>
+                    <th>Timestamp</th>
+                    <th>Request Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in request_logs %}
+                <tr>
+                    <td>{{ log.id }}</td>
+                    <td>{{ log.user_id }}</td>
+                    <td>{{ log.username }}</td>
+                    <td>{{ log.timestamp }}</td>
+                    <td><pre>{{ log.request_data }}</pre></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <script>
+                // JavaScript for sorting request logs
+                document.getElementById("sort-button").addEventListener("click", function() {
+                    var table = document.getElementById("all-request-logs-table").getElementsByTagName("tbody")[0];
+                    var rows = table.rows;
+                    var data = [];
+
+                    // Convert table rows to array
+                    for (var i = 0; i < rows.length; i++) {
+                        var cells = rows[i].cells;
+                        var rowData = {
+                            id: cells[0].innerText,
+                            user_id: cells[1].innerText,
+                            username: cells[2].innerText,
+                            timestamp: cells[3].innerText,
+                            request_data: cells[4].innerText
+                        };
+                        data.push(rowData);
+                    }
+
+                    // Toggle sorting direction
+                    var sortOrder = this.getAttribute("data-sort-order") || "asc";
+                    sortOrder = sortOrder === "asc" ? "desc" : "asc";
+                    this.setAttribute("data-sort-order", sortOrder);
+                    this.textContent = sortOrder.toUpperCase() + " Order";
+
+
+                    // Sort data array
+                    data.sort(function(a, b) {
+                        if (sortOrder === "asc") {
+                            return a.id - b.id;
+                        } else {
+                            return b.id - a.id;
+                        }
+                    });
+
+                    // Update table with sorted data
+                    while (table.firstChild) {
+                        table.removeChild(table.firstChild);
+                    }
+
+                    for (var i = 0; i < data.length; i++) {
+                        var row = table.insertRow(i);
+                        row.insertCell(0).innerText = data[i].id;
+                        row.insertCell(1).innerText = data[i].user_id;
+                        row.insertCell(2).innerText = data[i].username;
+                        row.insertCell(3).innerText = data[i].timestamp;
+                        row.insertCell(4).innerText = data[i].request_data;
+                    }
+                });
+            </script>
+    {% endif %}
+
+</body>
+</html>
