@@ -1,3 +1,5 @@
+from sqlalchemy.exc import NoResultFound
+
 from app import app
 from app.forms import LoginForm
 from flask import render_template, flash, redirect, url_for
@@ -160,11 +162,31 @@ def admin_request_logs():
         return "Access denied. Only admins are allowed to view this page."
 
     user_id = request.args.get('user_id')
+    show_all = request.args.get('show_all')  # Check if "Show All Requests" button is clicked
 
     if user_id:
-        # Fetch request logs for a specific user_id
-        select_query = sa.select(RequestLog).where(RequestLog.user_id == user_id)
-        user_id_exists = True
+        try:
+            # Check if the user_id exists in the database
+            user = User.query.filter_by(id=user_id).one()
+            user_id_exists = True
+
+            # Log the query
+            log_sql_queries(str(User.query.filter_by(id=user_id).statement), current_user)
+
+        except NoResultFound:
+            # If user_id does not exist, set user_id_exists to False
+            user_id_exists = False
+
+        if user_id_exists:
+            # Fetch request logs for the specific user_id
+            select_query = sa.select(RequestLog).where(RequestLog.user_id == user_id)
+        else:
+            # Fetch all request logs from the database if user_id does not exist
+            select_query = sa.select(RequestLog)
+    elif show_all == 'true':  # Handle the case when "Show All Requests" button is clicked
+        # Fetch all request logs from the database
+        select_query = sa.select(RequestLog)
+        user_id_exists = False
     else:
         # Fetch all request logs from the database if user_id is not provided
         select_query = sa.select(RequestLog)
@@ -183,7 +205,7 @@ def admin_request_logs():
 
     # Render the template with the request logs and user_id_exists flag
     return render_template('admin_request_logs.html', request_logs=request_logs, user_id=user_id,
-                           user_id_exists=user_id_exists)
+                           user_id_exists=user_id_exists, show_all=show_all)
 
 @app.before_request
 def log_request():
