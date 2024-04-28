@@ -3,7 +3,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.dialects.mysql import pymysql
 
 from app import app
-from app.dbInteract import getPlayerBattingInfo, getPlayerFieldingInfo, getPlayerPitchingInfo
+from app.dbInteract import getPlayerBattingInfo, getPlayerFieldingInfo, getPlayerPitchingInfo, getTeamInfo
 from app.forms import LoginForm
 from flask import render_template, flash, redirect, url_for
 from flask_login import current_user, login_user
@@ -32,25 +32,12 @@ from config import Config
 def index():
     return render_template('index.html', title='Home')
 
-@app.route('/roster')
+@app.route('/roster/<teamid>/<yearid>')
 @login_required
-def roster():
-    user = {'username': 'Spencer'}
-    players = [
-        {'Name': 'John Doe', 'Position': 'Catcher', 'GamesPlayed': 50, 'BattingAverage': 0.300, 'OnBasePercentage': 0.400, 'SluggingPercentage': 0.500},
-        {'Name': 'Jane Smith', 'Position': 'Shortstop', 'GamesPlayed': 45, 'BattingAverage': 0.280, 'OnBasePercentage': 0.350, 'SluggingPercentage': 0.450},
-        {'Name': 'Mike Johnson', 'Position': 'Outfielder', 'GamesPlayed': 55, 'BattingAverage': 0.320, 'OnBasePercentage': 0.420, 'SluggingPercentage': 0.550}
-    ]
-    pitchers = [
-        {'Name': 'Jake Anderson', 'GamesPitched': 30, 'GamesStarted': 25, 'InningsPitched': 150, 'WHIP': 1.20, 'StrikeoutsPer9': 8.5},
-        {'Name': 'Sarah Brown', 'GamesPitched': 35, 'GamesStarted': 30, 'InningsPitched': 170, 'WHIP': 1.15, 'StrikeoutsPer9': 9.0}
-    ]
-    team ={
-            'team': 'New York Yankees',
-            'record': '72-9',
-            'year': '2020'
-        }
-    return render_template('roster.html', title='Roster', user=user, players=players, pitchers=pitchers, team=team)
+def roster(teamid, yearid):
+    team_info = getTeamInfo(teamid, yearid)
+    battingRoster = getBattingInfoByTeamIDandYearID(teamid, yearid)
+    return render_template('roster.html', title='Roster', user=user, team=team_info, battingRoster=battingRoster,yearid=yearid)
 
 @app.route('/player/<int:player_id>')
 @login_required
