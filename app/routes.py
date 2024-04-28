@@ -1,6 +1,9 @@
 from sqlalchemy.exc import NoResultFound
 
+from sqlalchemy.dialects.mysql import pymysql
+
 from app import app
+from app.dbInteract import getPlayerBattingInfo, getPlayerFieldingInfo, getPlayerPitchingInfo
 from app.forms import LoginForm
 from flask import render_template, flash, redirect, url_for
 from flask_login import current_user, login_user
@@ -17,6 +20,11 @@ from app.forms import EditProfileForm
 from app.models import RequestLog
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+
+#import sys
+#sys.path.append('/config.py')
+import config
+from config import Config
 
 @app.route('/')
 @app.route('/index')
@@ -47,28 +55,32 @@ def roster():
 @app.route('/player/<int:player_id>')
 @login_required
 def player_stats(player_id):
-    user = {'username': 'Spencer'}
-    players = [
-        {'player_id': 1, 'Name': 'John', 'Position': 'Catcher', 'GamesPlayed': 50, 'BattingAverage': 0.300, 'OnBasePercentage': 0.400, 'SluggingPercentage': 0.500},
-        {'player_id': 2, 'Name': 'Jane Smith', 'Position': 'Shortstop', 'GamesPlayed': 45, 'BattingAverage': 0.280, 'OnBasePercentage': 0.350, 'SluggingPercentage': 0.450},
-        {'player_id': 3, 'Name': 'Mike Johnson', 'Position': 'Outfielder', 'GamesPlayed': 55, 'BattingAverage': 0.320, 'OnBasePercentage': 0.420, 'SluggingPercentage': 0.550}
-    ]
-    pitchers = [
-        {'player_id': 4, 'Name': 'Jake Anderson', 'GamesPitched': 30, 'GamesStarted': 25, 'InningsPitched': 150, 'WHIP': 1.20, 'StrikeoutsPer9': 8.5},
-        {'player_id': 5, 'Name': 'Sarah Brown', 'GamesPitched': 35, 'GamesStarted': 30, 'InningsPitched': 170, 'WHIP': 1.15, 'StrikeoutsPer9': 9.0}
-    ]
-    team = {
-        'team': 'New York Yankees',
-        'record': '72-9',
-        'year': '2020'
-    }
-    # Find the player in the list based on the player_id parameter
-    selected_player = next((player for player in players if player['player_id'] == player_id), None)
 
-    if selected_player:
-        return render_template('player.html', title=f"Player ID {player_id}'s Stats", user=user, player=selected_player, team=team)
-    else:
-        return "Player not found", 404
+    # players = [
+    #     {'player_id': 1, 'Name': 'John', 'Position': 'Catcher', 'GamesPlayed': 50, 'BattingAverage': 0.300, 'OnBasePercentage': 0.400, 'SluggingPercentage': 0.500},
+    #     {'player_id': 2, 'Name': 'Jane Smith', 'Position': 'Shortstop', 'GamesPlayed': 45, 'BattingAverage': 0.280, 'OnBasePercentage': 0.350, 'SluggingPercentage': 0.450},
+    #     {'player_id': 3, 'Name': 'Mike Johnson', 'Position': 'Outfielder', 'GamesPlayed': 55, 'BattingAverage': 0.320, 'OnBasePercentage': 0.420, 'SluggingPercentage': 0.550}
+    # ]
+
+    # Fetch player info based on player_id
+    # selected_player = next((player for player in players if player['player_id'] == player_id), None)
+
+    # if selected_player:
+    player_id="aardsda01"
+
+        # Call getPlayerBattingInfo to get batting data
+    batting_info = getPlayerBattingInfo(str(player_id))
+    # Fetch batting, pitching, and fielding info for the player
+    batting_info = getPlayerBattingInfo(str(player_id))
+    pitching_info = getPlayerPitchingInfo(str(player_id))
+    fielding_info = getPlayerFieldingInfo(str(player_id))
+# Render the template with player and info
+    return render_template('player.html', player_id=player_id, batting=batting_info, pitching=pitching_info, fielding=fielding_info)
+
+        # Render the template with player and batting info
+        # return render_template('player.html', info=batting_info)
+    # else:
+    #     return "Player not found", 404
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -91,7 +103,6 @@ def login():
 
 @app.route('/logout')
 def logout():
-
     logout_user()
     return redirect(url_for('index'))
 
@@ -106,7 +117,6 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)

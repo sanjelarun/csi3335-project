@@ -13,7 +13,7 @@ This virtual environment contains essential Python libraries and frameworks requ
 
 ```bash
 git clone https://github.com/sanjelarun/csi3335-project-venv.git
-cd csi3335-project-venv
+cd csi3335.py-project-venv
 ```
 
 2. **Create a Virtual Environment**
