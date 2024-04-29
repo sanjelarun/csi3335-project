@@ -221,14 +221,14 @@
                 <th class="sortable-header" onclick="sortTable('rosterTable', 0)">Player Name</th>
                 <th class="sortable-header" onclick="sortTable('rosterTable', 1)">Position</th>
                 <th class="sortable-header" onclick="sortTable('rosterTable', 2)">Games Played</th>
-                <th class="sortable-header" onclick="sortTable('rosterTable', 3)">At Bats</th>
-                <th class="sortable-header" onclick="sortTable('rosterTable', 4)">Hits</th>
-                <th class="sortable-header" onclick="sortTable('rosterTable', 5)">Runs</th>
-                <th class="sortable-header" onclick="sortTable('rosterTable', 6)">Home Runs</th>
-                <th class="sortable-header" onclick="sortTable('rosterTable', 7)">RBI</th>
-                <th class="sortable-header" onclick="sortTable('rosterTable', 8)">Walks</th>
-                <th class="sortable-header" onclick="sortTable('rosterTable', 9)">Hit By Pitch</th>
-                <th class="sortable-header" onclick="sortTable('rosterTable', 10)">Sacrifice Flies</th>
+<!--                <th class="sortable-header" onclick="sortTable('rosterTable', 3)">At Bats</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('rosterTable', 4)">Hits</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('rosterTable', 5)">Runs</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('rosterTable', 6)">Home Runs</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('rosterTable', 7)">RBI</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('rosterTable', 8)">Walks</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('rosterTable', 9)">Hit By Pitch</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('rosterTable', 10)">Sacrifice Flies</th>-->
                 <th class="sortable-header" onclick="sortTable('rosterTable', 11)">Batting Average</th>
                 <th class="sortable-header" onclick="sortTable('rosterTable', 12)">On-Base %</th>
                 <th class="sortable-header" onclick="sortTable('rosterTable', 13)">Slugging %</th>
@@ -244,14 +244,14 @@
                 <td><a href="{{ url_for('player_stats', player_id=player.playerid) }}">{{ player.nameFirst }} {{ player.nameLast }}</a></td>
                 <td>{{ positions | join(', ') }}</td>
                 <td>{{ player.b_G }}</td>
-                <td>{{ player.b_AB }}</td>
-                <td>{{ player.b_H }}</td>
-                <td>{{ player.b_R }}</td>
-                <td>{{ player.b_HR }}</td>
-                <td>{{ player.b_RBI }}</td>
-                <td>{{ player.b_BB }}</td>
-                <td>{{ player.b_HBP }}</td>
-                <td>{{ player.b_SF }}</td>
+<!--                <td>{{ player.b_AB }}</td>-->
+<!--                <td>{{ player.b_H }}</td>-->
+<!--                <td>{{ player.b_R }}</td>-->
+<!--                <td>{{ player.b_HR }}</td>-->
+<!--                <td>{{ player.b_RBI }}</td>-->
+<!--                <td>{{ player.b_BB }}</td>-->
+<!--                <td>{{ player.b_HBP }}</td>-->
+<!--                <td>{{ player.b_SF }}</td>-->
                 <td>{% if player.b_AB > 0 %}{{ "%.3f"|format(player.b_H / player.b_AB) }}{% else %}0.000{% endif %}</td>  <!-- Batting Average -->
                 <td>{% if player.b_AB + player.b_BB + player.b_HBP + player.b_SF > 0 %}{{ "%.3f"|format((player.b_H + player.b_BB + player.b_HBP) / (player.b_AB + player.b_BB + player.b_HBP + player.b_SF)) }}{% else %}0.000{% endif %}</td>  <!-- On-Base % -->
                 <td>{% if player.b_AB > 0 %}{{ "%.3f"|format((player.b_H + player.b_2B + 2 * player.b_3B + 3 * player.b_HR) / player.b_AB) }}{% else %}0.000{% endif %}</td>  <!-- Slugging % -->
@@ -271,13 +271,13 @@
                 <th class="sortable-header" onclick="sortTable('pitchingTable', 3)">Innings Pitched</th>
                 <th class="sortable-header" onclick="sortTable('pitchingTable', 4)">WHIP</th>
                 <th class="sortable-header" onclick="sortTable('pitchingTable', 5)">Strikeouts / 9 Innings</th>
-                <th class="sortable-header" onclick="sortTable('pitchingTable', 6)">Wins</th>
-                <th class="sortable-header" onclick="sortTable('pitchingTable', 7)">Losses</th>
-                <th class="sortable-header" onclick="sortTable('pitchingTable', 8)">Saves</th>
-                <th class="sortable-header" onclick="sortTable('pitchingTable', 9)">ERA</th>
-                <th class="sortable-header" onclick="sortTable('pitchingTable', 10)">Strikeouts</th>
-                <th class="sortable-header" onclick="sortTable('pitchingTable', 11)">Hits Allowed</th>
-                <th class="sortable-header" onclick="sortTable('pitchingTable', 12)">Walks Allowed</th>
+<!--                <th class="sortable-header" onclick="sortTable('pitchingTable', 6)">Wins</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('pitchingTable', 7)">Losses</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('pitchingTable', 8)">Saves</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('pitchingTable', 9)">ERA</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('pitchingTable', 10)">Strikeouts</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('pitchingTable', 11)">Hits Allowed</th>-->
+<!--                <th class="sortable-header" onclick="sortTable('pitchingTable', 12)">Walks Allowed</th>-->
             </tr>
             {% for player in pitchingRoster %}
             <tr>
@@ -287,13 +287,13 @@
                 <td>{{ player.p_IP }}</td>
                 <td>{{ player.p_WHIP }}</td>
                 <td>{{ player.p_SO_per_9 }}</td>
-                <td>{{ player.p_W }}</td>
-                <td>{{ player.p_L }}</td>
-                <td>{{ player.p_SV }}</td>
-                <td>{{ player.p_ERA }}</td>
-                <td>{{ player.p_SO }}</td>
-                <td>{{ player.p_H }}</td>
-                <td>{{ player.p_BB }}</td>
+<!--                <td>{{ player.p_W }}</td>-->
+<!--                <td>{{ player.p_L }}</td>-->
+<!--                <td>{{ player.p_SV }}</td>-->
+<!--                <td>{{ player.p_ERA }}</td>-->
+<!--                <td>{{ player.p_SO }}</td>-->
+<!--                <td>{{ player.p_H }}</td>-->
+<!--                <td>{{ player.p_BB }}</td>-->
             </tr>
             {% endfor %}
         </table>
