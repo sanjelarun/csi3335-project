@@ -63,8 +63,8 @@ def getTeamInfo(teamID: str, yearID: int) -> list[dict[str, str]]:
             line["team_G"] = str(row[38])
             line["franchID"] = str(row[39])
             line["WSWin"] = str(row[40])
-            line["divWin"] = str(row[40])
-            line["LGwin"] = str(row[40])
+            line["divWin"] = str(row[41])
+            line["LGwin"] = str(row[42])
 
 
             output.append(line)
