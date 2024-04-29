@@ -16,6 +16,9 @@
         th {
             background-color: #f2f2f2;
         }
+        .sortable-header {
+            cursor: pointer;
+        }
     </style>
     <script>
         function toggleStats() {
@@ -30,43 +33,104 @@
                 detailedStats.style.display = 'none';
             }
         }
+         function toggleSection(sectionId) {
+            var section = document.getElementById(sectionId);
+            if (section.style.display === "none") {
+            section.style.display = "block";
+            section.classList.add('active');
+        } else {
+            section.style.display = "none";
+            section.classList.remove('active');
+        }
+        }
+
+        function sortTable(tableId, columnIndex) {
+            var table, rows, switching, i, shouldSwitch, dir, switchCount = 0;
+            table = document.getElementById(tableId);
+            switching = true;
+            dir = "asc"; // Set initial sorting direction to ascending
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < rows.length - 1; i++) {
+                    shouldSwitch = false;
+                    var x = rows[i].getElementsByTagName("td")[columnIndex].textContent.trim();
+                    var y = rows[i + 1].getElementsByTagName("td")[columnIndex].textContent.trim();
+                    var isNumericX = !isNaN(x);
+                    var isNumericY = !isNaN(y);
+
+                    if (dir === "asc") {
+                        if ((isNumericX && isNumericY && parseFloat(x) > parseFloat(y)) ||
+                            (!isNumericX && !isNumericY && x > y)) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir === "desc") {
+                        if ((isNumericX && isNumericY && parseFloat(x) < parseFloat(y)) ||
+                            (!isNumericX && !isNumericY && x < y)) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchCount++;
+                } else {
+                    if (switchCount === 0 && dir === "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
     </script>
 </head>
 
 <body>
 <div>
-    Helpful Links:
-    <a href="{{ url_for('index') }}">Home</a>
-    <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
-    <a href="{{ url_for('login') }}">Login</a>
+    {% extends "base.html" %}
+    {% block content %}
 </div>
 {% for team in team %}
 <h1>{{team.team_name}} - {{yearid}}</h1>
 <h1>Record: {{team.team_W}} - {{team.team_L}}</h1>
+{% if team.WSWin == 'Y' %}
+<h2>Won the World Series</h2>
+{% endif %}
+{% if team.DivWin == 'Y' %}
+<h2>Won their division</h2>
+{% endif %}
+{% if team.LgWin == 'Y' %}
+<h2>Won their league</h2>
+{% endif %}
 {% endfor %}
 
-    <h2>Team Stats</h2>
-    <button onclick="toggleStats()">Toggle Advanced Stats</button>
-    <div id="simpleStats" style="display: block">
-        <table>
-            <tr>
-                <th>Team Name</th>
-                <th>Wins</th>
-                <th>Losses</th>
-                <th>Home Runs</th>
-            </tr>
-            {% for team in team %}
-            <tr>
-                <td>{{ team.team_name }}</td>
-                <td>{{ team.team_W }}</td>
-                <td>{{ team.team_L }}</td>
-                <td>{{ team.team_HR }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-    <div id="detailedStats" style="display: none;">
-        <table>
+<h2>Team Stats</h2>
+<button onclick="toggleStats()">Toggle Advanced Stats</button>
+<div id="simpleStats" style="display: block">
+    <table>
+        <tr>
+            <th onclick="sortTable('teamStatsTable', 0)">Team Name</th>
+            <th onclick="sortTable('teamStatsTable', 1)">Team Ranking</th>
+            <th onclick="sortTable('teamStatsTable', 2)">Games Played</th>
+            <th onclick="sortTable('teamStatsTable', 3)">Franchise</th>
+            <th onclick="sortTable('teamStatsTable', 4)">Attendance</th>
+        </tr>
+        {% for team in team %}
+        <tr>
+            <td>{{ team.team_name }}</td>
+            <td>{{ team.team_rank }}</td>
+            <td>{{ team.team_G }}</td>
+            <td>{{ team.franchID }}</td>
+            <td>{{ team.team_attendance }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+<div id="detailedStats" style="display: none;">
+    <table>
         <tr>
             <th>Team Name</th>
             <th>Wins</th>
@@ -151,16 +215,23 @@
     </div>
     <div>
         <h2>Roster</h2>
-        <table>
+        <h3>Batting Stats</h3>
+        <table id="rosterTable">
             <tr>
-                <th>Player Name</th>
-                <th>Position</th>
-                <th>Games Played</th>
-                <th>At Bats</th>
-                <th>Hits</th>
-                <th>Runs</th>
-                <th>Home Runs</th>
-                <th>RBI</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 0)">Player Name</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 1)">Position</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 2)">Games Played</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 3)">At Bats</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 4)">Hits</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 5)">Runs</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 6)">Home Runs</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 7)">RBI</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 8)">Walks</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 9)">Hit By Pitch</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 10)">Sacrifice Flies</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 11)">Batting Average</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 12)">On-Base %</th>
+                <th class="sortable-header" onclick="sortTable('rosterTable', 13)">Slugging %</th>
             </tr>
             {% set processed_players = [] %}
             {% for player in battingRoster %}
@@ -174,15 +245,59 @@
                 <td>{{ positions | join(', ') }}</td>
                 <td>{{ player.b_G }}</td>
                 <td>{{ player.b_AB }}</td>
-                <td>{{ player.b_R }}</td>
                 <td>{{ player.b_H }}</td>
+                <td>{{ player.b_R }}</td>
                 <td>{{ player.b_HR }}</td>
                 <td>{{ player.b_RBI }}</td>
+                <td>{{ player.b_BB }}</td>
+                <td>{{ player.b_HBP }}</td>
+                <td>{{ player.b_SF }}</td>
+                <td>{% if player.b_AB > 0 %}{{ "%.3f"|format(player.b_H / player.b_AB) }}{% else %}0.000{% endif %}</td>  <!-- Batting Average -->
+                <td>{% if player.b_AB + player.b_BB + player.b_HBP + player.b_SF > 0 %}{{ "%.3f"|format((player.b_H + player.b_BB + player.b_HBP) / (player.b_AB + player.b_BB + player.b_HBP + player.b_SF)) }}{% else %}0.000{% endif %}</td>  <!-- On-Base % -->
+                <td>{% if player.b_AB > 0 %}{{ "%.3f"|format((player.b_H + player.b_2B + 2 * player.b_3B + 3 * player.b_HR) / player.b_AB) }}{% else %}0.000{% endif %}</td>  <!-- Slugging % -->
             </tr>
             {% set _ = processed_players.append(player.nameFirst) %}
             {% endif %}
             {% endfor %}
         </table>
+
+
+        <h3>Pitching Stats</h3>
+        <table id="pitchingTable">
+            <tr>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 0)">Player Name</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 1)">Games Pitched</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 2)">Games Started</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 3)">Innings Pitched</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 4)">WHIP</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 5)">Strikeouts / 9 Innings</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 6)">Wins</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 7)">Losses</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 8)">Saves</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 9)">ERA</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 10)">Strikeouts</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 11)">Hits Allowed</th>
+                <th class="sortable-header" onclick="sortTable('pitchingTable', 12)">Walks Allowed</th>
+            </tr>
+            {% for player in pitchingRoster %}
+            <tr>
+                <td><a href="{{ url_for('player_stats', player_id=player.playerid) }}">{{ player.nameFirst }} {{ player.nameLast }}</a></td>
+                <td>{{ player.p_G }}</td>
+                <td>{{ player.p_GS }}</td>
+                <td>{{ player.p_IP }}</td>
+                <td>{{ player.p_WHIP }}</td>
+                <td>{{ player.p_SO_per_9 }}</td>
+                <td>{{ player.p_W }}</td>
+                <td>{{ player.p_L }}</td>
+                <td>{{ player.p_SV }}</td>
+                <td>{{ player.p_ERA }}</td>
+                <td>{{ player.p_SO }}</td>
+                <td>{{ player.p_H }}</td>
+                <td>{{ player.p_BB }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 </body>
+{%endblock%}
 </html>

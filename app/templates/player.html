@@ -135,12 +135,10 @@
 </head>
 <body>
 <div>
-    Helpful Links:
-    <a href="{{ url_for('index') }}">Home</a>
-    <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
-    <a href="{{ url_for('login') }}">Login</a>
+    {% extends "base.html" %}
+    {% block content %}
 </div>
-<hr>
+
 
 <h1>{{ player }}'s Stats</h1>
 
@@ -255,4 +253,5 @@
 </div>
 
 </body>
+{%endblock%}
 </html>
