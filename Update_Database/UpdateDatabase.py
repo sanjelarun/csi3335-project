@@ -2,6 +2,7 @@
 
 import pymysql
 from People import updatePeople 
+from Batting import updateBatting
 
 import csi3335f2024 as cfg
 
@@ -11,19 +12,10 @@ con = pymysql.connect(host=cfg.mysql['location'],user=cfg.mysql['user'],password
 
 # retrieve info
 try:
-
-   
     cur = con.cursor()
 
     updatePeople(cur)
-
-    # sql = '''SELECT yearID, ballots, votes, inducted, birthYear, deathYear 
-    #         FROM halloffame NATURAL JOIN people 
-    #         WHERE nameFirst=%s AND nameLast=%s;'''
-    # #execute html and extract needed info from result set
-    # cur.execute(sql,[firstName,lastName])
-    # results = cur.fetchall()
-   
+    updateBatting(cur)
 
 except Exception:
     con.rollback()
