@@ -1,1 +1,1 @@
-mysql = {'location':'localhost','user':'web','password':'mypass','database':'yourteamname'}
+mysql = {'location':'localhost','user':'partyTimeUser','password':'partyTimePassword','database':'baseball'}
