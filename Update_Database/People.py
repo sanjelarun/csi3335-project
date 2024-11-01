@@ -41,4 +41,4 @@ def updatePeople(cursor):
         exe = cursor.execute(sql,newPerson)
         peopleAdded += exe
     
-    print("{} new People added!".format(peopleAdded))
+    print("Complete: {} new People added!".format(peopleAdded))

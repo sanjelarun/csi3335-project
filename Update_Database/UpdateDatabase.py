@@ -3,6 +3,11 @@
 import pymysql
 from People import updatePeople 
 from Batting import updateBatting
+from FieldingOFSplit import updateFieldingOFSplit
+from AllStarFull import updateAllStarFull
+from SeriesPost import updateSeriesPost
+from AwardsManagers import updateAwardsManagers
+from HallOfFame import updateHallOfFame
 
 import csi3335f2024 as cfg
 
@@ -16,6 +21,11 @@ try:
 
     updatePeople(cur)
     updateBatting(cur)
+    updateFieldingOFSplit(cur)
+    updateAllStarFull(cur) 
+    updateSeriesPost(cur)
+    updateAwardsManagers(cur)
+    updateHallOfFame(cur)
 
 except Exception:
     con.rollback()
