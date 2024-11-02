@@ -8,6 +8,12 @@ from AllStarFull import updateAllStarFull
 from SeriesPost import updateSeriesPost
 from AwardsManagers import updateAwardsManagers
 from HallOfFame import updateHallOfFame
+from Parks import updateParks
+from Managers import updateManagers
+from FieldingPost import updateFieldingPost
+from TeamsHalf import updateTeamsHalf
+from AwardsSharePlayers import updateAwardsSharePlayers
+from Schools import updateSchools
 
 import csi3335f2024 as cfg
 
@@ -26,6 +32,13 @@ try:
     updateSeriesPost(cur)
     updateAwardsManagers(cur)
     updateHallOfFame(cur)
+    updateParks(cur)
+    updateManagers(cur)
+    updateFieldingPost(cur)
+    updateTeamsHalf(cur)
+    updateAwardsSharePlayers(cur)
+    updateSchools(cur)
+
 
 except Exception:
     con.rollback()
