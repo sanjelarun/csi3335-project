@@ -6,6 +6,7 @@ from Batting import updateBatting
 from Franchises import updateFranchises
 from Fielding import updateFielding
 from Appearances import updateAppearances
+from PitchingPost import updatePitchingPost
 
 import csi3335f2024 as cfg
 
@@ -22,6 +23,7 @@ try:
     updateFranchises(cur)
     updateFielding(cur)
     updateAppearances(cur)
+    updatePitchingPost(cur)
 
 except Exception:
     con.rollback()
