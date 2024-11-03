@@ -7,6 +7,7 @@ from Franchises import updateFranchises
 from Fielding import updateFielding
 from Appearances import updateAppearances
 from PitchingPost import updatePitchingPost
+from ManagersHalf import updateManagersHalf
 
 import csi3335f2024 as cfg
 
@@ -24,6 +25,8 @@ try:
     updateFielding(cur)
     updateAppearances(cur)
     updatePitchingPost(cur)
+    # Update managers first
+    updateManagersHalf(cur)
 
 except Exception:
     con.rollback()
