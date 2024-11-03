@@ -14,7 +14,6 @@ def updatePitching:
             continue
 
         newPit = [
-            row['pitching_ID'],
             row['playerID'],
             row['yearID'],
             row['teamID'],
@@ -46,6 +45,6 @@ def updatePitching:
             row['p_GIDP'],
         ]
 
-        sql = '''INSERT INTO pitching (pitchingID,playerID,yearID,teamID,stint,p_W,p_L,p_G,p_GS,p_CG,p_SHO,p_SV,p_IPOuts,p_H,p_ER,p_HR,p_BB,p_SO,p_BAOpp,p_ERA,p_IBB,p_WP,p_HBP,p_BK,p_BFP,p_GF,p_R,p_SH,p_SF,p_GIDP) VALUES(%s,%s,%s,,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);'''
+        sql = '''INSERT INTO pitching (playerID,yearID,teamID,stint,p_W,p_L,p_G,p_GS,p_CG,p_SHO,p_SV,p_IPOuts,p_H,p_ER,p_HR,p_BB,p_SO,p_BAOpp,p_ERA,p_IBB,p_WP,p_HBP,p_BK,p_BFP,p_GF,p_R,p_SH,p_SF,p_GIDP) VALUES(%s,%s,%s,,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);'''
         exe = cursor.execute(sql,newPit)
         pitchingAdded += exe
