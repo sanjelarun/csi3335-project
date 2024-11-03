@@ -15,10 +15,10 @@ def updateFranchises(cursor):
             row['franchID'],
             row['franchName'],
             row['active'],
-            row['NAassoc'],
+            row['NAassoc'] if pd.notnull(row['NAassoc']) else None,
         ]
 
-        sql = '''INSERT INTO franchises 
+        sql = '''INSERT IGNORE INTO franchises 
                     (franchID,franchName,active,NAassoc)
                 VALUES(%s,%s,%s,%s)
                 ON DUPLICATE KEY UPDATE

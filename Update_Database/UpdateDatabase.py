@@ -4,6 +4,7 @@ import pymysql
 from People import updatePeople 
 from Batting import updateBatting
 from Franchises import updateFranchises
+from Fielding import  updateFielding
 
 import csi3335f2024 as cfg
 
@@ -18,6 +19,7 @@ try:
     updatePeople(cur)
     updateBatting(cur)
     updateFranchises(cur)
+    updateFielding(cur)
 
 except Exception:
     con.rollback()
