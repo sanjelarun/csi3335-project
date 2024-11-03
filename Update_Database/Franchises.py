@@ -17,7 +17,8 @@ def updateFranchises(cursor):
             row['active'],
             row['NAassoc'] if pd.notnull(row['NAassoc']) else None,
         ]
-
+        # Since year isn't tracked and duplicates aren't allowed,
+        # Insert on new entries, update on existing ones.
         sql = '''INSERT IGNORE INTO franchises 
                     (franchID,franchName,active,NAassoc)
                 VALUES(%s,%s,%s,%s)

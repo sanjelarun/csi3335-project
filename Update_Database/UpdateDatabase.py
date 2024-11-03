@@ -9,6 +9,7 @@ from Appearances import updateAppearances
 from PitchingPost import updatePitchingPost
 from ManagersHalf import updateManagersHalf
 from AwardsShareManagers import updateAwardsShareManagers
+from Salaries import updateSalaries
 
 import csi3335f2024 as cfg
 
@@ -29,6 +30,7 @@ try:
     # Update managers first
     updateManagersHalf(cur)
     updateAwardsShareManagers(cur)
+    updateSalaries(cur)
 
 except Exception:
     con.rollback()

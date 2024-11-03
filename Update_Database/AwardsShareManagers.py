@@ -21,7 +21,7 @@ def updateAwardsShareManagers(cursor):
             row['pointsMax'] if pd.notnull(row['pointsMax']) else None,
             row['votesFirst'] if pd.notnull(row['votesFirst']) else None,
         ]
-        sql = '''INSERT IGNORE INTO awardsshare
+        sql = '''INSERT INTO awardsshare
                 (awardID, yearID, playerID, lgID, pointsWon, pointsMax, votesFirst)
                 VALUES(%s, %s, %s, %s, %s, %s, %s);'''
         exe = cursor.execute(sql, newManagerHalf)

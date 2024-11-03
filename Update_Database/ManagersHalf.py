@@ -17,10 +17,10 @@ def updateManagersHalf(cursor):
             row['yearID'],
             row['teamID'],
             row['inseason'],
-            row['G']if pd.notnull(row['G']) else None,
-            row['W']if pd.notnull(row['W']) else None,
-            row['L']if pd.notnull(row['L']) else None,
-            row['rank']if pd.notnull(row['rank']) else None,
+            row['G'] if pd.notnull(row['G']) else None,
+            row['W'] if pd.notnull(row['W']) else None,
+            row['L'] if pd.notnull(row['L']) else None,
+            row['rank'] if pd.notnull(row['rank']) else None,
             row['half'] if pd.notnull(row['half']) else None,
         ]
         sql = '''UPDATE managers

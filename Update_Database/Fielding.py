@@ -32,7 +32,7 @@ def updateFielding(cursor):
             row['CS'] if pd.notnull(row['CS']) else None,
             row['ZR'] if pd.notnull(row['ZR']) else None,
         ]
-        sql = '''INSERT IGNORE INTO fielding 
+        sql = '''INSERT INTO fielding 
                 (playerID,yearID,teamID,stint,position,f_G,f_GS,f_InnOuts,f_PO,f_A,f_E,f_DP,f_PB,f_WP,f_SB,f_CS,f_ZR)
                 VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
         exe = cursor.execute(sql, newField)
