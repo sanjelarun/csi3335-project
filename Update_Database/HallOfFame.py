@@ -19,7 +19,7 @@ def updateHallOfFame(cursor):
             row["votedBy"],
             row["ballots"],
             row["needed"],
-            row["votes"],
+            row["votes"] if pd.notnull(row['votes']) else None,
             row["inducted"],
             row["category"],
             row["needed_note"],

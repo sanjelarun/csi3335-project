@@ -27,7 +27,7 @@ def updateFieldingPost(cursor):
             row["E"],
             row["DP"],
             row["TP"],
-            row["PB"]
+            row["PB"] if pd.notnull(row['PB']) else None,
         ]
         
         sql = '''INSERT INTO fieldingpost (playerID,yearId,teamID,round,position,f_G,f_GS,f_InnOuts,f_PO,f_A,f_E,f_DP,f_TP,f_PB)

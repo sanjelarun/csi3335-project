@@ -49,15 +49,15 @@ try:
     updateTeamsHalf(cur)
 
     updateFieldingOFSplit(cur)
-    #updateAllStarFull(cur)
+    updateAllStarFull(cur)
     updatePitchingPost(cur)
-    #updateFieldingPost(cur)
+    updateFieldingPost(cur)
     updateSeriesPost(cur)
 
     updateAwardsManagers(cur)
     updateAwardsShareManagers(cur)
     updateAwardsSharePlayers(cur)
-    #updateHallOfFame(cur)
+    updateHallOfFame(cur)
     
     updateParks(cur)
     
