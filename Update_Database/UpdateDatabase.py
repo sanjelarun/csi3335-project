@@ -3,17 +3,24 @@
 import pymysql
 from People import updatePeople 
 from Batting import updateBatting
+from Franchises import updateFranchises
+from Fielding import updateFielding
 from FieldingOFSplit import updateFieldingOFSplit
-from AllStarFull import updateAllStarFull
+from Appearances import updateAppearances
+from PitchingPost import updatePitchingPost
+from FieldingPost import updateFieldingPost
 from SeriesPost import updateSeriesPost
-from AwardsManagers import updateAwardsManagers
+from AllStarFull import updateAllStarFull
 from HallOfFame import updateHallOfFame
 from Parks import updateParks
-from Managers import updateManagers
-from FieldingPost import updateFieldingPost
-from TeamsHalf import updateTeamsHalf
-from AwardsSharePlayers import updateAwardsSharePlayers
 from Schools import updateSchools
+from Managers import updateManagers
+from ManagersHalf import updateManagersHalf
+from TeamsHalf import updateTeamsHalf
+from AwardsManagers import updateAwardsManagers
+from AwardsSharePlayers import updateAwardsSharePlayers
+from AwardsShareManagers import updateAwardsShareManagers
+from Salaries import updateSalaries
 
 import csi3335f2024 as cfg
 
@@ -27,18 +34,30 @@ try:
 
     updatePeople(cur)
     updateBatting(cur)
+    updateFranchises(cur)
+    updateFielding(cur)
+    updateAppearances(cur)
+
+    updateManagers(cur)
+    updateManagersHalf(cur)
+
+    updateTeamsHalf(cur)
+
     updateFieldingOFSplit(cur)
     updateAllStarFull(cur) 
-    updateSeriesPost(cur)
-    updateAwardsManagers(cur)
-    updateHallOfFame(cur)
-    updateParks(cur)
-    updateManagers(cur)
+    updatePitchingPost(cur)
     updateFieldingPost(cur)
-    updateTeamsHalf(cur)
-    updateAwardsSharePlayers(cur)
-    updateSchools(cur)
+    updateSeriesPost(cur)
 
+    updateAwardsManagers(cur)
+    updateAwardsShareManagers(cur)
+    updateAwardsSharePlayers(cur)
+    updateHallOfFame(cur)
+    
+    updateParks(cur)
+    
+    updateSchools(cur)
+    updateSalaries(cur)
 
 except Exception:
     con.rollback()
