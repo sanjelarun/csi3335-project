@@ -21,6 +21,11 @@ from AwardsManagers import updateAwardsManagers
 from AwardsSharePlayers import updateAwardsSharePlayers
 from AwardsShareManagers import updateAwardsShareManagers
 from Salaries import updateSalaries
+from AwardsPlayers import update_awards_players
+from CollegePlaying import update_college_playing
+from Pitching import update_pitching
+from Teams import update_teams
+from BattingPost import update_batting_post
 
 import csi3335f2024 as cfg
 
@@ -44,20 +49,27 @@ try:
     updateTeamsHalf(cur)
 
     updateFieldingOFSplit(cur)
-    updateAllStarFull(cur) 
+    #updateAllStarFull(cur)
     updatePitchingPost(cur)
-    updateFieldingPost(cur)
+    #updateFieldingPost(cur)
     updateSeriesPost(cur)
 
     updateAwardsManagers(cur)
     updateAwardsShareManagers(cur)
     updateAwardsSharePlayers(cur)
-    updateHallOfFame(cur)
+    #updateHallOfFame(cur)
     
     updateParks(cur)
     
     updateSchools(cur)
     updateSalaries(cur)
+
+    # Mitchell's table updates
+    update_awards_players(cur)
+    update_college_playing(cur)
+    update_pitching(cur)
+    update_teams(cur)
+    update_batting_post(cur)
 
 except Exception:
     con.rollback()

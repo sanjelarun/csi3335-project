@@ -1,7 +1,7 @@
 # Updates the Awards table from AwardsPlayers
 import pandas as pd
 
-def update_awards(cursor):
+def update_awards_players(cursor):
     print("Adding new awards data...")
 
     data = pd.read_csv("csvFiles/AwardsPlayers.csv",na_values=['',' '])
@@ -14,15 +14,15 @@ def update_awards(cursor):
             continue
 
         new_award = [
+            row['playerID'],
             row['awardID'],
             row['yearID'],
-            row['playerID'],
             row['lgID'],
             row['tie'],
             row['notes'],
         ]
 
-        sql = '''INSERT INTO awards (awardID,yearID,playerID,lgID,tie,notes) VALUES (%s,%s,%s,%s,%s,%s);'''
+        sql = '''INSERT INTO awards (playerID,awardID,yearID,lgID,tie,notes) VALUES (%s,%s,%s,%s,%s,%s);'''
         exe = cursor.execute(sql,new_award)
         awards_added += exe
 

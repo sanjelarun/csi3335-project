@@ -12,7 +12,7 @@ def update_teams(cursor):
     for row in data.iloc:
         if row["yearID"] < 2023:
             continue
-        #exclude R,
+
         new_team = [
             row['yearID'],
             row['lgID'],
@@ -60,11 +60,9 @@ def update_teams(cursor):
             row['BPF'],
             row['PPF'],
         ]
-        # row['team_projW'],
-        # row['team_projL'],
 
-        sql = '''INSERT INTO teams (teamID,yearID,lgID,divID,franchID,team_name,team_G,team_G_home,team_W,team_L,DivWin,WCWin,LgWin,WSWin,team_R,team_AB,team_H,team_2B,team_3B,team_HR,team_BB,team_SO,team_SB,team_CS,team_HBP,team_SF,team_RA,team_ER,team_ERA,team_CG,team_SHO,team_SV,team_IPouts,team_HA,team_HRA,team_BBA,team_SOA,team_E,team_DP,team_FP,park_name,team_attendance,team_BPF,team_PPF) 
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);'''
+        sql = '''INSERT INTO teams (yearID,lgID,teamID,franchID,divID,team_rank,team_G,team_G_home,team_W,team_L,DivWin,WCWin,LgWin,WSWin,team_R,team_AB,team_H,team_2B,team_3B,team_HR,team_BB,team_SO,team_SB,team_CS,team_HBP,team_SF,team_RA,team_ER,team_ERA,team_CG,team_SHO,team_SV,team_IPouts,team_HA,team_HRA,team_BBA,team_SOA,team_E,team_DP,team_FP,team_name,park_name,team_attendance,team_BPF,team_PPF) 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);'''
         exe = cursor.execute(sql,new_team)
         teams_added += exe
 

@@ -2,7 +2,7 @@
 import pandas as pd
 
 def update_college_playing(cursor):
-    print("Adding new collegeplaying data...")
+    print("Adding new college playing data...")
 
     data = pd.read_csv("csvFiles/CollegePlaying.csv",na_values=['',' '])
     data = data.where(pd.notnull(data),None)
