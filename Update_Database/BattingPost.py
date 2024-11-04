@@ -1,19 +1,19 @@
 # Updates the battingpost table
-import pandas as pd;
+import pandas as pd
 
-def updateBattingPost(cursor):
+def update_batting_post(cursor):
     print("Adding new battingpost data...")
 
     data = pd.read_csv("csvFiles/BattingPost.csv",na_values=['',' '])
     data = data.where(pd.notnull(data),None)
 
-    battingPostAdded = 0
+    batting_post_added = 0
 
     for row in data.iloc:
-        if(row["yearID"] < 2023):
+        if row["yearID"] < 2023:
             continue
 
-        newBatPost = [
+        new_bat_post = [
             row['playerID'],
             row['yearID'],
             row['teamID'],
@@ -39,5 +39,5 @@ def updateBattingPost(cursor):
 
         sql = '''INSERT INTO battingpost (playerID,yearID,teamID,round,b_G,b_AB,b_R,b_H,b_2B,b_3B,b_HR,b_RBI,b_SB,b_CS,b_BB,b_SO,b_IBB,b_HBP,b_SH,b_SF,b_GIDP) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);'''
 
-        exe = cursor.execute(sql,newBatPost)
-        battingPostAdded += exe
+        exe = cursor.execute(sql,new_bat_post)
+        batting_post_added += exe
