@@ -42,4 +42,4 @@ def updateBatting(cursor):
         exe = cursor.execute(sql,newBat)
         battingAdded += exe
     
-    print("{} new rows of batting data added!".format(battingAdded))
+    print("Complete: {} new rows of batting data added!".format(battingAdded))
