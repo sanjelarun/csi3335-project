@@ -1,7 +1,7 @@
 # Updates the Teams table
 import pandas as pd
 
-def update_teams(cursor):
+def updateTeams(cursor):
     print("Adding new teams data...")
 
     data = pd.read_csv("csvFiles/Teams.csv", na_values=['',' '])

@@ -1,7 +1,7 @@
 # Updates the batting post table
 import pandas as pd
 
-def update_batting_post(cursor):
+def updateBattingPost(cursor):
     print("Adding new batting post data...")
 
     data = pd.read_csv("csvFiles/BattingPost.csv",na_values=['',' '])
