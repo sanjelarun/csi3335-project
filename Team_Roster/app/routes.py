@@ -1,39 +1,24 @@
 from flask import render_template, flash, redirect, request
 
 from app import app
-from app.forms import FindTeam
+
+from pages.index import ShowIndexPage
+from pages.findTeam import ShowFindTeam
+from pages.roster import ShowRoster
+from pages.depthChart import ShowDepthChart
 
 @app.route('/')
 @app.route('/index')
-def index():
-    user = {'username': 'Immaculate Party Time'}
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html', title='Home', user=user, posts=posts)
-
 @app.route('/findTeam', methods=['GET', 'POST'])
 def findTeam():
-    form = FindTeam()
-    if form.validate_on_submit():
-        return redirect('/{}/roster?year={}'.format(form.teamName.data,form.year.data))
-    return render_template('findTeam.html', title='Find Team', form=form)
+    return ShowFindTeam()
 
-@app.route('/<team>/roster',methods=['GET'])
-def roster(team):
-    print(request.data)
+@app.route('/<teamName>/roster',methods=['GET'])
+def roster(teamName):
     year =request.args.get("year")
-    return render_template('roster.html', title="{}'s Roster".format(team), team=team, year=year)
+    return ShowRoster(teamName,year)
 
-@app.route('/<team>/depthChart',methods=['GET'])
-def depthChart(team):
-    print(request.data)
+@app.route('/<teamName>/depthChart',methods=['GET'])
+def depthChart(teamName):
     year =request.args.get("year")
-    return render_template('depthChart.html', title="{}'s Depth Chart".format(team), team=team, year=year)
+    return ShowDepthChart(teamName,year)

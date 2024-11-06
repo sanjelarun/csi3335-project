@@ -3,8 +3,8 @@
 {% block content %}
 <h1>{{ title }}</h1>
 
-<button onclick="window.location.href='/{{team}}/roster?year={{year}}'">Team Roster</button>
-<button onclick="window.location.href='/{{team}}/depthChart?year={{year}}'">Depth Chart</button>
+<button onclick="window.location.href='/{{teamName}}/roster?year={{year}}'">Team Roster</button>
+<button onclick="window.location.href='/{{teamName}}/depthChart?year={{year}}'">Depth Chart</button>
 
 {% block teamData %} {% endblock %}
 
