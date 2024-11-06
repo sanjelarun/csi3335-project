@@ -20,11 +20,9 @@ def index():
     return render_template('index.html', title='Home', user=user, posts=posts)
 
 @app.route('/findTeam', methods=['GET', 'POST'])
-def login():
+def findTeam():
     form = FindTeam()
     if form.validate_on_submit():
-        flash('Trying to find team {} at year {}'.format(
-            form.teamName.data, form.year.data))
         return redirect('/{}/roster?year={}'.format(form.teamName.data,form.year.data))
     return render_template('findTeam.html', title='Find Team', form=form)
 
@@ -33,3 +31,9 @@ def roster(team):
     print(request.data)
     year =request.args.get("year")
     return render_template('roster.html', title="{}'s Roster".format(team), team=team, year=year)
+
+@app.route('/<team>/depthChart',methods=['GET'])
+def depthChart(team):
+    print(request.data)
+    year =request.args.get("year")
+    return render_template('depthChart.html', title="{}'s Depth Chart".format(team), team=team, year=year)
