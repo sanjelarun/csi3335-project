@@ -2,12 +2,12 @@
 
 {% block content %}
 <h1>Find Team</h1>
-<form action="" method="post" novalidate>
+<form action="" method="post">
     {{ form.hidden_tag() }}
     <p>
-        {{ form.teamName.label }}<br>
-        {{ form.teamName(size=32) }}<br>
-        {% for error in form.teamName.errors %}
+        {{ form.team.label }} <br>
+        {{ form.team }}<br>
+        {% for error in form.team.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </p>

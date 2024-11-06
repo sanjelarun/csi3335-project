@@ -13,12 +13,12 @@ from pages.depthChart import ShowDepthChart
 def findTeam():
     return ShowFindTeam()
 
-@app.route('/<teamName>/roster',methods=['GET'])
-def roster(teamName):
+@app.route('/<teamId>/roster',methods=['GET'])
+def roster(teamId):
     year =request.args.get("year")
-    return ShowRoster(teamName,year)
+    return ShowRoster(teamId,year)
 
-@app.route('/<teamName>/depthChart',methods=['GET'])
-def depthChart(teamName):
+@app.route('/<teamId>/depthChart',methods=['GET'])
+def depthChart(teamId):
     year =request.args.get("year")
-    return ShowDepthChart(teamName,year)
+    return ShowDepthChart(teamId,year)
