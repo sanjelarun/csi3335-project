@@ -20,7 +20,7 @@ def updateAllStarFull(cursor):
             row["yearID"],
             row["gameID"],
             row["GP"],
-            row["startingPos"],
+            row["startingPos"] if pd.notnull(row['startingPos']) else None,
         ]
 
         sql = '''INSERT INTO allstarfull (playerID,lgID,teamID,yearID,gameID,GP,startingPos)
