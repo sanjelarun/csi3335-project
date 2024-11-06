@@ -42,3 +42,4 @@ def update_batting_post(cursor):
 
         exe = cursor.execute(sql,new_bat_post)
         batting_post_added += exe
+    print("Complete: {} new rows of batting post data added!".format(batting_post_added))
