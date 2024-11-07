@@ -2,7 +2,7 @@
 import pandas as pd
 
 
-def update_pitching(cursor):
+def updatePitching(cursor):
     print("Adding new pitching data...")
 
     data = pd.read_csv("csvFiles/Pitching.csv", na_values=['', ' '])

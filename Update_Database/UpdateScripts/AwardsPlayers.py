@@ -1,7 +1,7 @@
 # Updates the Awards table from AwardsPlayers
 import pandas as pd
 
-def update_awards_players(cursor):
+def updateAwardsPlayers(cursor):
     print("Adding new awards data...")
 
     data = pd.read_csv("csvFiles/AwardsPlayers.csv",na_values=['',' '])

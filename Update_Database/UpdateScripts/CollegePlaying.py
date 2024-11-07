@@ -1,7 +1,7 @@
 # Update the CollegePlaying table
 import pandas as pd
 
-def update_college_playing(cursor):
+def updateCollegePlaying(cursor):
     print("Adding new college playing data...")
 
     data = pd.read_csv("csvFiles/CollegePlaying.csv",na_values=['',' '])

@@ -1,31 +1,31 @@
 # Main Driver for our update database code
 
 import pymysql
-from People import updatePeople 
-from Batting import updateBatting
-from Franchises import updateFranchises
-from Fielding import updateFielding
-from FieldingOFSplit import updateFieldingOFSplit
-from Appearances import updateAppearances
-from PitchingPost import updatePitchingPost
-from FieldingPost import updateFieldingPost
-from SeriesPost import updateSeriesPost
-from AllStarFull import updateAllStarFull
-from HallOfFame import updateHallOfFame
-from Parks import updateParks
-from Schools import updateSchools
-from Managers import updateManagers
-from ManagersHalf import updateManagersHalf
-from TeamsHalf import updateTeamsHalf
-from AwardsManagers import updateAwardsManagers
-from AwardsSharePlayers import updateAwardsSharePlayers
-from AwardsShareManagers import updateAwardsShareManagers
-from Salaries import updateSalaries
-from AwardsPlayers import update_awards_players
-from CollegePlaying import update_college_playing
-from Pitching import update_pitching
-from Teams import update_teams
-from BattingPost import update_batting_post
+from UpdateScripts.People import updatePeople 
+from UpdateScripts.Franchises import updateFranchises
+from UpdateScripts.Batting import updateBatting
+from UpdateScripts.Pitching import updatePitching
+from UpdateScripts.Fielding import updateFielding
+from UpdateScripts.FieldingOFSplit import updateFieldingOFSplit
+from UpdateScripts.Appearances import updateAppearances
+from UpdateScripts.PitchingPost import updatePitchingPost
+from UpdateScripts.FieldingPost import updateFieldingPost
+from UpdateScripts.BattingPost import updateBattingPost
+from UpdateScripts.SeriesPost import updateSeriesPost
+from UpdateScripts.AllStarFull import updateAllStarFull
+from UpdateScripts.HallOfFame import updateHallOfFame
+from UpdateScripts.Parks import updateParks
+from UpdateScripts.Schools import updateSchools
+from UpdateScripts.Managers import updateManagers
+from UpdateScripts.ManagersHalf import updateManagersHalf
+from UpdateScripts.Teams import updateTeams
+from UpdateScripts.TeamsHalf import updateTeamsHalf
+from UpdateScripts.AwardsPlayers import updateAwardsPlayers
+from UpdateScripts.AwardsManagers import updateAwardsManagers
+from UpdateScripts.AwardsSharePlayers import updateAwardsSharePlayers
+from UpdateScripts.AwardsShareManagers import updateAwardsShareManagers
+from UpdateScripts.Salaries import updateSalaries
+from UpdateScripts.CollegePlaying import updateCollegePlaying
 
 import csi3335f2024 as cfg
 
@@ -39,21 +39,27 @@ try:
 
     updatePeople(cur)
     updateBatting(cur)
-    updateFranchises(cur)
+    updatePitching(cur)
+
     updateFielding(cur)
     updateAppearances(cur)
 
     updateManagers(cur)
     updateManagersHalf(cur)
 
+    updateFranchises(cur)
+    updateTeams(cur)
     updateTeamsHalf(cur)
 
     updateFieldingOFSplit(cur)
-    updateAllStarFull(cur)
+   
     updatePitchingPost(cur)
     updateFieldingPost(cur)
+    updateBattingPost(cur)
     updateSeriesPost(cur)
 
+    updateAllStarFull(cur)
+    updateAwardsPlayers(cur)
     updateAwardsManagers(cur)
     updateAwardsShareManagers(cur)
     updateAwardsSharePlayers(cur)
@@ -63,13 +69,7 @@ try:
     
     updateSchools(cur)
     updateSalaries(cur)
-
-    # Mitchell's table updates
-    update_awards_players(cur)
-    update_college_playing(cur)
-    update_pitching(cur)
-    update_teams(cur)
-    update_batting_post(cur)
+    updateCollegePlaying(cur)
 
 except Exception:
     con.rollback()
