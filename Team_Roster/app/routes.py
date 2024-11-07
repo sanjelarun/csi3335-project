@@ -2,7 +2,6 @@ from flask import render_template, flash, redirect, request
 
 from app import app
 
-from pages.index import ShowIndexPage
 from pages.findTeam import ShowFindTeam
 from pages.roster import ShowRoster
 from pages.depthChart import ShowDepthChart
