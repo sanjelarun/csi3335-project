@@ -1,13 +1,12 @@
-from flask import render_template, flash, redirect, request
-
+from flask import request
 from app import app
-
 from pages.findTeam import ShowFindTeam
 from pages.roster import ShowRoster
 from pages.depthChart import ShowDepthChart
 
-@app.route('/')
-@app.route('/index')
+
+@app.route('/',methods=['GET', 'POST'])
+@app.route('/index',methods=['GET', 'POST'])
 @app.route('/findTeam', methods=['GET', 'POST'])
 def findTeam():
     return ShowFindTeam()

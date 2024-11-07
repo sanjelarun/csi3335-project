@@ -1,0 +1,1 @@
+mysql = {'location':'localhost','user':'partyTimeUser','password':'partyTimePassword','database':'baseball'}

@@ -3,6 +3,7 @@ from wtforms import SelectField, IntegerField, SubmitField
 from wtforms.validators import DataRequired
 
 class FindTeam(FlaskForm):
-    team = SelectField('Team Name', choices=[],validators=[DataRequired()]) #Choices set dynamically
-    year = IntegerField('Year', validators=[DataRequired()])
+    year = SelectField('Year',choices=[], validators=[DataRequired()],id="year-dropdown")
+    team = SelectField('Team Name', choices=[],validators=[DataRequired()],validate_choice=False,id="team-dropdown")
+
     submit = SubmitField('Find Team Roster')

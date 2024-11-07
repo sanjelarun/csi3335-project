@@ -1,23 +1,53 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Find Team</h1>
+<h1>Find Any MLB Team. Any Year.</h1>
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>
-        {{ form.team.label }} <br>
-        {{ form.team }}<br>
-        {% for error in form.team.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
         {{ form.year.label }}<br>
-        {{ form.year(size=32) }}<br>
+        {{ form.year(class="form-control", id="year-dropdown") }}<br>
         {% for error in form.year.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </p>
+    <p>
+        {{ form.team.label }} <br>
+        {{ form.team(class="form-control", id="team-dropdown") }}<br>
+        {% for error in form.team.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+
     <p>{{ form.submit() }}</p>
 </form>
+<script>
+    $(document).ready(function () {
+        // Trigger AJAX request on year dropdown change
+        $('#year-dropdown').change(function () {
+            const selectedYear = $(this).val();
+
+            // Clear existing teams
+            $('#team-dropdown').empty();
+
+            if (selectedYear) {
+                // AJAX request to fetch teams for the selected year
+                $.getJSON(`/get_teams/${selectedYear}`, function (data) {
+                    // Add a placeholder option
+                    $('#team-dropdown').append($('<option>', { value: "", text: "Select Team" }));
+
+                    // Populate the team dropdown with received data
+                    $.each(data, function (index, team) {
+                        $('#team-dropdown').append($('<option>', {
+                            value: team[0],  // teamID
+                            text: team[1]    // team_name
+                        }));
+                    });
+                });
+            } else {
+                $('#team-dropdown').append($('<option>', { value: "", text: "First select a year..." }));
+            }
+        });
+    });
+</script>
 {% endblock %}
