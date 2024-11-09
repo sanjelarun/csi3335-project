@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, Integer, SmallInteger, String, Float, ForeignKey
+from sqlalchemy import CHAR, Column, Date, Double, Integer, SmallInteger, String, Float, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -79,5 +79,61 @@ class Franchise(Base):
 
     def __repr__(self):
         return '<Franchise: {}, ID:{}, Active: {}>'.format(self.franchName,self.franchID,self.active)
+    
+
+class Fielding(Base):
+    __tablename__ = 'fielding'
+    
+    fielding_ID = Column(Integer, primary_key=True, autoincrement=True)
+    playerID = Column(String(9), nullable=False, index=True)
+    yearID = Column(SmallInteger, nullable=False)
+    teamID = Column(CHAR(3), nullable=False, index=True)
+    stint = Column(SmallInteger, nullable=False)
+    position = Column(String(2), nullable=True)
+    f_G = Column(SmallInteger, nullable=True)
+    f_GS = Column(SmallInteger, nullable=True)
+    f_InnOuts = Column(SmallInteger, nullable=True)
+    f_PO = Column(SmallInteger, nullable=True)
+    f_A = Column(SmallInteger, nullable=True)
+    f_E = Column(SmallInteger, nullable=True)
+    f_DP = Column(SmallInteger, nullable=True)
+    f_PB = Column(SmallInteger, nullable=True)
+    f_WP = Column(SmallInteger, nullable=True)
+    f_SB = Column(SmallInteger, nullable=True)
+    f_CS = Column(SmallInteger, nullable=True)
+    f_ZR = Column(Double, nullable=True)
+
+    def __repr__(self):
+        return '<Fielding: {} {}, TeamID:{}>'.format(self.yearID,self.fielding_ID,self.teamID)
+    
+class People(Base):
+    __tablename__ = 'people'
+
+    playerID = Column(String(9), primary_key=True, nullable=False)
+    birthYear = Column(Integer, nullable=True)
+    birthMonth = Column(Integer, nullable=True)
+    birthDay = Column(Integer, nullable=True)
+    birthCountry = Column(String(255), nullable=True)
+    birthState = Column(String(255), nullable=True)
+    birthCity = Column(String(255), nullable=True)
+    deathYear = Column(Integer, nullable=True)
+    deathMonth = Column(Integer, nullable=True)
+    deathDay = Column(Integer, nullable=True)
+    deathCountry = Column(String(255), nullable=True)
+    deathState = Column(String(255), nullable=True)
+    deathCity = Column(String(255), nullable=True)
+    nameFirst = Column(String(255), nullable=True)
+    nameLast = Column(String(255), nullable=True, index=True)
+    nameGiven = Column(String(255), nullable=True)
+    weight = Column(Integer, nullable=True)
+    height = Column(Integer, nullable=True)
+    bats = Column(String(255), nullable=True)
+    throws = Column(String(255), nullable=True)
+    debutDate = Column(Date, nullable=True)
+    finalGameDate = Column(Date, nullable=True)
+
+    def __repr__(self):
+        return '<People: {} {}, ID:{}>'.format(self.nameFirst,self.nameLast,self.playerID)
+
 
     

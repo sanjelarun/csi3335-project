@@ -1,6 +1,14 @@
 {% extends "teamContainer.html" %}
 
-{% block teamData %}
-<h2>{{teamId}} Depth Chart</h2>
-<p>Year: {{year}}</p>
+{% block content %}
+<h1>Depth Chart for Team {{ teamId }} ({{ year }})</h1>
+
+{% for position, players in position_data.items() %}
+    <h2>Position: {{ position }}</h2>
+    <ul>
+    {% for player in players[:6] %}  {# Limit to top 6 players #}
+        <li>{{ player.name }} - {{ player.time_percentage }}</li>
+    {% endfor %}
+    </ul>
+{% endfor %}
 {% endblock %}

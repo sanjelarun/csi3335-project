@@ -16,7 +16,7 @@ def roster(teamId):
     year =request.args.get("year")
     return ShowRoster(teamId,year)
 
-@app.route('/<teamId>/depthChart',methods=['GET'])
+@app.route('/<teamId>/depthChart', methods=['GET'])
 def depthChart(teamId):
-    year =request.args.get("year")
-    return ShowDepthChart(teamId,year)
+    year = request.args.get("year")
+    return ShowDepthChart(teamId, year)
