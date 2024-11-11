@@ -1,8 +1,10 @@
 from flask import request
-from app import app
-from pages.findTeam import ShowFindTeam
-from pages.roster import ShowRoster
-from pages.depthChart import ShowDepthChart
+from Team_Roster.app import app
+from Team_Roster.pages.findTeam import ShowFindTeam
+from Team_Roster.pages.roster import ShowRoster
+from Team_Roster.pages.depthChart import ShowDepthChart
+
+from Team_Roster.pages.pitchingStats import ShowPitchingChart
 
 
 @app.route('/',methods=['GET', 'POST'])
@@ -15,6 +17,11 @@ def findTeam():
 def roster(teamId):
     year =request.args.get("year")
     return ShowRoster(teamId,year)
+
+@app.route('/<teamId>/depthChart', methods=['GET'])
+def pitchingChart(teamId):
+    year = request.args.get("year")
+    return ShowPitchingChart(teamId, year)
 
 @app.route('/<teamId>/depthChart', methods=['GET'])
 def depthChart(teamId):

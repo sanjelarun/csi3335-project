@@ -135,5 +135,41 @@ class People(Base):
     def __repr__(self):
         return '<People: {} {}, ID:{}>'.format(self.nameFirst,self.nameLast,self.playerID)
 
+class Pitching(Base):
+    __tablename__ = 'pitching'
 
-    
+    pitching_id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    playerID = Column(String(9), primary_key=True, nullable=False)
+    yearID = Column(SmallInteger, nullable=False)
+    teamID = Column(CHAR(3), nullable=False, index=True)
+    stint = Column(SmallInteger, nullable=False)
+    p_W = Column(SmallInteger, nullable=True)
+    p_L = Column(SmallInteger, nullable=True)
+    p_G = Column(SmallInteger, nullable=True)
+    p_GS = Column(SmallInteger, nullable=True)
+    p_CG = Column(SmallInteger, nullable=True)
+    p_SHO = Column(SmallInteger, nullable=True)
+    p_SV = Column(SmallInteger, nullable=True)
+    p_IPOuts = Column(Integer, nullable=True)
+    p_H = Column(SmallInteger, nullable=True)
+    p_ER = Column(SmallInteger, nullable=True)
+    p_HR = Column(SmallInteger, nullable=True)
+    p_BB = Column(SmallInteger, nullable=True)
+    p_SO = Column(SmallInteger, nullable=True)
+    p_BAOpps = Column(Double, nullable=True)
+    p_ERA = Column(Double, nullable=True)
+    p_IBB = Column(SmallInteger, nullable=True)
+    p_WP = Column(SmallInteger, nullable=True)
+    p_HBP = Column(SmallInteger, nullable=True)
+    p_BK = Column(SmallInteger, nullable=True)
+    p_BFP = Column(SmallInteger, nullable=True)
+    p_GF = Column(SmallInteger, nullable=True)
+    p_R = Column(SmallInteger, nullable=True)
+    p_SH = Column(SmallInteger, nullable=True)
+    p_SF = Column(SmallInteger, nullable=True)
+    p_GIDP = Column(SmallInteger, nullable=True)
+
+    def __repr__(self):
+        return '<Pitching: {} {}, teamID:{}>'.format(self.yearID,self.pitching_id,self.teamID)
+
+
