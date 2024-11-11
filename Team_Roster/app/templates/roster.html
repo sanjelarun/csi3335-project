@@ -3,4 +3,55 @@
 {% block teamData %}
 <h2>{{teamId}} Player Roster</h2>
 <p>Year: {{year}}</p>
+<h1>Batting Statistics for Team {{ teamId }} ({{ year }})</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Player Name</th>
+                <th>Games Played (G)</th>
+                <th>Plate Appearances (PS)</th>
+                <th>Home Runs (HR)</th>
+                <th>Stolen Bases (SB)</th>
+                <th>Walk % (BB%)</th>
+                <th>Strikeout % (K%)</th>
+                <th>ISO</th>
+                <th>BABIP</th>
+                <th>AVG</th>
+                <th>OBP</th>
+                <th>SLG</th>
+                <th>wOBA</th>
+    <!--            <th>wRC+</th>-->
+    <!--            <th>BsR</th>-->
+    <!--            <th>Off</th>-->
+    <!--            <th>Def</th>-->
+    <!--            <th>WAR</th>-->
+            </tr>
+        </thead>
+        <tbody>
+            {% for player_id, stats in batting_data.items() %}
+            <tr>
+                <td>{{ stats.full_name }}</td>
+                <td>{{ stats.G }}</td>
+                <td>{{ stats["PA"] }}</td>
+                <td>{{ stats["HR"] }}</td>
+                <td>{{ stats["SB"] }}</td>
+                <td>{{ stats["BB%"] }}</td>
+                <td>{{ stats["K%"] }}</td>
+                <td>{{ stats["ISO"] }}</td>
+                <td>{{ stats["BABIP"] }}</td>
+                <td>{{ stats["AVG"] }}</td>
+                <td>{{ stats["OBP"] }}</td>
+                <td>{{ stats["SLG"] }}</td>
+                <td>{{ stats["wOBA"] }}</td>
+    <!--            <td>{{ stats["wRC+"] }}</td>-->
+    <!--            <td>{{ stats["BsR"] }}</td>-->
+    <!--            <td>{{ stats["Off"] }}</td>-->
+    <!--            <td>{{ stats["Def"] }}</td>-->
+    <!--            <td>{{ stats["WAR"] }}</td>-->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
+
