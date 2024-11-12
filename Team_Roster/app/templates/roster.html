@@ -1,47 +1,51 @@
 {% extends "teamContainer.html" %}
 
 {% block teamData %}
-<h2>{{teamId}} Player Roster</h2>
-<p>Year: {{year}}</p>
+<h2>{{ teamId }} Player Roster</h2>
+<p>Year: {{ year }}</p>
 {% endblock %}
 
 {% block pitchingData %}
 <h1>Pitching Statistics</h1>
 
-<table>
-    <thead>
-        <tr>
-            <th>Player Name</th>
-            <th>Games Played (G)</th>
-            <th>Games Started (GS)</th>
-            <th>Innings Pitched (IP)</th>
-            <th>Strikeout % (K%)</th>
-            <th>Walk % (BB%)</th>
-            <th>HR/9</th>
-            <th>BABIP</th>
-            <th>LOB%</th>
-            <th>ERA</th>
-            <th>FIP</th>
-            <th>WAR</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for player_id, stats in pitching_data.items() %}
-        <tr>
-            <td>{{ stats.get("full_name","N/A") }}</td>
-            <td>{{ stats.get("G","N/A") }}</td>
-            <td>{{ stats.get("GS","N/A") }}</td>
-            <td>{{ stats.get("IP","N/A") }}</td>
-            <td>{{ stats.get("K%","N/A") }}</td>
-            <td>{{ stats.get("BB%","N/A") }}</td>
-            <td>{{ stats.get("HR/9","N/A") }}</td>
-            <td>{{ stats.get("BABIP","N/A") }}</td>
-            <td>{{ stats.get("LOB%","N/A") }}</td>
-            <td>{{ stats.get("ERA","N/A") }}</td>
-            <td>{{ stats.get("FIP","N/A") }}</td>
-            <td>{{ stats.get("WAR","N/A") }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% if pitching_data %}
+    <table>
+        <thead>
+            <tr>
+                <th>Player Name</th>
+                <th>Games Played (G)</th>
+                <th>Games Started (GS)</th>
+                <th>Innings Pitched (IP)</th>
+                <th>Strikeout % (K%)</th>
+                <th>Walk % (BB%)</th>
+                <th>HR/9</th>
+                <th>BABIP</th>
+                <th>LOB%</th>
+                <th>ERA</th>
+                <th>FIP</th>
+                <th>WAR</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player_id, stats in pitching_data.items() %}
+            <tr>
+                <td>{{ stats.get("full_name", "N/A") }}</td>
+                <td>{{ stats.get("G", "N/A") }}</td>
+                <td>{{ stats.get("GS", "N/A") }}</td>
+                <td>{{ stats.get("IP", "N/A") }}</td>
+                <td>{{ stats.get("K%", "N/A") }}</td>
+                <td>{{ stats.get("BB%", "N/A") }}</td>
+                <td>{{ stats.get("HR/9", "N/A") }}</td>
+                <td>{{ stats.get("BABIP", "N/A") }}</td>
+                <td>{{ stats.get("LOB%", "N/A") }}</td>
+                <td>{{ stats.get("ERA", "N/A") }}</td>
+                <td>{{ stats.get("FIP", "N/A") }}</td>
+                <td>{{ stats.get("WAR", "N/A") }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No pitching data available.</p>
+{% endif %}
 {% endblock %}

@@ -1,8 +1,9 @@
-from Team_Roster.app.forms import FindTeam
-from Team_Roster.app.models import Team
+from app.forms import FindTeam
+from app.models import Team
 from flask import flash, jsonify, render_template, redirect
-from Team_Roster.app import app, db
+from app import app
 import sqlalchemy as sa
+from app import db
 
 def ShowFindTeam():
     form = FindTeam()
