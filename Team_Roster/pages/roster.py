@@ -14,32 +14,32 @@ def getBattingStats(teamId, year):
             func.sum(Batting.b_SB).label("SB"),
             (func.sum(Batting.b_BB)/ func.sum(Batting.b_AB)).label("BB"),
             (func.sum(Batting.b_SO)/ func.sum(Batting.b_AB)).label("K"),
-            (func.sum(Batting.b_2B) + (2 * func.sum(Batting.b_3B)) + (3 * func.sum(Batting.b_HR))/
+            ((func.sum(Batting.b_2B) + (2 * func.sum(Batting.b_3B)) + (3 * func.sum(Batting.b_HR)))/
                 func.sum(Batting.b_AB)).label("ISO"),
-            (func.sum(Batting.b_H) - func.sum(Batting.b_HR)/
-                func.sum(Batting.b_AB) - (func.sum(Batting.b_SO)/func.sum(Batting.b_AB)) - func.sum(Batting.b_HR) + func.sum(Batting.b_SF)
+            ((func.sum(Batting.b_H) - func.sum(Batting.b_HR))/
+             (func.sum(Batting.b_AB) - func.sum(Batting.b_SO) - func.sum(Batting.b_HR) + func.sum(Batting.b_SF))
                      ).label("BABIP"),
             (func.sum(Batting.b_H)/
                 func.sum(Batting.b_AB)).label("AVG"),
-            (func.sum(Batting.b_H) + func.sum(Batting.b_BB) + func.sum(Batting.b_HBP)/
-                func.sum(Batting.b_AB) + func.sum(Batting.b_HBP) + func.sum(Batting.b_SF)
+            ((func.sum(Batting.b_H) + func.sum(Batting.b_BB) + func.sum(Batting.b_HBP))/
+             (func.sum(Batting.b_AB) + func.sum(Batting.b_BB) + func.sum(Batting.b_HBP) + func.sum(Batting.b_SF))
             ).label("OBP"),
-            (func.sum(Batting.b_H) + (2 * func.sum(Batting.b_2B)) + (3 * func.sum(Batting.b_3B)) + (
-                    func.sum(Batting.b_HR))/
+            ((((func.sum(Batting.b_H) - (func.sum(Batting.b_HR) + func.sum(Batting.b_3B) + func.sum(Batting.b_2B))) +
+               (2 * func.sum(Batting.b_2B)) + (3 * func.sum(Batting.b_3B))) + (4*func.sum(Batting.b_HR)))/
                 func.sum(Batting.b_AB)
             ).label("SLG"),
             (
-                (0.69 * func.sum(Batting.b_BB)) +
+                ((0.69 * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
                 (0.72 * func.sum(Batting.b_HBP)) +
-                (0.888 * func.sum(Batting.b_H)) +
+                (0.888 * ((func.sum(Batting.b_H) - (func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
                 (1.271 * func.sum(Batting.b_2B)) +
                 (1.616 * func.sum(Batting.b_3B)) +
-                (2.101 * func.sum(Batting.b_HR))/
-                func.sum(Batting.b_AB) +
+                (2.101 * func.sum(Batting.b_HR)))/
+                (func.sum(Batting.b_AB) +
                 func.sum(Batting.b_BB) -
                 func.sum(Batting.b_IBB) +
                 func.sum(Batting.b_SF) +
-                func.sum(Batting.b_HBP)
+                func.sum(Batting.b_HBP))
             ).label("wOBA"),
             # func.sum().label("wRC+"),  # Unsure
             # func.sum().label("BsR"),  # Unsure
