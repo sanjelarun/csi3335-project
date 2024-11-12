@@ -9,6 +9,7 @@
     <select name="stat" id="stat" onchange="this.form.submit()">
         <option value="percentage" {% if stat == 'percentage' %}selected{% endif %}>Time Percentage</option>
         <option value="PA" {% if stat == 'PA' %}selected{% endif %}>Plate Appearances</option>
+        <option value="wOBA" {% if stat == 'wOBA' %}selected{% endif %}>wOBA</option>
     </select>
     <input type="hidden" name="year" value="{{ year }}">
 </form>
@@ -21,6 +22,8 @@
             <li>{{ player.nameFirst }} {{ player.nameLast }} - 
                 {% if stat == 'percentage' %}
                     {{ player.stat_value }}%
+                {% elif stat == 'wOBA' %}
+                    {{ player.stat_value|round(3) }}
                 {% else %}
                     {{ player.stat_value }}
                 {% endif %}
