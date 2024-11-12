@@ -18,7 +18,13 @@
     {% if players %}
         <ul>
         {% for player in players %}
-            <li>{{ player.nameFirst }} {{ player.nameLast }} - {{ player.stat_value }}%</li>
+            <li>{{ player.nameFirst }} {{ player.nameLast }} - 
+                {% if stat == 'percentage' %}
+                    {{ player.stat_value }}%
+                {% else %}
+                    {{ player.stat_value }}
+                {% endif %}
+            </li>
         {% endfor %}
         </ul>
     {% else %}

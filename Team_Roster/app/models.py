@@ -135,5 +135,33 @@ class People(Base):
     def __repr__(self):
         return '<People: {} {}, ID:{}>'.format(self.nameFirst,self.nameLast,self.playerID)
 
+class Batting(Base):
+    __tablename__ = 'batting'
 
+    batting_ID = Column(Integer, primary_key=True, autoincrement=True)
+    playerID = Column(String(9), nullable=False, index=True)
+    yearID = Column(SmallInteger, nullable=False)
+    teamID = Column(CHAR(3), nullable=False, index=True)
+    stint = Column(SmallInteger, nullable=False)
+    b_G = Column(SmallInteger, nullable=True)
+    b_AB = Column(SmallInteger, nullable=True)
+    b_R = Column(SmallInteger, nullable=True)
+    b_H = Column(SmallInteger, nullable=True)
+    b_2B = Column(SmallInteger, nullable=True)
+    b_3B = Column(SmallInteger, nullable=True)
+    b_HR = Column(SmallInteger, nullable=True)
+    b_RBI = Column(SmallInteger, nullable=True)
+    b_SB = Column(SmallInteger, nullable=True)
+    b_CS = Column(SmallInteger, nullable=True)
+    b_BB = Column(SmallInteger, nullable=True)
+    b_SO = Column(SmallInteger, nullable=True)
+    b_IBB = Column(SmallInteger, nullable=True)
+    b_HBP = Column(SmallInteger, nullable=True)
+    b_SH = Column(SmallInteger, nullable=True)
+    b_SF = Column(SmallInteger, nullable=True)
+    b_GIDP = Column(SmallInteger, nullable=True)
+
+
+    def __repr__(self):
+        return '<Batting: {} {}, TeamID:{}>'.format(self.yearID, self.batting_ID, self.teamID)
     
