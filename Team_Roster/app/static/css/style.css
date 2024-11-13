@@ -55,3 +55,57 @@ select {
 .select+label {
     margin-top: 2rem;
 }
+
+
+table {
+    display: table;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    text-indent: initial;
+    unicode-bidi: isolate;
+    border-spacing: 2px;
+    border-color: gray;
+    margin: 50px;
+}
+
+.stats-table table {
+    font-size: 14px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    unicode-bidi: isolate;
+    border-color: inherit;
+}
+
+.stats-table th {
+    background-color: gray;
+    color: white;
+    font-weight: bold;
+    border: 1px solid gray;
+    cursor: pointer;
+    text-align: center;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.stats-table td {
+    vertical-align: top;
+    border-top: 1px solid #ccc;
+    height: 23px;
+    text-wrap: inherit;
+    min-width: 25px;
+}
+
+.stats-tablee th,
+.stats-table td {
+    border: solid 1px #eaede3;
+    font: 12px / 16px "segoe ui", arial, sans-serif;
+    padding-right: 3px;
+    padding-left: 3px;
+    padding-top: 5px;
+    padding-bottom: 4px;
+}
