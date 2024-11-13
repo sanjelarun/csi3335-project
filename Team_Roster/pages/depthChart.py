@@ -1,7 +1,14 @@
 from flask import render_template
 from app import db
+import sqlalchemy as sa
 from app.models import People, Fielding, Team
-from sqlalchemy import func
+from sqlalchemy import func, and_
+
+def getTeam(teamId,year):
+    team = db.session.scalar(
+        sa.select(Team).where(and_(Team.teamID==teamId, Team.yearID == year))
+    )
+    return team
 
 def ShowDepthChart(teamId, year):
     #Query to get player fielding time in each position for the specified team and year
@@ -41,4 +48,6 @@ def ShowDepthChart(teamId, year):
             "time_percentage": f"{result.time_percentage:.2f}%"
         })
 
-    return render_template('depthChart.html', position_data=position_data, teamId=teamId, year=year)
+    team=getTeam(teamId,year)
+
+    return render_template('depthChart.html',title="Depth Chart - {} {}".format(year, team.team_name), position_data=position_data, team=team, teamId=teamId, year=year)
