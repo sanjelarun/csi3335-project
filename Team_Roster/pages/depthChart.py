@@ -3,8 +3,8 @@ from app import db
 from app.models import People, Fielding, Batting
 from sqlalchemy import func
 
-def ShowDepthChart(teamId):
-    year = request.args.get("year", type=int)
+def ShowDepthChart(teamId, year):
+    
     stat = request.args.get('stat', 'percentage')  # Default to 'percentage' if no stat is specified
 
     positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P', 'OF']
