@@ -65,7 +65,7 @@ table {
     unicode-bidi: isolate;
     border-spacing: 2px;
     border-color: gray;
-    margin: 50px;
+    margin-bottom: 50px;
 }
 
 .stats-table table {
@@ -82,7 +82,7 @@ tr {
 }
 
 .stats-table th {
-    background-color: gray;
+    background-color: #041E42;
     color: white;
     font-weight: bold;
     border: 1px solid gray;

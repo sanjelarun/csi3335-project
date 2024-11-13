@@ -1,7 +1,8 @@
 from flask import render_template
 from app import db
-from app.models import Batting, People
-from sqlalchemy import func
+import sqlalchemy as sa
+from app.models import Batting, People, Team
+from sqlalchemy import and_, func
 
 
 def getBattingStats(teamId, year):
@@ -106,5 +107,16 @@ def getBattingStats(teamId, year):
         batting_data[result.player_id] = player_data
 
     return batting_data
+
+def getTeam(teamId,year):
+    team = db.session.scalar(
+        sa.select(Team).where(and_(Team.teamID==teamId, Team.yearID == year))
+    )
+    return team
+
 def ShowRoster(teamId, year):
-    return render_template('roster.html', title="{}'s Roster".format(teamId), teamId=teamId, year=year, batting_data=getBattingStats(teamId, year))
+
+    battingData = getBattingStats(teamId,year)
+    team = getTeam(teamId,year)
+
+    return render_template('roster.html', title="Roster - {} {}".format(year, team.team_name), teamId=teamId, team=team, year=year, batting_data=battingData)
