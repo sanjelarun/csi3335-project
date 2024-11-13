@@ -135,6 +135,7 @@ class People(Base):
     def __repr__(self):
         return '<People: {} {}, ID:{}>'.format(self.nameFirst,self.nameLast,self.playerID)
 
+
 class Batting(Base):
     __tablename__ = 'batting'
 
@@ -164,4 +165,3 @@ class Batting(Base):
 
     def __repr__(self):
         return '<Batting: {} {}, TeamID:{}>'.format(self.yearID, self.batting_ID, self.teamID)
-    
