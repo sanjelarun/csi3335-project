@@ -1,7 +1,14 @@
 from flask import jsonify, render_template, request
 from app import db
-from app.models import People, Fielding, Batting
-from sqlalchemy import func
+import sqlalchemy as sa
+from app.models import People, Fielding, Batting, Team
+from sqlalchemy import func, and_
+
+def getTeam(teamId,year):
+    team = db.session.scalar(
+        sa.select(Team).where(and_(Team.teamID==teamId, Team.yearID == year))
+    )
+    return team
 
 def ShowDepthChart(teamId, year):
     
@@ -95,5 +102,6 @@ def ShowDepthChart(teamId, year):
         
     selected_stats = all_stats.get(stat, {})
 
-    # Render the template and return the updated HTML
-    return render_template('depthChart.html', positions_stats=selected_stats, stat=stat, teamID=teamId, year=year)
+    team=getTeam(teamId,year)
+
+    return render_template('depthChart.html',title="Depth Chart - {} {}".format(year, team.team_name), positions_stats=selected_stats, stat=stat, team=team, teamId=teamId, year=year)

@@ -1,7 +1,8 @@
 from flask import render_template
 from app import db
-from app.models import Batting, People
-from sqlalchemy import func
+import sqlalchemy as sa
+from app.models import Batting, People, Team
+from sqlalchemy import and_, func
 
 
 def getBattingStats(teamId, year):
@@ -76,7 +77,7 @@ def getBattingStats(teamId, year):
             # subquery.c["WAR"]
         )
         .join(People, People.playerID == subquery.c.player_id)
-        .order_by(subquery.c["G"])
+        .order_by(subquery.c.PA.desc())
         .all()
     )
 
@@ -85,17 +86,18 @@ def getBattingStats(teamId, year):
         player_data = {
             "full_name": result.full_name,
             "player_id": result.player_id,
-            "PA": result.PA,
-            "HR": result.HR,
-            "SB": result.SB,
-            "BB%": result.BB,
-            "K%": result.K,
-            "ISO": result.ISO,
-            "BABIP": result.BABIP,
-            "AVG": result.AVG,
-            "OBP": result.OBP,
-            "SLG": result.SLG,
-            "wOBA": result.wOBA,
+            "G": result.G,
+            "PA": result.PA or 0,
+            "HR": result.HR or 0,
+            "SB": result.SB or 0,
+            "BB%": result.BB or 0,
+            "K%": result.K or 0,
+            "ISO": result.ISO or 0,
+            "BABIP": result.BABIP or 0,
+            "AVG": result.AVG or 0,
+            "OBP": result.OBP or 0,
+            "SLG": result.SLG or 0,
+            "wOBA": result.wOBA or 0,
             # "wRC+": result["wRC+"],
             # "BsR": result["BsR"],
             # "Off": result["Off"],
@@ -105,5 +107,16 @@ def getBattingStats(teamId, year):
         batting_data[result.player_id] = player_data
 
     return batting_data
+
+def getTeam(teamId,year):
+    team = db.session.scalar(
+        sa.select(Team).where(and_(Team.teamID==teamId, Team.yearID == year))
+    )
+    return team
+
 def ShowRoster(teamId, year):
-    return render_template('roster.html', title="{}'s Roster".format(teamId), teamId=teamId, year=year, batting_data=getBattingStats(teamId, year))
+
+    battingData = getBattingStats(teamId,year)
+    team = getTeam(teamId,year)
+
+    return render_template('roster.html', title="Roster - {} {}".format(year, team.team_name), teamId=teamId, team=team, year=year, batting_data=battingData)

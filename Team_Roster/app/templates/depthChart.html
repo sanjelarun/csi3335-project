@@ -1,7 +1,7 @@
 {% extends "teamContainer.html" %}
 
 {% block teamData %}
-<h1>Depth Chart for Team {{ teamID }} ({{ year }})</h1>
+<h1>Depth Chart - {{year}} Team {{ team.team_name }}</h1>
 
 <!-- Dropdown to change stat -->
 <form method="GET" action="/{{ teamID }}/depthChart">
