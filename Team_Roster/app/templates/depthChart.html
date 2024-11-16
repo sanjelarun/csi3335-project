@@ -13,7 +13,7 @@
     </select>
     <input type="hidden" name="year" value="{{ year }}">
 </form>
-
+<!-- 
 {% for position, players in positions_stats.items() %}
     <h2>Position: {{ position }}</h2>
     {% if players %}
@@ -33,5 +33,76 @@
     {% else %}
         <p>No players found for this position.</p>
     {% endif %}
-{% endfor %}
+{% endfor %} -->
+
+<!-- <div class="diamond">
+  <div class="base first">1B</div>
+  <div class="base second">2B</div>
+  <div class="base third">3B</div>
+  <div class="base home">C</div>
+  <div class="base pitcher">P</div>
+  <div class="outfield left">LF</div>
+  <div class="outfield center">CF</div>
+  <div class="outfield right">RF</div>
+</div> -->
+
+<div class="diamond">
+    <div class="position catcher" id="C">
+        <h4>C</h4>
+        <ul>
+            <li>Player 1</li>
+            <li>Player 2</li>
+        </ul>
+    </div>
+    <div class="position first-base" id="1B">
+        <h4>1B</h4>
+        <ul></ul>
+    </div>
+    <div class="position second-base" id="2B">
+        <h4>2B</h4>
+        <ul></ul>
+    </div>
+    <div class="position shortstop" id="SS">
+        <h4>SS</h4>
+        <ul></ul>
+    </div>
+    <div class="position third-base" id="3B">
+        <h4>3B</h4>
+        <ul></ul>
+    </div>
+    <div class="position left-field" id="LF">
+        <h4>LF</h4>
+        <ul></ul>
+    </div>
+    <div class="position center-field" id="CF">
+        <h4>CF</h4>
+        <ul></ul>
+    </div>
+    <div class="position right-field" id="RF">
+        <h4>RF</h4>
+        <ul></ul>
+    </div>
+    <div class="position pitcher" id="P">
+        <h4>P</h4>
+        <ul></ul>
+    </div>
+</div>
+
+<script>
+    const positionsData = JSON.parse('{{ positions_stats | tojson | safe }}');
+
+    Object.entries(positionsData).forEach(([position, players]) => {
+        const positionElement = document.getElementById(position);
+        if (positionElement) {
+            const ul = positionElement.querySelector('ul');
+            players.forEach(player => {
+                const li = document.createElement('li');
+                li.textContent = `${player.nameFirst} ${player.nameLast}`;
+                ul.appendChild(li);
+            });
+        }
+    });
+</script>
+
+
 {% endblock %}

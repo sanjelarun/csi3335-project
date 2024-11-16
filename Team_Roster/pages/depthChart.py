@@ -36,7 +36,7 @@ def ShowDepthChart(teamId, year):
             .order_by(func.sum(Fielding.f_InnOuts).desc())
             .limit(6)
         )
-        all_stats['percentage'][position] = percentage_query.all()
+        all_stats['percentage'][position] = [row._asdict() for row in percentage_query.all()]
 
             # Query for Plate Appearances (PA)
         pa_query = (
@@ -57,7 +57,7 @@ def ShowDepthChart(teamId, year):
             .order_by(func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH).desc())
             .limit(6)
         )
-        all_stats['PA'][position] = pa_query.all()
+        all_stats['PA'][position] = [row._asdict() for row in pa_query.all()]
 
         woba_query = (
             db.session.query(
@@ -97,7 +97,7 @@ def ShowDepthChart(teamId, year):
                 ).desc())
             .limit(6)
         )
-        all_stats['wOBA'][position] = woba_query.all()
+        all_stats['wOBA'][position] = [row._asdict() for row in woba_query.all()]
 
         
     selected_stats = all_stats.get(stat, {})
