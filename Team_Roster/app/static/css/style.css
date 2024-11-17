@@ -110,9 +110,49 @@ tr {
     padding-bottom: 4px;
 }
 
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#stadium {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    height: 0;
+    padding-bottom: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+    transform-origin: top center;
+}
+
+#stadium > div {
+    position: absolute;
+}
+
+@media (max-width: 768px) {
+    #stadium {
+        padding: 1rem;
+        max-width: 100%;
+    }
+}
+
+
 
 #field{ 
-    position:absolute;
     top:-110px;
     left:145px;
     height:700px;
@@ -120,7 +160,8 @@ tr {
     border-radius:1% 100% 1% 1%;
     border:1px solid green;
     background-color:green;
-   -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+    margin: auto;
 }
 #in-field{ 
     position:absolute;
@@ -129,7 +170,7 @@ tr {
     height:450px;
     width:450px;
     border-radius:1% 50% 1% 1%;
-   -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
 }
 #base-lines{
     position:absolute;
@@ -139,7 +180,7 @@ tr {
     width:670px;
     border-left:2px solid white;
     border-bottom:2px solid white;
-    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
 }
 #in-field-grass{
     position:absolute;
@@ -149,13 +190,13 @@ tr {
     width:260px;
     border:2px solid green;
     background-color:green;
-    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
 }
 .base{
     position:absolute;
     height:13px;
     width:13px;
-    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
     border:1px solid white;
     background-color:white;
     z-index: 1000;
@@ -189,7 +230,7 @@ tr {
     height:80px;
     width:80px;
     border-radius:100% 100% 100% 100%;
-    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
      border:1px solid #836539;
     background-color:#836539;
 }
@@ -214,7 +255,7 @@ tr {
     position:absolute;
     height:40px;
     width: 40px;
-    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
     border:1px solid #836539;
     background-color:#836539;
 }
@@ -260,8 +301,8 @@ tr {
     height:100px;
     width:100px;
     border-radius:100% 100% 100% 100%;
-   -webkit-transform: rotate(-45deg);
-     border:1px solid #836539;
+    transform: rotate(-45deg);
+    border:1px solid #836539;
     background-color:#836539;
 }
 #first-base-thing{
@@ -270,113 +311,72 @@ tr {
     position:absolute;
     height:170px;
     width:13px;
-    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
     border-right:2px solid white;
     border-bottom:2px solid white;
 }
 
-
-
-/* .diamond {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    background-color: #8ecae6;
-    border: 2px solid #219ebc;
-    transform: rotate(45deg);
-    overflow: visible;
-    display: grid;
-    grid-template-areas: 
-    ". . . center . . ."
-    ". . left . right . ."
-    ". third . pitcher . first ."
-    ". . home . . . .";
-    grid-gap: 10px;
-    justify-content: center;
-}
-
-.position {
+/* General styling for player boxes */
+.player-box {
     position: absolute;
-    width: 60px;
+    background-color: rgba(255, 255, 255, 0.9); /* Slight transparency for card effect */
+    border: 1px solid #ccc; /* Soft border */
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Soft shadow to create the "card" effect */
+    width: 150px;
+    max-width: 200px;
+    min-width: 120px;
+    z-index: 999;
+    font-family: 'Arial', sans-serif;
+    font-size: 12px;
     text-align: center;
-    transform: rotate(-45deg); 
-    padding: 10px;
-    border: 1px solid black;
-    border-radius: 5px;
-    text-align: center;
+    background-color: #f9f9f9;
 }
 
-#C { grid-area: home; }
-#P { grid-area: pitcher; }
-#1B { grid-area: first; }
-#2B { grid-area: center; }
-#3B { grid-area: third; }
-#SS { grid-area: center; }
-#LF { grid-area: left; }
-#CF { grid-area: center; }
-#RF { grid-area: right; }
-
-.catcher {
-    bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%) rotate(-45deg);
+.position-header {
+    background-color: #041e42; /* Dark background */
+    color: #fff;
+    padding: 0px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 4px;
+    margin-bottom: 10px;
 }
 
-.first-base {
-    top: 50%;
-    right: -40px;
-    transform: translateY(-50%) rotate(-45deg);
+.position-label {
+    font-size: 14px;
+    font-weight: bold;
 }
 
-.second-base {
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%) rotate(-45deg);
-}
+/* Styling for position containers */
+#box-pitcher { top: 25%; left: 90%; transform: translateX(-50%); }
+#box-catcher { top: 75%; left: 49.5%; transform: translateX(-50%); }
+#box-firstbase { top: 50%; left: 70%; }
+#box-secondbase { top: 25%; left: 55%; }
+#box-thirdbase { top: 50%; left: 15%; }
+#box-shortstop { top: 25%; left: 25%; }
+#box-leftfield { top: 5%; left: 10%; }
+#box-centerfield { top: 0%; left: 49%; transform: translateX(-50%); }
+#box-rightfield { top: 5%; right: 10%; }
 
-.shortstop {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-45deg);
-}
-
-.third-base {
-    top: 50%;
-    left: -40px;
-    transform: translateY(-50%) rotate(-45deg);
-}
-
-.left-field {
-    top: -80px;
-    left: -80px;
-    transform: rotate(-45deg);
-}
-
-.center-field {
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%) rotate(-45deg);
-}
-
-.right-field {
-    top: -80px;
-    right: -80px;
-    transform: rotate(-45deg);
-}
-
-.pitcher {
-    top: 40%;
-    left: 50%;
-    transform: translateX(-50%) rotate(-45deg);
-}
-
-ul {
-    list-style: none;
+/* Adjustments for player names and stats in the list */
+.player-box ul {
+    list-style-type: none;
     padding: 0;
     margin: 0;
 }
 
-ul li {
+.player-box li {
+    margin-bottom: 5px;
     font-size: 12px;
-    color: #023047;
-} */
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+    .player-box {
+        width: 120px;
+        font-size: 10px;
+    }
+}

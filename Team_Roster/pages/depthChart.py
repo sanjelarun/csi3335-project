@@ -14,7 +14,7 @@ def ShowDepthChart(teamId, year):
     
     stat = request.args.get('stat', 'percentage')  # Default to 'percentage' if no stat is specified
 
-    positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P', 'OF']
+    positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P']
     all_stats = {'percentage': {}, 'PA': {}, 'wOBA': {}}
 
     for position in positions:
