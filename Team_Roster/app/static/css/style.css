@@ -42,6 +42,14 @@ input[type=submit]:hover {
     font-weight: 500;
 }
 
+.large-input {
+    font-size: large;
+    width: 80%;
+    padding: 8px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
 select {
     width: 200px;
     height: 40px;
@@ -100,7 +108,7 @@ tr {
     min-width: 25px;
 }
 
-.stats-tablee th,
+.stats-table th,
 .stats-table td {
     border: solid 1px #eaede3;
     font: 12px / 16px "segoe ui", arial, sans-serif;
@@ -108,4 +116,39 @@ tr {
     padding-left: 3px;
     padding-top: 5px;
     padding-bottom: 4px;
+}
+
+.immaculate-grid-table table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.immaculate-grid-table td,
+.immaculate-grid-table th {
+    width: 9rem;
+    height: 9rem;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid #3b3b3b;
+    padding: 8px;
+}
+
+.immaculate-grid-table th {
+    border: 5px solid #ddd;
+    font-size: x-large;
+}
+
+.immaculate-grid-table th.immaculate-table-top {
+    border-top: 0;
+}
+
+.immaculate-grid-table th.immaculate-table-left {
+    border-left: 0;
+}
+
+.immaculate-grid-table td {
+    background-color: #041E42;
+    color: white;
+    font-size: large;
 }
