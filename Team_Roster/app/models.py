@@ -12,11 +12,10 @@ Base = declarative_base()
 
 class User(UserMixin,db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True,
-                                                unique=True)
-    email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True,
-                                             unique=True)
+    username: so.Mapped[str] = so.mapped_column(sa.String(64),index=True,unique=True)
+    email: so.Mapped[str] = so.mapped_column(sa.String(120),index=True,unique=True)
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
+    is_admin = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -106,7 +105,6 @@ class Franchise(Base):
 
     def __repr__(self):
         return '<Franchise: {}, ID:{}, Active: {}>'.format(self.franchName,self.franchID,self.active)
-    
 
 class Fielding(Base):
     __tablename__ = 'fielding'
@@ -198,7 +196,6 @@ class Pitching(Base):
 
     def __repr__(self):
         return '<Pitching: {} {}, teamID:{}>'.format(self.yearID,self.pitching_id,self.teamID)
-
 
 class Batting(Base):
     __tablename__ = 'batting'
