@@ -1,14 +1,37 @@
 {% extends "teamContainer.html" %}
 
-{% block content %}
-<h1>Depth Chart for Team {{ teamId }} ({{ year }})</h1>
+{% block teamData %}
+<h1>Depth Chart - {{year}} Team {{ team.team_name }}</h1>
 
-{% for position, players in position_data.items() %}
+<!-- Dropdown to change stat -->
+<form method="GET" action="/{{ teamID }}/depthChart">
+    <label for="stat">Select Stat: </label>
+    <select name="stat" id="stat" onchange="this.form.submit()">
+        <option value="percentage" {% if stat == 'percentage' %}selected{% endif %}>Time Percentage</option>
+        <option value="PA" {% if stat == 'PA' %}selected{% endif %}>Plate Appearances</option>
+        <option value="wOBA" {% if stat == 'wOBA' %}selected{% endif %}>wOBA</option>
+    </select>
+    <input type="hidden" name="year" value="{{ year }}">
+</form>
+
+{% for position, players in positions_stats.items() %}
     <h2>Position: {{ position }}</h2>
-    <ul>
-    {% for player in players[:6] %}  {# Limit to top 6 players #}
-        <li>{{ player.name }} - {{ player.time_percentage }}</li>
-    {% endfor %}
-    </ul>
+    {% if players %}
+        <ul>
+        {% for player in players %}
+            <li>{{ player.nameFirst }} {{ player.nameLast }} - 
+                {% if stat == 'percentage' %}
+                    {{ player.stat_value }}%
+                {% elif stat == 'wOBA' %}
+                    {{ player.stat_value|round(3) }}
+                {% else %}
+                    {{ player.stat_value }}
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No players found for this position.</p>
+    {% endif %}
 {% endfor %}
 {% endblock %}
