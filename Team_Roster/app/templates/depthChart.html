@@ -6,7 +6,7 @@
 <form method="GET" action="/{{ teamId }}/depthChart">
     <label for="stat">Select Stat: </label>
     <select name="stat" id="stat" onchange="this.form.submit()">
-        <option value="percentage" {% if stat == 'percentage' %}selected{% endif %}>Time Percentage</option>
+        <option value="percentage" {% if stat == 'percentage' %}selected{% endif %}>Time Percentage</option> <!--Change to Playing Time-->
         <option value="PA" {% if stat == 'PA' %}selected{% endif %}>Plate Appearances</option>
         <option value="wOBA" {% if stat == 'wOBA' %}selected{% endif %}>wOBA</option>
     </select>
