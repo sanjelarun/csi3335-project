@@ -16,6 +16,7 @@ class User(UserMixin,db.Model):
     email: so.Mapped[str] = so.mapped_column(sa.String(120),index=True,unique=True)
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     is_admin = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -106,7 +107,6 @@ class Franchise(Base):
     def __repr__(self):
         return '<Franchise: {}, ID:{}, Active: {}>'.format(self.franchName,self.franchID,self.active)
 
-
 class Fielding(Base):
     __tablename__ = 'fielding'
     
@@ -160,7 +160,6 @@ class People(Base):
 
     def __repr__(self):
         return '<People: {} {}, ID:{}>'.format(self.nameFirst,self.nameLast,self.playerID)
-
 
 class Batting(Base):
 

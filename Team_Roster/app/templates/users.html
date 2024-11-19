@@ -9,33 +9,35 @@
 </head>
 <body>
     <div style="
-        display: flex;
-        justify-content: space-evenly;
-        align-items: center;
-        color: white;
-        background-color: #041E42;
-        margin: -10px;
-        height: 100px;
-        ">
-        <h3>Immaculate Party Time MLB Player Roster</h3>
-        <image src="{{ url_for('static', filename='images/mlb.png') }}" style="width: 150px;border-radius: 5%;"></image>
-    </div>
-    <div>
-        Navigation:
-        <a href="{{ url_for('users') }}">Home</a>
-        {% if current_user.is_anonymous %}
-        <a href="{{ url_for('login') }}">Login</a>
-        {% else %}
-        <a href="{{ url_for('logout') }}">Logout</a>
-        {% endif %}
-    </div>
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            color: white;
+            background-color: #041E42;
+            margin: -10px;
+            height: 100px;
+            ">
+            <h3>Immaculate Party Time MLB Player Roster</h3>
+            {% if current_user.is_anonymous %}
+            <button onclick="window.location.href='/login'">Login</button>
+            {% else %}
+                <button onclick="window.location.href='/findTeam'">Find Your Team</button>
+                {% if current_user.is_admin %}
+                    <button onclick="window.location.href='/index'">View Users</button>
+                {% endif %}
+            <button onclick="window.location.href='/logout'">Logout</button>
+            {% endif %}
+            <image src="{{ url_for('static', filename='images/mlb.png') }}" style="width: 150px;border-radius: 5%;"></image>
+        </div>
     <h1>Active Users</h1>
     <ul>
         {% for user in users %}
         <li>
             ID: {{ user.id }}, Username: {{ user.username }}, Email: {{ user.email }}
-            <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST">
-                <button type="submit">Delete</button>
+            <form action="{{ url_for('toggle_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                <button type="submit">
+                    {{ 'Deactivate' if user.is_active else 'Activate' }}
+                </button>
             </form>
         </li>
         {% endfor %}

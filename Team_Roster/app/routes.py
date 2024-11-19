@@ -13,23 +13,32 @@ from werkzeug.security import generate_password_hash
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
+@login_required
 def index():
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
     if current_user.is_admin:
         return redirect(url_for('users'))
     return ShowFindTeam()
 
 @app.route('/users', methods=['GET'])
+@login_required
 def users():
+    if not current_user.is_admin:
+        return redirect(url_for('index'))
+
     users = User.query.all()
     return render_template('users.html', users=users)
 
-@app.route('/delete_user/<int:user_id>', methods=['POST'])
-def delete_user(user_id):
+@app.route('/toggle_user/<int:user_id>', methods=['POST'])
+@login_required
+def toggle_user(user_id):
+    if not current_user.is_admin:
+        return redirect(url_for('index'))
+
     user = User.query.get_or_404(user_id)
-    db.session.delete(user)
+    user.is_active = not user.is_active
     db.session.commit()
+    status = "activated" if user.is_active else "deactivated"
+    flash(f"User {user.username} has been {status}.")
     return redirect(url_for('users'))
 
 @app.route('/findTeam', methods=['GET', 'POST'])
@@ -62,6 +71,10 @@ def login():
         # Check if user exists and if the password is correct
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
+            return redirect(url_for('login'))
+
+        if not user.is_active:
+            flash('Your account has been deactivated. Please contact support.')
             return redirect(url_for('login'))
 
         login_user(user, remember=form.remember_me.data)
@@ -103,7 +116,8 @@ def ensure_admin():
                 username="admin",
                 email="admin@email.com",
                 password_hash=generate_password_hash("password"),
-                is_admin=True
+                is_admin=True,
+                is_active=True
             )
             db.session.add(admin)
             db.session.commit()

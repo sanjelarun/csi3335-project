@@ -25,18 +25,16 @@
             height: 100px;
             ">
             <h3>Immaculate Party Time MLB Player Roster</h3>
-            <button onclick="window.location.href='/findTeam'">Find Your Team</button>
-            <image src="{{ url_for('static', filename='images/mlb.png') }}" style="width: 150px;border-radius: 5%;"></image>
-        </div>
-
-        <div>
-            Navigation:
-            <a href="{{ url_for('index') }}">Home</a>
             {% if current_user.is_anonymous %}
-            <a href="{{ url_for('login') }}">Login</a>
+            <button onclick="window.location.href='/login'">Login</button>
             {% else %}
-            <a href="{{ url_for('logout') }}">Logout</a>
+                <button onclick="window.location.href='/findTeam'">Find Your Team</button>
+                {% if current_user.is_admin %}
+                    <button onclick="window.location.href='/index'">View Users</button>
+                {% endif %}
+            <button onclick="window.location.href='/logout'">Logout</button>
             {% endif %}
+            <image src="{{ url_for('static', filename='images/mlb.png') }}" style="width: 150px;border-radius: 5%;"></image>
         </div>
         {% with messages = get_flashed_messages() %}
         {% if messages %}
