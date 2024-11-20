@@ -164,25 +164,6 @@
 </script>
 
 
-<h3>Position: {{ position }}</h3>
-{% if players %}
-<ul>
-    {% for player in players %}
-    <li>{{ player.nameFirst }} {{ player.nameLast }} -
-        {% if stat == 'percentage' %}
-        {{ player.stat_value }}%
-        {% elif stat == 'wOBA' %}
-        {{ player.stat_value|round(3) }}
-        {% else %}
-        {{ player.stat_value }}
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No players found for this position.</p>
-{% endif %}
-{% endfor %}
 
 <h2>Depth Chart Tables</h2>
 
