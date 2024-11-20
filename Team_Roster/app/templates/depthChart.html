@@ -35,88 +35,90 @@
 {% endfor %} -->
 <body>
     <main>
-        <div id="stadium">
-            <div id="field" class="mowed-grass">
+        <div id="stadium-wrapper">
+            <div id="stadium">
+                <div id="field" class="mowed-grass">
+                </div>
+                <div id="pitching-box" class="pitching-box">Pitcher Info</div>
+                <div id="in-field"></div>
+                <div id="in-field-grass" class="mowed-grass"></div>
+                <div id="batting-circle"></div>
+                <div id="first-base" class="base">
+                <div class="pulse"></div>
+                <div class="action-area"></div>
+                </div>
+                <div id="second-base" class="base">
+                <div class="pulse"></div>
+                <div class="action-area"></div>
+                </div>
+                <div id="thrid-base" class="base">
+                <div class="pulse"></div>
+                <div class="action-area"></div>
+                </div>
+                <div id="home-plate">
+                <div class="action-area"></div>
+                </div>
+                <div class="home-plate-pulse pulse"></div>
+                <div id="base-lines"></div>
+                <div id="pitchers-mound"></div>
+                <div id="pitchers-plate"></div>
+                <div id="first-circle" class="half-circle"></div>
+                <div id="second-circle" class="half-circle"></div>
+                <div id="third-circle" class="half-circle"></div>
+                <div id="batters-box-right" class="batters-box"></div>
+                <div id="batters-box-left" class="batters-box"></div>
+                <div id="first-base-thing"></div>
             </div>
-            <div id="pitching-box" class="pitching-box">Pitcher Info</div>
-            <div id="in-field"></div>
-            <div id="in-field-grass" class="mowed-grass"></div>
-            <div id="batting-circle"></div>
-            <div id="first-base" class="base">
-            <div class="pulse"></div>
-            <div class="action-area"></div>
+        
+            <div id="player-boxes">
+                <div id="box-pitcher" class="player-box">
+                    <div class="position-header">
+                        <span class="position-label">P</span>
+                    </div>
+                </div>
+                <div id="box-catcher" class="player-box">
+                    <div class="position-header">
+                        <span class="position-label">C</span>
+                    </div>
+                </div>
+                <div id="box-firstbase" class="player-box">
+                    <div class="position-header">
+                        <span class="position-label">1B</span>
+                    </div>
+                </div>
+                <div id="box-secondbase" class="player-box">
+                    <div class="position-header">
+                        <span class="position-label">2B</span>
+                    </div>
+                </div>
+                <div id="box-thirdbase" class="player-box">
+                    <div class="position-header">
+                        <span class="position-label">3B</span>
+                    </div>
+                </div>
+                <div id="box-shortstop" class="player-box">
+                    <div class="position-header">
+                        <span class="position-label">SS</span>
+                    </div>
+                </div>
+                <div id="box-leftfield" class="player-box">
+                    <div class="position-header">
+                        <span class="position-label">LF</span>
+                    </div>
+                </div>
+                <div id="box-centerfield" class="player-box">
+                    <div class="position-header">
+                        <span class="position-label">CF</span>
+                    </div>
+                </div>
+                <div id="box-rightfield" class="player-box">
+                    <div class="position-header">
+                        <span class="position-label">RF</span>
+                    </div>
+                </div>
             </div>
-            <div id="second-base" class="base">
-            <div class="pulse"></div>
-            <div class="action-area"></div>
-            </div>
-            <div id="thrid-base" class="base">
-            <div class="pulse"></div>
-            <div class="action-area"></div>
-            </div>
-            <div id="home-plate">
-            <div class="action-area"></div>
-            </div>
-            <div class="home-plate-pulse pulse"></div>
-            <div id="base-lines"></div>
-            <div id="pitchers-mound"></div>
-            <div id="pitchers-plate"></div>
-            <div id="first-circle" class="half-circle"></div>
-            <div id="second-circle" class="half-circle"></div>
-            <div id="third-circle" class="half-circle"></div>
-            <div id="batters-box-right" class="batters-box"></div>
-            <div id="batters-box-left" class="batters-box"></div>
-            <div id="first-base-thing"></div>
         </div>
 
-        
-        <div id="player-boxes">
-            <div id="box-pitcher" class="player-box">
-                <div class="position-header">
-                    <span class="position-label">P</span>
-                </div>
-            </div>
-            <div id="box-catcher" class="player-box">
-                <div class="position-header">
-                    <span class="position-label">C</span>
-                </div>
-            </div>
-            <div id="box-firstbase" class="player-box">
-                <div class="position-header">
-                    <span class="position-label">1B</span>
-                </div>
-            </div>
-            <div id="box-secondbase" class="player-box">
-                <div class="position-header">
-                    <span class="position-label">2B</span>
-                </div>
-            </div>
-            <div id="box-thirdbase" class="player-box">
-                <div class="position-header">
-                    <span class="position-label">3B</span>
-                </div>
-            </div>
-            <div id="box-shortstop" class="player-box">
-                <div class="position-header">
-                    <span class="position-label">SS</span>
-                </div>
-            </div>
-            <div id="box-leftfield" class="player-box">
-                <div class="position-header">
-                    <span class="position-label">LF</span>
-                </div>
-            </div>
-            <div id="box-centerfield" class="player-box">
-                <div class="position-header">
-                    <span class="position-label">CF</span>
-                </div>
-            </div>
-            <div id="box-rightfield" class="player-box">
-                <div class="position-header">
-                    <span class="position-label">RF</span>
-                </div>
-            </div>
-        </div>
     </main>
 
 </body>

@@ -113,7 +113,7 @@ tr {
 body {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    /* min-height: 100vh; */
     margin: 0;
 }
 
@@ -123,7 +123,42 @@ main {
     justify-content: center;
     align-items: center;
     position: relative;
-    overflow: hidden;
+    overflow: auto;
+}
+
+#stadium-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    overflow: auto;
+    transform-origin: center top;
+}
+
+@media (max-width: 1200px) {
+    #stadium-wrapper {
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 992px) {
+    #stadium-wrapper {
+        transform: scale(0.6);
+    }
+}
+
+@media (max-width: 768px) {
+    #stadium-wrapper {
+        transform: scale(0.5);
+    }
+}
+
+@media (max-width: 576px) {
+    #stadium-wrapper {
+        transform: scale(0.4);
+    }
 }
 
 #stadium {
@@ -142,15 +177,6 @@ main {
 #stadium > div {
     position: absolute;
 }
-
-@media (max-width: 768px) {
-    #stadium {
-        padding: 1rem;
-        max-width: 100%;
-    }
-}
-
-
 
 #field{ 
     top:-110px;
@@ -350,7 +376,6 @@ main {
     font-weight: bold;
 }
 
-/* Styling for position containers */
 #box-pitcher { top: 25%; left: 90%; transform: translateX(-50%); }
 #box-catcher { top: 75%; left: 49.5%; transform: translateX(-50%); }
 #box-firstbase { top: 50%; left: 70%; }
@@ -361,7 +386,6 @@ main {
 #box-centerfield { top: 0%; left: 49%; transform: translateX(-50%); }
 #box-rightfield { top: 5%; right: 10%; }
 
-/* Adjustments for player names and stats in the list */
 .player-box ul {
     list-style-type: none;
     padding: 0;
@@ -373,10 +397,18 @@ main {
     font-size: 12px;
 }
 
-/* Responsive layout */
 @media (max-width: 768px) {
     .player-box {
-        width: 120px;
-        font-size: 10px;
+        width: 8%;
+        padding: 8px;
+        font-size: 0.7em;
+    }
+}
+
+@media (max-width: 576px) {
+    .player-box {
+        width: 6%;
+        padding: 5px;
+        font-size: 0.6em;
     }
 }
