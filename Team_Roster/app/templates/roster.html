@@ -59,9 +59,8 @@
 
 
 </table>
+
 <h3>Game Statistics</h3>
-
-
 <table class="stats-table">
     <thead>
         <tr>
@@ -127,6 +126,7 @@
         <td> {{team.team_PPF }} </td>
     </tbody>
 </table>
+
 <h2>Player Batting Statistics for the {{ team.yearID }} {{team.team_name}} </h2>
 <table class="stats-table">
     <thead>
@@ -176,99 +176,39 @@
         {% endfor %}
     </tbody>
 </table>
-    <table>
-        <thead>
-            <tr>
-                <th>Player Name</th>
-                <th>Games Played (G)</th>
-                <th>Plate Appearances (PS)</th>
-                <th>Home Runs (HR)</th>
-                <th>Stolen Bases (SB)</th>
-                <th>Walk % (BB%)</th>
-                <th>Strikeout % (K%)</th>
-                <th>ISO</th>
-                <th>BABIP</th>
-                <th>AVG</th>
-                <th>OBP</th>
-                <th>SLG</th>
-                <th>wOBA</th>
-    <!--            <th>wRC+</th>-->
-    <!--            <th>BsR</th>-->
-    <!--            <th>Off</th>-->
-    <!--            <th>Def</th>-->
-    <!--            <th>WAR</th>-->
-            </tr>
-        </thead>
-        <tbody>
-            {% for player_id, stats in batting_data.items() %}
-            <tr>
-                <td>{{ stats.full_name }}</td>
-                <td>{{ stats.G }}</td>
-                <td>{{ stats["PA"] }}</td>
-                <td>{{ stats["HR"] }}</td>
-                <td>{{ stats["SB"] }}</td>
-                <td>{{ stats["BB%"] }}</td>
-                <td>{{ stats["K%"] }}</td>
-                <td>{{ stats["ISO"] }}</td>
-                <td>{{ stats["BABIP"] }}</td>
-                <td>{{ stats["AVG"] }}</td>
-                <td>{{ stats["OBP"] }}</td>
-                <td>{{ stats["SLG"] }}</td>
-                <td>{{ stats["wOBA"] }}</td>
-    <!--            <td>{{ stats["wRC+"] }}</td>-->
-    <!--            <td>{{ stats["BsR"] }}</td>-->
-    <!--            <td>{{ stats["Off"] }}</td>-->
-    <!--            <td>{{ stats["Def"] }}</td>-->
-    <!--            <td>{{ stats["WAR"] }}</td>-->
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+<h2>Player Pitching Statistics for the {{ team.yearID }} {{team.team_name}} </h2>
+<table class="stats-table">
+    <thead>
+        <tr>
+            <th>Player Name</th>
+            <th>Innings Pitched (IP)</th>
+            <th>Strikeout % (K%)</th>
+            <th>Walk % (BB%)</th>
+            <th>HR/9</th>
+            <th>BABIP</th>
+            <th>LOB%</th>
+            <th>ERA</th>
+            <th>FIP</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player_id, stats in pitching_data.items() %}
+        <tr>
+            <td>{{ stats.full_name }}</td>
+            <td>{{ stats["IP"] }}</td>
+            <td>{{ '%0.2f'| format(stats["K9"]) }}%</td>
+            <td>{{ '%0.2f'| format(stats["BB9"]) }}%</td>
+            <td>{{ '%0.3f'| format(stats["HR9"]) }}</td>
+            <td>{{ '%0.3f'| format(stats["BABIP"]) }}</td>
+            <td>{{ '%0.3f'| format(stats["LOB"] * 100) }}%</td>
+            <td>{{ '%0.3f'| format(stats["ERA"]) }}</td>
+            <td>{{ '%0.3f'| format(stats["FIP"]) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 <h2>{{ teamId }} Player Roster</h2>
 <p>Year: {{ year }}</p>
-{% endblock %}
-
-{% block pitchingData %}
-<h1>Pitching Statistics</h1>
-
-{% if pitching_data %}
-    <table>
-        <thead>
-            <tr>
-                <th>Player Name</th>
-                <th>Games Played (G)</th>
-                <th>Games Started (GS)</th>
-                <th>Innings Pitched (IP)</th>
-                <th>Strikeout % (K%)</th>
-                <th>Walk % (BB%)</th>
-                <th>HR/9</th>
-                <th>BABIP</th>
-                <th>LOB%</th>
-                <th>ERA</th>
-                <th>FIP</th>
-                <th>WAR</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for player_id, stats in pitching_data.items() %}
-            <tr>
-                <td>{{ stats.get("full_name", "N/A") }}</td>
-                <td>{{ stats.get("G", "N/A") }}</td>
-                <td>{{ stats.get("GS", "N/A") }}</td>
-                <td>{{ stats.get("IP", "N/A") }}</td>
-                <td>{{ stats.get("K%", "N/A") }}</td>
-                <td>{{ stats.get("BB%", "N/A") }}</td>
-                <td>{{ stats.get("HR/9", "N/A") }}</td>
-                <td>{{ stats.get("BABIP", "N/A") }}</td>
-                <td>{{ stats.get("LOB%", "N/A") }}</td>
-                <td>{{ stats.get("ERA", "N/A") }}</td>
-                <td>{{ stats.get("FIP", "N/A") }}</td>
-                <td>{{ stats.get("WAR", "N/A") }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No pitching data available.</p>
-{% endif %}
 {% endblock %}

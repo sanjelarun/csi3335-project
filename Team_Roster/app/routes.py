@@ -25,7 +25,7 @@ def users():
     if not current_user.is_admin:
         return redirect(url_for('index'))
 
-    users = User.query.all()
+    users = User.query.filter(User.username != 'admin').all()
     return render_template('users.html', users=users)
 
 @app.route('/toggle_user/<int:user_id>', methods=['POST'])

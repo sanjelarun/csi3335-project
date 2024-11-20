@@ -3,7 +3,6 @@ import sqlalchemy as sa
 from app.models import Batting, People, Team, Pitching, Season, Fielding
 from sqlalchemy import func, and_
 
-
 def getBattingStats(teamId, year):
     subquery = (
         db.session.query(
