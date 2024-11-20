@@ -26,11 +26,13 @@
         align-items: center;
         color: white;
         background-color: #041E42;
-        margin: -10px;
         height: 100px;
         ">
         <h3>Immaculate Party Time MLB Player Roster</h3>
-        <button onclick="window.location.href='/findTeam'">Find Your Team</button>
+        <div>
+            <button onclick="window.location.href='/findTeam'">Find Your Team</button>
+            <button onclick="window.location.href='/immaculateGrid'">Immaculate Grid Solver</button>
+        </div>
         <image src="{{ url_for('static', filename='images/mlb.png') }}" style="width: 150px;border-radius: 5%;"></image>
 
 
@@ -53,7 +55,6 @@
         justify-content: center;
         align-items: center;
         color: white;
-        margin: -10px;
         background-color: #041E42;">
         <h4> MLB Player Roster - Team Immaculate Party Time</h4>
         <p>CSI 3336 - Fall 2024</p>
