@@ -10,7 +10,6 @@ from app.models import User
 import sqlalchemy as sa
 from werkzeug.security import generate_password_hash
 
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
@@ -108,7 +107,7 @@ def logout():
 
 @app.before_request
 def ensure_admin():
-    if not hasattr(app, 'admin_checked'):  # Ensure this logic runs only once
+    if not hasattr(app, 'admin_checked'):
         app.admin_checked = True
         admin_user = User.query.filter_by(is_admin=True).first()
         if not admin_user:

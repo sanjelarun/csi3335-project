@@ -1,6 +1,7 @@
 import os
 
 from csi3335f2024 import mysql
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:

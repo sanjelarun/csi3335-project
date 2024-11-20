@@ -1,4 +1,3 @@
-
 from sqlalchemy import CHAR, Column, Date, Double, Integer, SmallInteger, String, Float, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
