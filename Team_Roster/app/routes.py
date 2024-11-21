@@ -3,6 +3,7 @@ from app import app
 from pages.findTeam import ShowFindTeam
 from pages.roster import ShowRoster
 from pages.depthChart import ShowDepthChart
+from pages.immaculateGrid import ShowImmaculateGrid
 
 
 @app.route('/',methods=['GET', 'POST'])
@@ -20,3 +21,7 @@ def roster(teamId):
 def depthChart(teamId):
     year = request.args.get("year")
     return ShowDepthChart(teamId, year)
+
+@app.route('/immaculateGrid', methods=['GET','POST'])
+def immaculateGrid():
+    return ShowImmaculateGrid()

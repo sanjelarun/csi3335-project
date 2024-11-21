@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Immaculate Grid Solver</h1>
+
+<p>Paste in the URL of an <a href="https://www.immaculategrid.com/" target="_blank">Immaculate Grid</a> game to view a
+    solution!</p>
+
+<form action="" method="POST">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.url.label }}<br>
+        {{ form.url(class="form-control large-input") }}<br>
+        {% for error in form.url.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+
+{% if url %}
+<p>URL: {{ url }}</p>
+{% endif %}
+
+{% if (questions and solutionNames) %}
+<h2>Immaculate Grid Solution</h2>
+<table class="immaculate-grid-table">
+    <!-- Header Row -->
+    <tr>
+        <th class="immaculate-table-left immaculate-table-top"></th>
+        {% for i in range(3) %}
+        <th class="immaculate-table-top">{{ questions[i] }}</th> <!-- Display question values for columns -->
+        {% endfor %}
+    </tr>
+
+    <!-- Table Rows -->
+    {% for i in range(3) %}
+    <tr>
+        <th class="immaculate-table-left">{{ questions[i + 3] }}</th> <!-- Display question values for rows -->
+        {% for j in range(3) %}
+        <td>{{ solutionNames[i * 3 + j] }}</td> <!-- Display corresponding solution -->
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% endblock %}
