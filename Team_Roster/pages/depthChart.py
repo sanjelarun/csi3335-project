@@ -34,7 +34,7 @@ def getSelectedStats(teamId,year,stat):
         )
         all_stats['percentage'][position] = [row._asdict() for row in percentage_query.all()]
 
-            # Query for Plate Appearances (PA)
+            # Query for Plate Appearances (PA) -- Every player is in batting but not necessarily in pitching. Use to determine PA better?
         pa_query = (
             db.session.query(
                 People.nameFirst,
