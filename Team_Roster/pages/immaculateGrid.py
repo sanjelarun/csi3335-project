@@ -13,5 +13,9 @@ def ShowImmaculateGrid():
         url = form.url.data
         questions = scrapeImmaculateGridQuestions(url)
         solutionNames = solveGrid(questions)
+
+        print("URL:", url)
+        print("Questions:", questions)
+        ("Solution Names:", solutionNames)
     
     return render_template('immaculateGrid.html', title='Immaculate Grid Solver', form=form, url = url,questions = questions, solutionNames = solutionNames)
