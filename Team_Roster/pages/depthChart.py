@@ -11,7 +11,7 @@ def getTeam(teamId,year):
     return team
 
 def getSelectedStats(teamId,year,stat):
-    positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P', 'OF']
+    positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P']
     all_stats = {'percentage': {}, 'PA': {}, 'wOBA': {}}
     for position in positions:
         percentage_query = (
@@ -32,9 +32,9 @@ def getSelectedStats(teamId,year,stat):
             .order_by(func.sum(Fielding.f_InnOuts).desc())
             .limit(6)
         )
-        all_stats['percentage'][position] = percentage_query.all()
+        all_stats['percentage'][position] = [row._asdict() for row in percentage_query.all()]
 
-            # Query for Plate Appearances (PA)
+            # Query for Plate Appearances (PA) -- Every player is in batting but not necessarily in pitching. Use to determine PA better?
         pa_query = (
             db.session.query(
                 People.nameFirst,
@@ -53,7 +53,7 @@ def getSelectedStats(teamId,year,stat):
             .order_by(func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH).desc())
             .limit(6)
         )
-        all_stats['PA'][position] = pa_query.all()
+        all_stats['PA'][position] = [row._asdict() for row in pa_query.all()]
 
         woba_query = (
             db.session.query(
@@ -93,7 +93,7 @@ def getSelectedStats(teamId,year,stat):
                 ).desc())
             .limit(6)
         )
-        all_stats['wOBA'][position] = woba_query.all()
+        all_stats['wOBA'][position] = [row._asdict() for row in woba_query.all()]
 
         
     return all_stats.get(stat, {})
