@@ -13,11 +13,7 @@ def getAllTeams():
     return team_list
 
 # Retrieves all players associated with a given team.
-# Parameters:
-# - team_name (str): The name of the team to query.
-# Returns: A list of tuples, where each tuple contains a player's ID and the team name.
 # Notes: The query ensures that players are grouped by their playerID and the team's name.
-# Debug: Outputs the team being queried and the total count of players found.
 def getPlayersByTeam(team_name):
     return (
         db.session.query(People.playerID)
@@ -34,11 +30,9 @@ def getPlayersByTeam(team_name):
 # Retrieves all players who have achieved a minimum number of wins in a season.
 # Parameters:
 # - numWins (int): The minimum number of wins required.
-# Returns: A list of playerIDs that satisfy the criteria.
 # Notes: 
 # - Only pitchers are awarded "wins," as this statistic is specific to the Pitching table.
 # - The query joins People, Pitching, and Team tables to ensure accurate filtering and grouping.
-# Debug: Outputs the number of players found with the required wins.
 def getPlayerWinsBySeason(numWins):
     return (
         db.session.query(People.playerID)
