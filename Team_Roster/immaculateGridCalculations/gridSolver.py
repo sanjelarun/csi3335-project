@@ -1,7 +1,6 @@
-from flask import jsonify, render_template, request
 from app import db
 import sqlalchemy as sa
-from app.models import People, Fielding, Batting, Team, Pitching, Season
+from app.models import People, Fielding, Batting, Team, Pitching, AllStarFull, Awards
 from sqlalchemy import func, and_, literal_column
 
 
@@ -47,10 +46,10 @@ def getPlayerWinsBySeason(numWins):
 
 # All players with a CAREER era over a certian amount
 # Parameters:
-# - numWins (int): The minimum career ERA required
+# - maxERA (int): The maximum career ERA required
 # Notes: 
 # - Career ERA cannot be caluclated using stint ERA, so I had to do the full calculaton
-def getPlayerCareerEra(greaterThan):
+def getPlayerCareerEra(maxERA):
     return (
         db.session.query(Pitching.playerID.label("playerID"))
         .group_by(Pitching.playerID)
@@ -60,7 +59,7 @@ def getPlayerCareerEra(greaterThan):
                 /
                 (func.sum(Pitching.p_IPOuts)/3)
                 *9
-            ) >= greaterThan
+            ) <= maxERA
         )
     )
 
@@ -78,23 +77,143 @@ def getPlayerSeasonRBI(minRBI):
 
     return query
 
-
 # All players with a SEASON Strikeout over a certian amount, while on a certian team
 # Parameters:
 # - minK (int): The minimum season Strikeouts required
 # - teamName: the name of the team they achieved this stat on
 # Notes: 
-def getPlayerSeasonK(minK,teamName):
+def getPlayerSeasonK(minK):
     query = (
         db.session.query(
             Pitching.playerID,
             Pitching.teamID.label("teamID")
         )
         .group_by(Pitching.playerID, Pitching.yearID, Pitching.teamID)  # Group by playerID, yearId, and teamID
-        .having(func.sum(Pitching.p_SO) >= 200)  # Having condition for total strikeouts
+        .having(func.sum(Pitching.p_SO) >= minK)  # Having condition for total strikeouts
         )
     return query
 
+# All players with 30 HR/ 30 SB season
+# Parameters:
+# Notes: 
+def getPlayer3030Season():
+    query = (db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+            )
+            .group_by(Batting.playerID, Batting.yearID)
+            .having(
+            and_(
+                func.sum(Batting.b_HR) >= 30.0,
+                func.sum(Batting.b_SB) >= 30.0
+            )
+        )
+    )
+
+    return query
+
+# All players n+ Home Runs in a season
+# Parameters: minHR - the number of home runs required
+# Notes: 
+def getPlayerSeasonHR(minHR):
+    query = (db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+            )
+            .group_by(Batting.playerID, Batting.yearID)
+            .having(
+                func.sum(Batting.b_HR) >= minHR,
+        )
+    )
+    return query
+
+# All players n+ Career HR
+# Parameters: minHR - the number of home runs required
+# Notes: 
+def getPlayerCareerHR(minHR):
+    query = (db.session.query(
+            Batting.playerID.label("playerID")
+            )
+            .group_by(Batting.playerID)
+            .having(
+                func.sum(Batting.b_HR) >= minHR,
+        )
+    )
+    return query
+
+# All players n+ Season Hits
+# Parameters: minHits - the number of hits required
+# Notes: 
+def getPlayerSeasonHits(minHits):
+    query = (db.session.query(
+            Batting.playerID.label("playerID")
+            )
+            .group_by(Batting.playerID, Batting.yearID)
+            .having(
+                func.sum(Batting.b_H) >= minHits,
+        )
+    )
+    return query
+
+# All players n+ Career Hits
+# Parameters: minHits - the number of hits required
+# Notes: 
+def getPlayerCareerHits(minHits):
+    query = (db.session.query(
+            Batting.playerID.label("playerID")
+            )
+            .group_by(Batting.playerID)
+            .having(
+                func.sum(Batting.b_H) >= minHits,
+        )
+    )
+    return query
+
+# All players who were in an all star game
+# Parameters: 
+# Notes: 
+def getPlayerAllStar():
+    query = (db.session.query(
+            AllStarFull.playerID.label("playerID"),
+            AllStarFull.teamID.label("teamID")
+            )
+    )
+    return query
+
+# All players who have recieved an award
+# Parameters:
+#    awardName: the name of the award
+def getPlayerAward(awardName):
+    query = (db.session.query(
+            Awards.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+            )
+            .join(Batting, and_(Awards.yearID == Batting.yearID, Awards.playerID == Batting.playerID))
+            .filter(Awards.awardID == awardName)
+    )
+    return query
+
+# Pitched min. 1 game
+def getPitchers():
+    query = (db.session.query(
+            Pitching.playerID.label("playerID"),
+            Pitching.teamID.label("teamID")
+            )
+            .filter(Pitching.p_G >= 1)
+    )
+    return query
+
+# Played fielding position min. 1 game
+def getFieldingPosition(position):
+    query = (db.session.query(
+            Fielding.playerID.label("playerID"),
+            Fielding.teamID.label("teamID")
+            )
+            .filter(
+                and_(Fielding.f_G >= 1, Fielding.position == position)
+                )
+    )
+    return query
 
 # Solves the "immaculate grid" by processing queries for players matching specific criteria.
 # Parameters:
@@ -119,7 +238,6 @@ def solveGrid(questions):
     #print("Team List:", teamList)  # Debug team mapping
 
     for index, currentQuestion in enumerate(questions):
-        teamName=""
 
         if currentQuestion in teamList: # If the player needs to be a part of a particular team
             subquery = getPlayersByTeam(currentQuestion.strip())
@@ -132,10 +250,54 @@ def solveGrid(questions):
             subquery = getPlayerCareerEra(num)
         elif "100+ RBI Season" in currentQuestion:
             num = 100
-            subquery = getPlayerSeasonRBI(num,teamName)
-        elif "200+ K Season" in currentQuestion:
-            num = 200
-            subquery = getPlayerSeasonK(num,teamName)
+            subquery = getPlayerSeasonRBI(num)
+        elif "+ K Season" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+            subquery = getPlayerSeasonK(num)
+        elif "30+ HR / 30+ SB Season" in currentQuestion:
+            subquery = getPlayer3030Season()
+        elif "+ HR Season" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+            subquery = getPlayerSeasonHR(num)
+        elif "+ HR Career" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+            subquery = getPlayerCareerHR(num)
+        elif "+ Hits Season" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+            subquery = getPlayerSeasonHits(num)
+        elif "+ Hits Career" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+            subquery = getPlayerCareerHits(num)
+        elif "Pitched min. 1 game" in currentQuestion:
+            subquery = getPitchers()
+        elif "Played First Base min. 1 game" in currentQuestion:
+            subquery = getFieldingPosition("1B")
+        elif "Played Second Base min. 1 game" in currentQuestion:
+            subquery = getFieldingPosition("2B")
+        elif "Played Third Base min. 1 game" in currentQuestion:
+            subquery = getFieldingPosition("3B")
+        elif "Played Shortstop min. 1 game" in currentQuestion:
+            subquery = getFieldingPosition("SS")
+        elif "Played Catcher min. 1 game" in currentQuestion:
+            subquery = getFieldingPosition("C")
+        elif "Played Right Field min. 1 game" in currentQuestion:
+            subquery = getFieldingPosition("RF")
+        elif "Played Center Field min. 1 game" in currentQuestion:
+            subquery = getFieldingPosition("CF")
+        elif "Played Left Field min. 1 game" in currentQuestion:
+            subquery = getFieldingPosition("LF")
+        elif "Played Outfield min. 1 game" in currentQuestion:
+            subquery = getFieldingPosition("OF")
+        elif "All Star" in currentQuestion:
+            subquery = getPlayerAllStar()
+        elif "Gold Glove" in currentQuestion:
+            subquery = getPlayerAward("Gold Glove")
+        elif "MVP" in currentQuestion:
+            subquery = getPlayerAward("Most Valuable Player")
+        elif "Silver Slugger" in currentQuestion:
+            subquery = getPlayerAward("Silver Slugger")    
+        elif "Cy Young" in currentQuestion:
+            subquery = getPlayerAward("Cy Young Award")    
         else:
             continue
 
@@ -152,10 +314,8 @@ def solveGrid(questions):
 
     # This builds the combined queries for each question combination
     # This should not need to be modified even if other questions are added.
-    for id,rowQuery in enumerate(rowQueries):
-        for jd,colQuery in enumerate(columnQueries):           
-            # print(f"Row Query: {questions[id+3]}")
-            # print(f"Col Query: {questions[jd]}")
+    for rowQuery in rowQueries:
+        for colQuery in columnQueries:         
 
             rowSubquery = rowQuery.subquery()  # Convert rowQuery to subquery
             colSubquery = colQuery.subquery()  # Convert colQuery to subquery
@@ -197,7 +357,7 @@ def solveGrid(questions):
                 )
                 if player:
                     fullName = f"{player.nameFirst} {player.nameLast}"
-                    finalPlayers.append(f"{questions[id+3]} {questions[jd]} "+fullName)
+                    finalPlayers.append(fullName)
                     print(f"Added player for grid cell: {fullName}")  # Debug.
                 else:
                     print("Could not find valid player!")
