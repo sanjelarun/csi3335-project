@@ -146,7 +146,8 @@ def getPlayerCareerHR(minHR):
 # Notes: 
 def getPlayerSeasonHits(minHits):
     query = (db.session.query(
-            Batting.playerID.label("playerID")
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
             )
             .group_by(Batting.playerID, Batting.yearID)
             .having(
@@ -252,21 +253,21 @@ def solveGrid(questions):
             num = 100
             subquery = getPlayerSeasonRBI(num)
         elif "+ K Season" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+            num = int(currentQuestion.partition("+")[0]) 
             subquery = getPlayerSeasonK(num)
         elif "30+ HR / 30+ SB Season" in currentQuestion:
             subquery = getPlayer3030Season()
         elif "+ HR Season" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+            num = int(currentQuestion.partition("+")[0]) 
             subquery = getPlayerSeasonHR(num)
         elif "+ HR Career" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+            num = int(currentQuestion.partition("+")[0]) 
             subquery = getPlayerCareerHR(num)
         elif "+ Hits Season" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+            num = int(currentQuestion.partition("+")[0]) 
             subquery = getPlayerSeasonHits(num)
         elif "+ Hits Career" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+            num = int(currentQuestion.partition("+")[0]) 
             subquery = getPlayerCareerHits(num)
         elif "Pitched min. 1 game" in currentQuestion:
             subquery = getPitchers()
@@ -321,6 +322,11 @@ def solveGrid(questions):
             colSubquery = colQuery.subquery()  # Convert colQuery to subquery
             combined = (
                 db.session.query(Batting.playerID)
+                #Rules for joining the queries:
+                # Always join on player ID
+                # Join on teamId, IF...
+                # Both subqueries have teamID attributes
+                # AND ONE, BUT NOT BOTH subqureries have 'isTeamCheck' attributes (indicating it was a team name question)
                 .join(
                     rowSubquery, 
                     and_(
