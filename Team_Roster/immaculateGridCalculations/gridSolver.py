@@ -300,7 +300,12 @@ def solveGrid(questions):
         elif "Cy Young" in currentQuestion:
             subquery = getPlayerAward("Cy Young Award")    
         else:
-            continue
+            print("ERROR: INVALID QUESTION!!!!")
+            #Create a subquery type that won't return anything
+            subquery= db.session.query(
+                literal_column('TRUE').label('INVALID_QUESTION'),
+                Batting.playerID 
+            ).filter(Batting.b_G ==-1)
 
         # Any other question prompts should follow the format above. Any numeric prompts should function like the
         # win season and be capable of accepting any numeric value.
