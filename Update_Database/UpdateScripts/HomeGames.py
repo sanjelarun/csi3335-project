@@ -11,7 +11,7 @@ def updatingHomeGames(cursor):
 
     for row in data.iloc:
         if(row["yearID"] < 2023):
-            continue:
+            continue
 
         newHomeGame = [
             row['teamID'],
