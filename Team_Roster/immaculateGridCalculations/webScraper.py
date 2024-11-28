@@ -1,4 +1,4 @@
 
 def scrapeImmaculateGridQuestions(url):
-    questions = ["Detroit Tigers","Boston Red Sox","10+ Win Season","10+ Win Season", "Seattle Mariners", "Houston Astros"]
+    questions = ["Detroit Tigers","200+ K Season","≤ 3.00 ERA Career","Gold Glove", "Played First Base min. 1 game", "Houston Astros"]
     return questions
