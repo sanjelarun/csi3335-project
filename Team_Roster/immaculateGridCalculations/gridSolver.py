@@ -44,6 +44,20 @@ def getPlayerWinsBySeason(numWins):
         .having(func.sum(Pitching.p_W)>=numWins)
     )
 
+# Retrieves all players who have achieved a minimum of .300 AVG in a season.
+# Notes: 
+def getPlayerAvgBySeason():
+    return (
+        db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+        )
+        .join(Team, (Team.yearID == Batting.yearID) & (Team.teamID == Batting.teamID))
+        .group_by(Batting.playerID, Batting.yearID, Batting.teamID)
+        .having((func.sum(Batting.b_H)/func.sum(Batting.b_AB)) >= .300)
+        )
+    
+
 # All players with a CAREER era over a certian amount
 # Parameters:
 # - maxERA (int): The maximum career ERA required
@@ -246,6 +260,8 @@ def solveGrid(questions):
         elif "Win Season" in currentQuestion: # If any n+ Win Season
             num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
             subquery = getPlayerWinsBySeason(num)
+        elif "Avg Season" in currentQuestion:
+            subquery = getPlayerAvgBySeason()
         elif "≤ 3.00 ERA Career" in currentQuestion:
             num = 3.0
             subquery = getPlayerCareerEra(num)
