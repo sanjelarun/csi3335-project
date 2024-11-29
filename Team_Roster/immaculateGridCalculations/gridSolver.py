@@ -267,6 +267,7 @@ def getNonUSBirthCountry():
         .filter(People.birthCountry != "USA")
     )
 
+# Gets all players who have only played on one team
 def getOneTeamPlayers():
     return (
         db.session.query(
@@ -369,7 +370,9 @@ def solveGrid(questions):
         elif "Silver Slugger" in currentQuestion:
             subquery = getPlayerAward("Silver Slugger")    
         elif "Cy Young" in currentQuestion:
-            subquery = getPlayerAward("Cy Young Award")    
+            subquery = getPlayerAward("Cy Young Award")
+        elif "Rookie Of The Year" in currentQuestion:
+            subquery = getPlayerAward("Rookie Of The Year Award")
         else:
             print("ERROR: INVALID QUESTION!!!!")
             #Create a subquery type that won't return anything
