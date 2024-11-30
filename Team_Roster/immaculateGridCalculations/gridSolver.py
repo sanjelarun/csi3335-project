@@ -109,7 +109,7 @@ def getPlayerWARSeason(maxWAR):
                 func.sum(Batting.b_2B) +  # Helps get close to target value ?
                 func.sum(Batting.b_3B) +  # Helps get close to target value ?
                 (Batting.b_BB)
-                ) / (9 * Season.s_R_W * 1.2 + 3)  # Generic formula for RPW
+                ) / (9 * Season.s_R_W * 1.2 + 3)  # Generic formula for RPW, using 1.2 to allow for more responses
             ) >=maxWAR)
     )
 
@@ -142,7 +142,7 @@ def getPlayerWARCareer(maxWAR):
                 func.sum(Batting.b_2B) +  # Helps get close to target value ?
                 func.sum(Batting.b_3B) +  # Helps get close to target value ?
                 (Batting.b_BB)
-                ) / (9 * Season.s_R_W * 1.5 + 3)  # Generic formula for RPW
+                ) / (9 * Season.s_R_W * 1.2 + 3)  # Generic formula for RPW, using 1.2 to allow for more responses
             ) >=maxWAR)
     )
 
