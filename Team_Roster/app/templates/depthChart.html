@@ -180,8 +180,8 @@
             <th>wOBA</th>
         <!--<th>Bat</th>-->
         <!--<th>Fld</th>-->
-        <!--<th>BsR</th>-->
-        <!--<th>WAR</th>-->
+<!--            <th>BsR</th>-->
+            <th>WAR</th>
         </tr>
     </thead>
     <tbody>
@@ -193,6 +193,7 @@
             <td> {{ '%0.3f'| format(batter.OBP) }}</td>
             <td> {{ '%0.3f'| format(batter.SLG) }}</td>
             <td> {{ '%0.3f'| format(batter.wOBA)}}</td>
+            <td> {{ '%0.1f'| format(batter.WAR)}}</td>
             <!-- TODO Bat, Fld, BsR, WAR -->
         </tr>
         {% endfor %}

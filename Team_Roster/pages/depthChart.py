@@ -220,7 +220,11 @@ def getBattingStats(teamId,year):
         db.session.query(
             Batting.playerID.label("player_id"),
             (
-                func.sum(Batting.b_AB)
+                (Batting.b_AB)+
+                (Batting.b_BB)+
+                (Batting.b_HBP)+
+                (Batting.b_SH)+
+                (Batting.b_SF)
             ).label("PA"),
             (
                 func.sum(Batting.b_H) /
@@ -252,13 +256,29 @@ def getBattingStats(teamId,year):
             # find or have stats that are difficult to calculate
             # ().label("Bat"),
             # ().label("Fld"),
-            # ().label("BsR"),
+            # ((
+            #     (Batting.b_SB*Season.s_runSB+
+            #     Batting.b_CS*Season.s_runCS)-
+            #     ((Batting.b_SB * Season.s_runSB+Batting.b_CS*Season.s_runCS)/
+            #      (Batting.b_BB + Batting.b_HBP - Batting.b_IBB))*
+            #     (Batting.b_BB + Batting.b_HBP - Batting.b_IBB))
+            #  ).label("BsR"),
             (
+                # Seriously stumped on how to calculate this value
                 (
-                    func.sum(Batting.b_R)
+                    (Batting.b_R) +
+                    #Base Running-Runs
+                    ((Batting.b_SB*Season.s_runSB+
+                     Batting.b_CS*Season.s_runCS-
+                      (Season.s_runSB * (Batting.b_BB +Batting.b_HBP + Batting.b_IBB)))+
+                     (Batting.b_GIDP))+
+                    func.sum(Batting.b_2B)+ # Helps get close to target value
+                    func.sum(Batting.b_3B)+ # Helps get close to target value
+                    (Batting.b_BB)
                 )
+                /(9*Season.s_R_W*1.5+3) # Generic formula for RPW
             ).label("WAR")
-        ).filter(Batting.yearID == year, Batting.teamID == teamId)
+        ).filter(Batting.yearID == year, Batting.teamID == teamId, Season.yearID ==year)
         .group_by(Batting.playerID)
         .subquery()
     )

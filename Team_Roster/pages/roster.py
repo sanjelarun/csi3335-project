@@ -1,7 +1,7 @@
 from flask import render_template
 from app import db
 import sqlalchemy as sa
-from app.models import Batting, People, Team
+from app.models import Batting, People, Team, Season
 from sqlalchemy import and_, func
 
 
@@ -10,7 +10,13 @@ def getBattingStats(teamId, year):
         db.session.query(
             Batting.playerID.label("player_id"),
             func.sum(Batting.b_G).label("G"),
-            func.sum(Batting.b_AB).label("PA"),
+            (
+                (Batting.b_AB)+
+                (Batting.b_BB)+
+                (Batting.b_HBP)+
+                (Batting.b_SH)+
+                (Batting.b_SF)
+            ).label("PA"),
             func.sum(Batting.b_HR).label("HR"),
             func.sum(Batting.b_SB).label("SB"),
             (func.sum(Batting.b_BB)/ func.sum(Batting.b_AB)).label("BB"),
@@ -46,10 +52,24 @@ def getBattingStats(teamId, year):
             # func.sum().label("BsR"),  # Unsure
             # func.sum().label("Off"),  # Unsure
             # func.sum().label("Def"),  # Unsure
-            # func.sum().label("WAR")  # Unsure
+            (
+                # Seriously stumped on how to calculate this value
+                (
+                    (Batting.b_R) +
+                    #Base Running-Runs
+                    ((Batting.b_SB*Season.s_runSB+
+                     Batting.b_CS*Season.s_runCS-
+                      (Season.s_runSB * (Batting.b_BB +Batting.b_HBP + Batting.b_IBB)))+
+                     (Batting.b_GIDP))+
+                    func.sum(Batting.b_2B)+ # Helps get close to target value
+                    func.sum(Batting.b_3B)+ # Helps get close to target value
+                    (Batting.b_BB)
+                )
+                /(9*Season.s_R_W*1.5+3) # Generic formula for RPW
+            ).label("WAR")  # Unsure
 
         )
-        .filter(Batting.yearID == year, Batting.teamID == teamId)
+        .filter(Batting.yearID == year, Batting.teamID == teamId, Season.yearID == year)
         .group_by(Batting.playerID)
         .subquery()
     )
@@ -74,7 +94,7 @@ def getBattingStats(teamId, year):
             # subquery.c["BsR"],
             # subquery.c["Off"],
             # subquery.c["Def"],
-            # subquery.c["WAR"]
+            subquery.c["WAR"]
         )
         .join(People, People.playerID == subquery.c.player_id)
         .order_by(subquery.c.PA.desc())
@@ -102,7 +122,7 @@ def getBattingStats(teamId, year):
             # "BsR": result["BsR"],
             # "Off": result["Off"],
             # "Def": result["Def"],
-            # "WAR": result["WAR"],
+            "WAR": result.WAR,
         }
         batting_data[result.player_id] = player_data
 
