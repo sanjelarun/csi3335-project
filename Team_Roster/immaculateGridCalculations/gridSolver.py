@@ -89,11 +89,12 @@ def getPlayerWARSeason(maxWAR):
     return(
         db.session.query(
             Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID"),
             Batting,
-            Season
+            Season,
         )
-        # Join causes some slowdown, needs to be sped up
         .join(Batting, (Season.yearID == Batting.yearID))
+        # Join causes some slowdown, needs to be sped up
         .group_by(Batting.playerID, Batting.yearID)
         .having(
             (
