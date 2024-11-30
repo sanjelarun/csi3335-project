@@ -92,6 +92,7 @@ def getPlayerWARSeason(maxWAR):
             Batting,
             Season
         )
+        # Join causes some slowdown, needs to be sped up
         .join(Batting, (Season.yearID == Batting.yearID))
         .group_by(Batting.playerID, Batting.yearID)
         .having(
@@ -124,6 +125,7 @@ def getPlayerWARCareer(maxWAR):
             Batting,
             Season
         )
+        # Join causes some slowdown, needs to be sped up
         .join(Batting, (Season.yearID == Batting.yearID))
         .group_by(Batting.playerID)
         .having(
@@ -140,7 +142,7 @@ def getPlayerWARCareer(maxWAR):
                 func.sum(Batting.b_2B) +  # Helps get close to target value ?
                 func.sum(Batting.b_3B) +  # Helps get close to target value ?
                 (Batting.b_BB)
-                ) / (9 * Season.s_R_W * 1.2 + 3)  # Generic formula for RPW
+                ) / (9 * Season.s_R_W * 1.5 + 3)  # Generic formula for RPW
             ) >=maxWAR)
     )
 

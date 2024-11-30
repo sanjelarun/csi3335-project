@@ -12,6 +12,8 @@ def scrapeImmaculateGridQuestions(url):
 
     # Get the HTML attributes that store the question information
     content = s.find_all('button')
+
+    #Storing in two different lists in order to get the correct question order
     questionsCol = []
     questionsRow = []
     for e in content:
@@ -23,6 +25,5 @@ def scrapeImmaculateGridQuestions(url):
     # questions = ["Detroit Tigers","200+ K Season","≤ 3.00 ERA Career","Gold Glove", "Played First Base min. 1 game", "Houston Astros"]
     # Remove duplicates from both sets, append into questionsCol, giving columns precedence
     questionsCol = list(set(questionsCol))
-    questionsRow = list(set(questionsRow))
-    questionsCol += questionsRow
+    questionsCol += list(set(questionsRow))
     return questionsCol
