@@ -44,6 +44,48 @@ def getPlayerWinsBySeason(numWins):
         .having(func.sum(Pitching.p_W)>=numWins)
     )
 
+# Fetches the career average of players with a minimum of .300 AVG
+def getPlayerAvgByCareer():
+    return(
+        db.session.query(
+            Batting.playerID.label("playerID")
+        )
+        .group_by(Batting.playerID)
+        .having((func.sum(Batting.b_H)/func.sum(Batting.b_AB))>=.300)
+    )
+
+# Fetches the players with 30+ stolen bases in a season
+def getPlayerSeasonSB():
+    return(
+        db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+        )
+        .join(Team, (Team.yearID == Batting.yearID) & (Team.teamID == Batting.teamID))
+        .group_by(Batting.playerID, Batting.yearID, Batting.teamID)
+        .having(func.sum(Batting.b_SB) >= 30)
+    )
+
+# Fetches the pitchers with career wins above a given number
+# Parameters:
+#   - winNum (int): The minimum career wins
+def getPlayerCareerWins(winNum):
+    return (
+        db.session.query(
+            Pitching.playerID.label("playerID")
+        )
+        .group_by(Pitching.playerID)
+        .having(func.sum(Pitching.p_W)>=winNum)
+    )
+
+# Fetches the players with a WAR value greater than 6
+def getPlayerWARSeason():
+    return(
+        db.session.query(
+
+        )
+    )
+
 # All players with a CAREER era over a certian amount
 # Parameters:
 # - maxERA (int): The maximum career ERA required
