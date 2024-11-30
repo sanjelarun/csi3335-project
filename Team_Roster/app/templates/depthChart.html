@@ -167,6 +167,38 @@
 
 <h2>Depth Chart Tables</h2>
 
+<h3>Batting</h3>
+
+<table class="stats-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>PA</th>
+            <th>AVG</th>
+            <th>OBP</th>
+            <th>SLG</th>
+            <th>wOBA</th>
+        <!--<th>Bat</th>-->
+        <!--<th>Fld</th>-->
+        <!--<th>BsR</th>-->
+        <!--<th>WAR</th>-->
+        </tr>
+    </thead>
+    <tbody>
+        {% for player_id, batter in batting_stats.items() %}
+        <tr>
+            <td> {{ batter.full_name }}</td>
+            <td> {{ batter.PA }}</td>
+            <td> {{ '%0.3f'| format(batter.AVG) }}</td>
+            <td> {{ '%0.3f'| format(batter.OBP) }}</td>
+            <td> {{ '%0.3f'| format(batter.SLG) }}</td>
+            <td> {{ '%0.3f'| format(batter.wOBA)}}</td>
+            <!-- TODO Bat, Fld, BsR, WAR -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 <h3>Pitching</h3>
 
 
