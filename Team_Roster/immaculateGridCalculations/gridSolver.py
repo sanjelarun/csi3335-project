@@ -80,8 +80,9 @@ def getPlayerCareerWins(winNum):
         .having(func.sum(Pitching.p_W)>=winNum)
     )
 
-# Fetches the players with a WAR value greater than 6
-# WAR value is difficult to calculate, returned players are likely wrong
+# Fetches the players with a WAR value greater than a given number
+# WAR value is difficult to calculate, returned players may be wrong.
+# Spent a lot of time trying to tackle this stat, this is as accurate as I could get.
 # Parameters:
 #   - maxWAR : maximum WAR value
 def getPlayerWARSeason(maxWAR):
@@ -112,13 +113,18 @@ def getPlayerWARSeason(maxWAR):
     )
 
 # Fetches the players above a certain WAR value for their career
+# WAR value is difficult to calculate, returned players may be wrong.
+# Spent a lot of time trying to tackle this stat, this is as accurate as I could get.
 # Parameters:
 #   - maxWAR : maximum WAR value
 def getPlayerWARCareer(maxWAR):
     return(
         db.session.query(
             Batting.playerID.label("playerID"),
+            Batting,
+            Season
         )
+        .join(Batting, (Season.yearID == Batting.yearID))
         .group_by(Batting.playerID)
         .having(
             func.sum(
