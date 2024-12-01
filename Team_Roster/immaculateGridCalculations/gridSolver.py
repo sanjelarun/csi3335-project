@@ -44,6 +44,48 @@ def getPlayerWinsBySeason(numWins):
         .having(func.sum(Pitching.p_W)>=numWins)
     )
 
+# Retrieves all players who have achieved a minimum of .300 AVG in a season.
+# Notes: 
+def getPlayerAvgBySeason():
+    return (
+        db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+        )
+        .join(Team, (Team.yearID == Batting.yearID) & (Team.teamID == Batting.teamID))
+        .group_by(Batting.playerID, Batting.yearID, Batting.teamID)
+        .having((func.sum(Batting.b_H)/func.sum(Batting.b_AB)) >= .300)
+        )
+
+
+# Retrieves all players who have achieved a minimum SV in a season.
+# Parameters:
+# - svNum (int): The minimum SV required.
+def getPlayerSVBySeason(svNum):
+    return (
+        db.session.query(
+            Pitching.playerID.label("playerID"),
+            Pitching.teamID.label("teamID")
+        )
+        .join(Team, (Team.teamID == Pitching.teamID) & (Team.yearID == Pitching.yearID))
+        .group_by(Pitching.playerID, Pitching.teamID, Pitching.yearID)
+        .having(func.sum(Pitching.p_SV) >= svNum)
+    )
+
+# All players with a CAREER K over a certain amount
+# Parameters:
+# - kNum (int): The min K
+# Notes: 
+# - K is also known as SO, strike outs 
+def getPlayerKByCareer(kNum):
+    return (
+        db.session.query(
+            Batting.playerID.label("playerID"),
+        )
+        .group_by(Batting.playerID)
+        .having(func.sum(Batting.b_SO) >= kNum)
+    )
+
 # All players with a CAREER era over a certian amount
 # Parameters:
 # - maxERA (int): The maximum career ERA required
@@ -216,6 +258,26 @@ def getFieldingPosition(position):
     )
     return query
 
+# Gets players who were born outside of the US
+def getNonUSBirthCountry():
+    return (
+        db.session.query(
+            People.playerID.label("playerID")
+        )
+        .filter(People.birthCountry != "USA")
+    )
+
+# Gets all players who have only played on one team
+def getOneTeamPlayers():
+    return (
+        db.session.query(
+            Batting.playerID.label("playerID"),
+        )
+        .join(Team, (Team.teamID == Batting.teamID))
+        .group_by(Batting.playerID)
+        .having(func.count(func.distinct(Batting.teamID)) == 1)
+    )
+
 # Solves the "immaculate grid" by processing queries for players matching specific criteria.
 # Parameters:
 # - questions (list[str]): A list of questions for the grid.
@@ -246,6 +308,14 @@ def solveGrid(questions):
         elif "Win Season" in currentQuestion: # If any n+ Win Season
             num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
             subquery = getPlayerWinsBySeason(num)
+        elif "Avg Season" in currentQuestion:
+            subquery = getPlayerAvgBySeason()
+        elif "Save Season" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerSVBySeason(num)
+        elif "K Career" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerKByCareer(num)
         elif "≤ 3.00 ERA Career" in currentQuestion:
             num = 3.0
             subquery = getPlayerCareerEra(num)
@@ -291,6 +361,8 @@ def solveGrid(questions):
             subquery = getFieldingPosition("OF")
         elif "All Star" in currentQuestion:
             subquery = getPlayerAllStar()
+        elif "Only One Team" in currentQuestion:
+            subquery = getOneTeamPlayers()
         elif "Gold Glove" in currentQuestion:
             subquery = getPlayerAward("Gold Glove")
         elif "MVP" in currentQuestion:
@@ -298,7 +370,9 @@ def solveGrid(questions):
         elif "Silver Slugger" in currentQuestion:
             subquery = getPlayerAward("Silver Slugger")    
         elif "Cy Young" in currentQuestion:
-            subquery = getPlayerAward("Cy Young Award")    
+            subquery = getPlayerAward("Cy Young Award")
+        elif "Rookie Of The Year" in currentQuestion:
+            subquery = getPlayerAward("Rookie Of The Year Award")
         else:
             print("ERROR: INVALID QUESTION!!!!")
             #Create a subquery type that won't return anything
