@@ -1,6 +1,8 @@
 from pages.findTeam import ShowFindTeam
 from pages.roster import ShowRoster
 from pages.depthChart import ShowDepthChart
+from pages.immaculateGrid import ShowImmaculateGrid
+
 from flask import flash, redirect, url_for, render_template, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from urllib.parse import urlsplit
@@ -56,6 +58,10 @@ def roster(teamId):
 def depthChart(teamId):
     year = request.args.get("year")
     return ShowDepthChart(teamId, year)
+
+@app.route('/immaculateGrid', methods=['GET','POST'])
+def immaculateGrid():
+    return ShowImmaculateGrid()
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

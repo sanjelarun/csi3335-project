@@ -32,19 +32,23 @@
         <td>{{team.team_rank}}</td>
     </tr>
     <tr>
-        <td>Games:</td>
-        <td>{{team.team_G}}</td>
+        <td> Games: </td>
+        <td> {{team.team_G}} </td>
     </tr>
     <tr>
-        <td>Home Game:</td>
+        <td>Home Games:</td>
+        {% if team.team_G_home != None %}
         <td>{{team.team_G_home}}</td>
+        {% else %}
+        <td>Unknown</td>
+        {% endif %}
     </tr>
     <tr>
         <td>Record (Wins/Losses):</td>
         <td>{{team.team_W}}/{{team.team_L}}</td>
     </tr>
     <tr>
-        <td>Projected Record :</td>
+        <td>Projected Record:</td>
         <td> {{team.team_projW }}/{{team.team_projL }} </td>
     </tr>
     <tr>
@@ -52,10 +56,16 @@
         <td> {{team.park_name }} </td>
 
     </tr>
+
     <tr>
         <td> Attendance: </td>
+        {% if team.team_attendance!=None %}
         <td> {{ "{:,d}".format(team.team_attendance)}} </td>
+        {% else %}
+        <td>Unknown</td>
+        {% endif %}
     </tr>
+
 
 
 </table>

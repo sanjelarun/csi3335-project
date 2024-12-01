@@ -105,7 +105,7 @@ class Franchise(Base):
 
     def __repr__(self):
         return '<Franchise: {}, ID:{}, Active: {}>'.format(self.franchName,self.franchID,self.active)
-
+    
 class Fielding(Base):
     __tablename__ = 'fielding'
     
@@ -187,7 +187,6 @@ class Batting(Base):
     b_SF = Column(SmallInteger, nullable=True)
     b_GIDP = Column(SmallInteger, nullable=True)
 
-
     def __repr__(self):
         return '<Batting: {} {}, TeamID:{}>'.format(self.yearID, self.batting_ID, self.teamID)
 
@@ -252,3 +251,39 @@ class Season(Base):
 
     def __repr__(self):
         return f"<Season {self.yearID})>"
+
+
+class AllStarFull(Base):
+    __tablename__ = 'allstarfull'
+
+    allstarfull_ID = Column(Integer, primary_key=True, autoincrement=True)
+    playerID = Column(String(9), ForeignKey("people.playerID"), nullable=False)
+    lgID = Column(CHAR(2), ForeignKey("leagues.lgID"), nullable=False)
+    teamID = Column(CHAR(3), nullable=False)
+    yearID = Column(SmallInteger, nullable=False)
+    gameID = Column(String(12), nullable=True)
+    GP = Column(SmallInteger, nullable=True)
+    startingPos = Column(SmallInteger, nullable=True)
+
+    def __repr__(self):
+        return (
+            f"<AllStarFull(allstarfull_ID={self.allstarfull_ID}, playerID={self.playerID}, "
+            f"yearID={self.yearID}, lgID={self.lgID}, teamID={self.teamID})>"
+        )
+
+class Awards(Base):
+    __tablename__ = 'awards'
+
+    awards_ID = Column(Integer, primary_key=True, autoincrement=True)
+    awardID = Column(String(255), nullable=False)
+    yearID = Column(SmallInteger, nullable=False)
+    playerID = Column(String(9), ForeignKey("people.playerID"), nullable=False)
+    lgID = Column(CHAR(2), ForeignKey("leagues.lgID"), nullable=False)
+    tie = Column(String(1), nullable=True)
+    notes = Column(String(100), nullable=True)
+
+    def __repr__(self):
+        return (
+            f"<Awards(awards_ID={self.awards_ID}, awardID={self.awardID}, "
+            f"yearID={self.yearID}, playerID={self.playerID}, lgID={self.lgID})>"
+        )
