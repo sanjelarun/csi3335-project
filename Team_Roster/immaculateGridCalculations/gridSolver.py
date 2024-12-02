@@ -3,6 +3,8 @@ import sqlalchemy as sa
 from app.models import People, Fielding, Batting, Team, Pitching, AllStarFull, Awards
 from sqlalchemy import func, and_, literal_column
 
+from Update_Database.UpdateScripts import HallOfFame
+
 
 # Retrieves a list of all team names from the database.
 # Returns: A list of team names as strings.
@@ -26,6 +28,19 @@ def getPlayersByTeam(team_name):
         .group_by(Batting.playerID)
     )
 
+# All players with a SEASON RBI over a certian amount, while on a certian team
+# Parameters:
+# - minRBI (int): The minimum season RBI required
+# Notes:
+def getPlayerSeasonRBI(minRBI):
+    query = (db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+            )
+            .group_by(Batting.playerID, Batting.yearID)
+            .having(func.sum(Batting.b_RBI) >= minRBI))
+
+    return query
 
 # Retrieves all players who have achieved a minimum number of wins in a season.
 # Parameters:
@@ -56,7 +71,6 @@ def getPlayerAvgBySeason():
         .group_by(Batting.playerID, Batting.yearID, Batting.teamID)
         .having((func.sum(Batting.b_H)/func.sum(Batting.b_AB)) >= .300)
         )
-
 
 # Retrieves all players who have achieved a minimum SV in a season.
 # Parameters:
@@ -104,20 +118,6 @@ def getPlayerCareerEra(maxERA):
             ) <= maxERA
         )
     )
-
-# All players with a SEASON RBI over a certian amount, while on a certian team
-# Parameters:
-# - minRBI (int): The minimum season RBI required
-# Notes: 
-def getPlayerSeasonRBI(minRBI):
-    query = (db.session.query(
-            Batting.playerID.label("playerID"),
-            Batting.teamID.label("teamID")
-            )
-            .group_by(Batting.playerID, Batting.yearID)
-            .having(func.sum(Batting.b_RBI) >= minRBI))
-
-    return query
 
 # All players with a SEASON Strikeout over a certian amount, while on a certian team
 # Parameters:
@@ -276,6 +276,108 @@ def getOneTeamPlayers():
         .join(Team, (Team.teamID == Batting.teamID))
         .group_by(Batting.playerID)
         .having(func.count(func.distinct(Batting.teamID)) == 1)
+    )
+
+#------------------------------------------------------------------------------
+# All players with a season ERA less than a certain amount while on a certain team
+#Parameters
+# - maxERA (int): The maximum season ERA required
+# Notes:
+def getPlayerSeasonERA(maxERA):
+    return (
+        db.session.query(
+            Pitching.playerID.label("playerID"),
+            Pitching.teamID.label("teamID")
+        )
+        .group_by(
+            Pitching.playerID,
+            Pitching.yearID
+        )
+        .having(
+            (
+                func.sum(Pitching.p_ER) /
+                (func.sum(Pitching.p_IPOuts)/3) * 9
+            )
+        ) <= maxERA
+    )
+
+# All players with a season run over a certain amount while one a certain team
+# Parameters:
+# - minRun (int): The minimum season run required
+# Notes:
+def getPlayerSeasonRun(minRun):
+    return (
+        db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+        )
+        .group_by(
+            Batting.playerID,
+            Batting.yearID
+        )
+        .having(
+            Batting.b_R >= minRun
+        )
+    )
+
+# All players with a career save over a certain amount
+# Parameters:
+# -svNum (int) The minimum SV required
+# Notes:
+def getPlayerSVByCareer(svNum):
+    return (
+        db.session.query(
+            Pitching.playerID.label("playerID"),
+            Pitching.teamID.label("teamID")
+        )
+        .group_by(
+            Pitching.playerID,
+            Pitching.teamID
+        )
+        .having(
+            func.sum(Pitching.p_SV) >= svNum
+        )
+    )
+
+# All players with a season double over a certain amount
+# Parameters:
+# - dblNum (int) The minimum double required
+# Notes
+def getPlayerDBLBySeason(dblNum):
+    return (
+        db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+        )
+        .group_by(
+            Batting.playerID,
+            Batting.yearID
+        )
+        .having(
+            Batting.b_2B >= dblNum
+        )
+    )
+
+# All players in the hall of fame
+# Parameters:
+# N/A
+# Notes:
+def getPlayerHallOfFame():
+    return (
+        db.session.query(
+            HallOfFame.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+        )
+        .join(
+            Batting,
+            HallOfFame.playerID == Batting.playerID
+        )
+        .group_by(
+            Batting.playerID
+        )
+        .filter(
+            HallOfFame.inducted == 'y'
+        )
     )
 
 # Solves the "immaculate grid" by processing queries for players matching specific criteria.

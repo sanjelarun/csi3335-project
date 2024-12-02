@@ -3,6 +3,7 @@ from app import db
 import sqlalchemy as sa
 from app.models import People, Fielding, Batting, Team, Pitching, Season
 from sqlalchemy import func, and_
+from pages.stats import *
 
 def getTeam(teamId,year):
     team = db.session.scalar(
@@ -214,7 +215,6 @@ def getPitchingStats(teamId,year):
         batting_data[result.player_id] = player_data
 
     return batting_data
-from pages.stats import *
 
 def ShowDepthChart(teamId, year):
     
