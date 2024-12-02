@@ -20,7 +20,7 @@ To run the app, some configuration is required:
 5. Update the database (see below)
 
 ** If you want to change what database, port, etc. the app uses: **
-Update the connection used in `config/csi3335f2024.py`
+Update the connection used in `csi3335f2024.py`
 
 ## Web App
 The core of this project is a web app that shows a team roster and solves the immaculate grid.
