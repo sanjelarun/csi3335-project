@@ -158,7 +158,7 @@
             <!--            <th>BsR</th>-->
             <!--            <th>Off</th>-->
             <!--            <th>Def</th>-->
-            <!--            <th>WAR</th>-->
+            <th>WAR</th>
         </tr>
     </thead>
     <tbody>
@@ -181,7 +181,7 @@
             <!--            <td>{{ stats["BsR"] }}</td>-->
             <!--            <td>{{ stats["Off"] }}</td>-->
             <!--            <td>{{ stats["Def"] }}</td>-->
-            <!--            <td>{{ stats["WAR"] }}</td>-->
+            <td>{{ '%0.1f'| format(stats["WAR"]) }}</td>
         </tr>
         {% endfor %}
     </tbody>

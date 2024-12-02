@@ -1,6 +1,6 @@
 from app import db
 import sqlalchemy as sa
-from app.models import People, Fielding, Batting, Team, Pitching, AllStarFull, Awards, HallOfFame
+from app.models import People, Fielding, Batting, Team, Pitching, AllStarFull, Awards, Appearances, Season, HallOfFame
 from sqlalchemy import func, and_, literal_column
 
 
@@ -96,6 +96,130 @@ def getPlayerKByCareer(kNum):
         )
         .group_by(Batting.playerID)
         .having(func.sum(Batting.b_SO) >= kNum)
+    )
+
+# Fetches the career average of players with a minimum of .300 AVG
+def getPlayerAvgByCareer():
+    return(
+        db.session.query(
+            Batting.playerID.label("playerID")
+        )
+        .group_by(Batting.playerID)
+        .having((func.sum(Batting.b_H)/func.sum(Batting.b_AB))>=.300)
+    )
+
+# Fetches the players with 30+ stolen bases in a season
+# Parameters:
+#   - maxSB (int): maximum stolen bases
+def getPlayerSeasonSB(maxSB):
+    return(
+        db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID")
+        )
+        .join(Team, (Team.yearID == Batting.yearID) & (Team.teamID == Batting.teamID))
+        .group_by(Batting.playerID, Batting.yearID, Batting.teamID)
+        .having(func.sum(Batting.b_SB) >= maxSB)
+    )
+
+# Fetches the pitchers with career wins above a given number
+# Parameters:
+#   - winNum (int): The minimum career wins
+def getPlayerCareerWins(winNum):
+    return (
+        db.session.query(
+            Pitching.playerID.label("playerID")
+        )
+        .group_by(Pitching.playerID)
+        .having(func.sum(Pitching.p_W)>=winNum)
+    )
+
+# Fetches the players with a WAR value greater than a given number
+# WAR value is difficult to calculate, returned players may be wrong.
+# Spent a lot of time trying to tackle this stat, this is as accurate as I could get.
+# Parameters:
+#   - maxWAR : maximum WAR value
+def getPlayerWARSeason(maxWAR):
+    return(
+        db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting.teamID.label("teamID"),
+            Batting,
+            Season,
+        )
+        .join(Batting, (Season.yearID == Batting.yearID))
+        # Join causes some slowdown, needs to be sped up
+        .group_by(Batting.playerID, Batting.yearID)
+        .having(
+            (
+                (
+                Batting.b_R +
+                # Base Running-Runs
+                (
+                     (Batting.b_SB * Season.s_runSB +
+                      Batting.b_CS * Season.s_runCS -
+                      (Season.s_runSB * (Batting.b_BB + Batting.b_HBP + Batting.b_IBB))) +
+                     (Batting.b_GIDP)
+                 ) +
+                func.sum(Batting.b_2B) +  # Helps get close to target value ?
+                func.sum(Batting.b_3B) +  # Helps get close to target value ?
+                (Batting.b_BB)
+                ) / (9 * Season.s_R_W * 1.2 + 3)  # Generic formula for RPW, using 1.2 to allow for more responses
+            ) >=maxWAR)
+    )
+
+# Fetches the players above a certain WAR value for their career
+# WAR value is difficult to calculate, returned players may be wrong.
+# Spent a lot of time trying to tackle this stat, this is as accurate as I could get.
+# Parameters:
+#   - maxWAR : maximum WAR value
+def getPlayerWARCareer(maxWAR):
+    return(
+        db.session.query(
+            Batting.playerID.label("playerID"),
+            Batting,
+            Season
+        )
+        # Join causes some slowdown, needs to be sped up
+        .join(Batting, (Season.yearID == Batting.yearID))
+        .group_by(Batting.playerID)
+        .having(
+            func.sum(
+                (
+                Batting.b_R +
+                # Base Running-Runs
+                (
+                     (Batting.b_SB * Season.s_runSB +
+                      Batting.b_CS * Season.s_runCS -
+                      (Season.s_runSB * (Batting.b_BB + Batting.b_HBP + Batting.b_IBB))) +
+                     (Batting.b_GIDP)
+                 ) +
+                func.sum(Batting.b_2B) +  # Helps get close to target value ?
+                func.sum(Batting.b_3B) +  # Helps get close to target value ?
+                (Batting.b_BB)
+                ) / (9 * Season.s_R_W * 1.2 + 3)  # Generic formula for RPW, using 1.2 to allow for more responses
+            ) >=maxWAR)
+    )
+
+# Fetches players that have been designated hitters
+def getPlayerDesignatedHitter():
+    return(
+        db.session.query(
+            Appearances.playerID.label("playerID"),
+            Appearances.teamID.label("TeamID")
+        )
+        .group_by(Appearances.playerID, Appearances.teamID)
+        .having(func.sum(Appearances.G_dh) > 0)
+    )
+
+# Fetches the teams that have won the world series
+def getWorldSeriesChamp():
+    return(
+        db.session.query(
+            Team.teamID.label("teamID"),
+        )
+        .group_by(Team.teamID, Team.yearID)
+        .filter(Team.WSWin == 'Y')
     )
 
 # All players with a CAREER era over a certian amount
@@ -426,10 +550,13 @@ def solveGrid(questions):
 
         if currentQuestion in teamList: # If the player needs to be a part of a particular team
             subquery = getPlayersByTeam(currentQuestion.strip())
+        
         elif "Win Season" in currentQuestion: # If any n+ Win Season
             num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
             subquery = getPlayerWinsBySeason(num)
-        elif "Avg Season" in currentQuestion:
+        elif ".300+ AVG Career" in currentQuestion:
+            subquery = getPlayerAvgByCareer()
+        elif "AVG Season" in currentQuestion:
             subquery = getPlayerAvgBySeason()
         elif "+ Run Season" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
@@ -443,6 +570,9 @@ def solveGrid(questions):
         elif "K Career" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerKByCareer(num)
+        elif "Wins Career" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerCareerWins(num)
         elif "≤ 3.00 ERA Career" in currentQuestion:
             num = 3.0
             subquery = getPlayerCareerEra(num)
@@ -453,18 +583,21 @@ def solveGrid(questions):
             num = 100
             subquery = getPlayerSeasonRBI(num)
         elif "+ K Season" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0]) 
+            num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerSeasonK(num)
         elif "30+ HR / 30+ SB Season" in currentQuestion:
             subquery = getPlayer3030Season()
+        elif "SB Season" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerSeasonSB(num)
         elif "+ HR Season" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0]) 
+            num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerSeasonHR(num)
         elif "+ HR Career" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0]) 
+            num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerCareerHR(num)
         elif "+ Hits Season" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0]) 
+            num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerSeasonHits(num)
         elif"+ Double Season" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
@@ -472,6 +605,12 @@ def solveGrid(questions):
         elif "+ Hits Career" in currentQuestion:
             num = int(currentQuestion.partition("+")[0]) 
             subquery = getPlayerCareerHits(num)
+        elif "WAR Season" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerWARSeason(num)
+        elif "WAR Career" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerWARCareer(num)
         elif "Pitched min. 1 game" in currentQuestion:
             subquery = getPitchers()
         elif "Played First Base min. 1 game" in currentQuestion:
@@ -492,6 +631,8 @@ def solveGrid(questions):
             subquery = getFieldingPosition("LF")
         elif "Played Outfield min. 1 game" in currentQuestion:
             subquery = getFieldingPosition("OF")
+        elif "Designated Hitter" in currentQuestion:
+            subquery = getPlayerDesignatedHitter()
         elif "All Star" in currentQuestion:
             subquery = getPlayerAllStar()
         elif "Hall of Fame" in currentQuestion:
@@ -505,13 +646,15 @@ def solveGrid(questions):
         elif "Silver Slugger" in currentQuestion:
             subquery = getPlayerAward("Silver Slugger")    
         elif "Cy Young" in currentQuestion:
-            subquery = getPlayerAward("Cy Young Award")
+            subquery = getPlayerAward("Cy Young Award")   
         elif "Rookie Of The Year" in currentQuestion:
-            subquery = getPlayerAward("Rookie Of The Year Award")
+            subquery = getPlayerAward("Rookie Of The Year Award") 
+        elif "World Series Champ" in currentQuestion:
+            subquery = getWorldSeriesChamp()
         elif "No-Hitter" in currentQuestion:
             subquery = getPlayerNoHitter()
         else:
-            print("ERROR: INVALID QUESTION!!!!")
+            print(f"ERROR: INVALID QUESTION: {currentQuestion}")
             #Create a subquery type that won't return anything
             subquery= db.session.query(
                 literal_column('TRUE').label('INVALID_QUESTION'),

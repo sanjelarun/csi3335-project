@@ -307,3 +307,34 @@ class Awards(Base):
             f"<Awards(awards_ID={self.awards_ID}, awardID={self.awardID}, "
             f"yearID={self.yearID}, playerID={self.playerID}, lgID={self.lgID})>"
         )
+
+class Appearances(Base):
+    __tablename__ = 'appearances'
+
+    appearances_ID = Column(Integer, primary_key=True, autoincrement=True)
+    playerID = Column(String(9), ForeignKey("people.playerID"), nullable=False)
+    yearID = Column(SmallInteger, nullable=False)
+    teamID = Column(CHAR(3), nullable=False)
+    lgID = Column(CHAR(2), ForeignKey("leagues.lgID"), nullable=False)
+    G_all = Column(SmallInteger, nullable=True)
+    GS = Column(SmallInteger, nullable=True)
+    G_batting = Column(SmallInteger, nullable=True)
+    G_defense = Column(SmallInteger, nullable=True)
+    G_p = Column(SmallInteger, nullable=True)
+    G_c = Column(SmallInteger, nullable=True)
+    G_1b = Column(SmallInteger, nullable=True)
+    G_2b = Column(SmallInteger, nullable=True)
+    G_3b = Column(SmallInteger, nullable=True)
+    G_ss = Column(SmallInteger, nullable=True)
+    G_lf = Column(SmallInteger, nullable=True)
+    G_cf = Column(SmallInteger, nullable=True)
+    G_rf = Column(SmallInteger, nullable=True)
+    G_of = Column(SmallInteger, nullable=True)
+    G_dh = Column(SmallInteger, nullable=True)
+    G_ph = Column(SmallInteger, nullable=True)
+    G_pr = Column(SmallInteger, nullable=True)
+    def __repr__(self):
+        return (
+            f"<Appearances(appearances_ID={self.appearances_ID}, "
+            f"yearID={self.yearID}, playerID={self.playerID}, lgID={self.lgID})>"
+        )
