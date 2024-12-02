@@ -1,9 +1,7 @@
 from app import db
 import sqlalchemy as sa
-from app.models import People, Fielding, Batting, Team, Pitching, AllStarFull, Awards
+from app.models import People, Fielding, Batting, Team, Pitching, AllStarFull, Awards, HallOfFame
 from sqlalchemy import func, and_, literal_column
-
-from Update_Database.UpdateScripts import HallOfFame
 
 
 # Retrieves a list of all team names from the database.
@@ -349,12 +347,13 @@ def getPlayerDBLBySeason(dblNum):
             Batting.playerID.label("playerID"),
             Batting.teamID.label("teamID")
         )
+        .filter(
+            Batting.b_2B >= dblNum
+        )
         .group_by(
             Batting.playerID,
+            Batting.teamID,
             Batting.yearID
-        )
-        .having(
-            Batting.b_2B >= dblNum
         )
     )
 
@@ -372,11 +371,32 @@ def getPlayerHallOfFame():
             Batting,
             HallOfFame.playerID == Batting.playerID
         )
-        .group_by(
-            Batting.playerID
-        )
         .filter(
             HallOfFame.inducted == 'y'
+        )
+        .group_by(
+            HallOfFame.playerID,
+            Batting.teamID
+        )
+    )
+
+# All players that threw a no-hitter
+# Parameters:
+# N/A
+# Notes:
+def getPlayerNoHitter():
+    return (
+        db.session.query(
+            Pitching.playerID.label("playerID"),
+            Pitching.teamID.label("teamID")
+        )
+        .group_by(
+            Pitching.playerID,
+            Pitching.teamID
+        )
+        .filter(
+            Pitching.p_H == 0,
+            Pitching.p_IPOuts == 27
         )
     )
 
@@ -406,21 +426,29 @@ def solveGrid(questions):
 
         if currentQuestion in teamList: # If the player needs to be a part of a particular team
             subquery = getPlayersByTeam(currentQuestion.strip())
-
         elif "Win Season" in currentQuestion: # If any n+ Win Season
             num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
             subquery = getPlayerWinsBySeason(num)
         elif "Avg Season" in currentQuestion:
             subquery = getPlayerAvgBySeason()
+        elif "+ Run Season" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerSeasonRun(num)
         elif "Save Season" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerSVBySeason(num)
+        elif "Save Career" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerSVByCareer(num)
         elif "K Career" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerKByCareer(num)
         elif "≤ 3.00 ERA Career" in currentQuestion:
             num = 3.0
             subquery = getPlayerCareerEra(num)
+        elif "≤ 3.00 ERA Season" in currentQuestion:
+            num = 3.0
+            subquery = getPlayerSeasonERA(num)
         elif "100+ RBI Season" in currentQuestion:
             num = 100
             subquery = getPlayerSeasonRBI(num)
@@ -438,6 +466,9 @@ def solveGrid(questions):
         elif "+ Hits Season" in currentQuestion:
             num = int(currentQuestion.partition("+")[0]) 
             subquery = getPlayerSeasonHits(num)
+        elif"+ Double Season" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerDBLBySeason(num)
         elif "+ Hits Career" in currentQuestion:
             num = int(currentQuestion.partition("+")[0]) 
             subquery = getPlayerCareerHits(num)
@@ -463,6 +494,8 @@ def solveGrid(questions):
             subquery = getFieldingPosition("OF")
         elif "All Star" in currentQuestion:
             subquery = getPlayerAllStar()
+        elif "Hall of Fame" in currentQuestion:
+            subquery = getPlayerHallOfFame()
         elif "Only One Team" in currentQuestion:
             subquery = getOneTeamPlayers()
         elif "Gold Glove" in currentQuestion:
@@ -475,6 +508,8 @@ def solveGrid(questions):
             subquery = getPlayerAward("Cy Young Award")
         elif "Rookie Of The Year" in currentQuestion:
             subquery = getPlayerAward("Rookie Of The Year Award")
+        elif "No-Hitter" in currentQuestion:
+            subquery = getPlayerNoHitter()
         else:
             print("ERROR: INVALID QUESTION!!!!")
             #Create a subquery type that won't return anything

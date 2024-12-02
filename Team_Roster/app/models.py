@@ -271,6 +271,26 @@ class AllStarFull(Base):
             f"yearID={self.yearID}, lgID={self.lgID}, teamID={self.teamID})>"
         )
 
+class HallOfFame(Base):
+    __tablename__ = 'halloffame'
+
+    halloffame_ID = Column(Integer, primary_key=True, autoincrement=True)
+    playerID = Column(String(9), ForeignKey("people.playerID"), nullable=False)
+    yearID = Column(SmallInteger, nullable=False)
+    votedBy = Column(String(64), nullable=False)
+    ballots = Column(SmallInteger, nullable=True)
+    needed = Column(SmallInteger, nullable=True)
+    votes = Column(SmallInteger, nullable=True)
+    inducted = Column(String(1), nullable=True)
+    category = Column(String(20), nullable=True)
+    note = Column(String(25), nullable=True)
+
+    def __repr__(self):
+        return (
+            f">HallOfFame(halloffame_ID={self.halloffame_ID}, playerID={self.playerID}, "
+            f"yearID={self.yearID})>"
+        )
+
 class Awards(Base):
     __tablename__ = 'awards'
 
