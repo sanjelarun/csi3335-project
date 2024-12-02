@@ -1,12 +1,15 @@
-# CSI3335 Project Virtual Environment
+# CSI3335 Group Project - Immaculate Party Time
 
-This repository provides a virtual environment setup with specified dependencies for student projects in the CSI3335 course. **Please use Python 3.10 and above**
 
-## Description
+
+
+## Virtual Environment Setup
+
+### Description
 
 This virtual environment contains essential Python libraries and frameworks required for the project. The `requirements.txt` file lists all the dependencies.
 
-## Instructions
+### Instructions
 
 
 1. **Clone the Repository**:
@@ -43,7 +46,7 @@ source project_env/bin/activate
 pip install -r requirements.txt
 ```
 
-## Usage
+### Usage
 
 Once the virtual environment is activated and dependencies are installed, you can start working on your project within this environment. Remember to deactivate the virtual environment once you're done:
 
