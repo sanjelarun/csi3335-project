@@ -215,6 +215,99 @@ def getPitchingStats(teamId,year):
 
     return batting_data
 
+def getBattingStats(teamId,year):
+    subquery=(
+        db.session.query(
+            Batting.playerID.label("player_id"),
+            (
+                (Batting.b_AB)+
+                (Batting.b_BB)+
+                (Batting.b_HBP)+
+                (Batting.b_SH)+
+                (Batting.b_SF)
+            ).label("PA"),
+            (
+                func.sum(Batting.b_H) /
+                func.sum(Batting.b_AB)
+            ).label("AVG"),
+            (
+                (func.sum(Batting.b_H) + func.sum(Batting.b_BB) + func.sum(Batting.b_HBP)) /
+                (func.sum(Batting.b_AB) + func.sum(Batting.b_BB) + func.sum(Batting.b_HBP) + func.sum(Batting.b_SF))
+             ).label("OBP"),
+            (
+                (((func.sum(Batting.b_H) - (func.sum(Batting.b_HR) + func.sum(Batting.b_3B) + func.sum(Batting.b_2B))) +
+                (2 * func.sum(Batting.b_2B)) + (3 * func.sum(Batting.b_3B))) + (4 * func.sum(Batting.b_HR))) / func.sum(Batting.b_AB)
+             ).label("SLG"),
+            (
+                ((0.69 * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
+                (0.72 * func.sum(Batting.b_HBP)) +
+                (0.888 * ((func.sum(Batting.b_H) - (
+                        func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
+                (1.271 * func.sum(Batting.b_2B)) +
+                (1.616 * func.sum(Batting.b_3B)) +
+                (2.101 * func.sum(Batting.b_HR))) /
+                (func.sum(Batting.b_AB) +
+                func.sum(Batting.b_BB) -
+                func.sum(Batting.b_IBB) +
+                func.sum(Batting.b_SF) +
+                func.sum(Batting.b_HBP))
+            ).label("wOBA"),
+            (
+                # Seriously stumped on how to calculate this value
+                (
+                    (Batting.b_R) +
+                    #Base Running-Runs
+                    ((Batting.b_SB*Season.s_runSB+
+                     Batting.b_CS*Season.s_runCS-
+                      (Season.s_runSB * (Batting.b_BB +Batting.b_HBP + Batting.b_IBB)))+
+                     (Batting.b_GIDP))+
+                    func.sum(Batting.b_2B)+ # Helps get close to target value
+                    func.sum(Batting.b_3B)+ # Helps get close to target value
+                    (Batting.b_BB)
+                )
+                /(9*Season.s_R_W*1.5+3) # Generic formula for RPW
+            ).label("WAR")
+        ).filter(Batting.yearID == year, Batting.teamID == teamId, Season.yearID ==year)
+        .group_by(Batting.playerID)
+        .subquery()
+    )
+    results = (
+        db.session.query(
+            func.concat(People.nameFirst, ' ', People.nameLast).label("full_name"),
+            subquery.c.player_id,
+            subquery.c["PA"],
+            subquery.c["AVG"],
+            subquery.c["OBP"],
+            subquery.c["SLG"],
+            subquery.c["wOBA"],
+            # subquery.c["Bat"],
+            # subquery.c["Fld"],
+            # subquery.c["BsR"],
+            subquery.c["WAR"]
+        )
+        .join(People, People.playerID == subquery.c.player_id)
+        .order_by(subquery.c["PA"].desc())
+        .all()
+    )
+    batting_data = {}
+    for result in results:
+        player_data = {
+            "full_name": result.full_name,
+            "player_id": result.player_id,
+            "PA": result.PA or 0,
+            "AVG": result.AVG or 0,
+            "OBP": result.OBP or 0,
+            "SLG": result.SLG or 0,
+            "wOBA": result.wOBA or 0,
+            # "Bat": result.Bat or 0,
+            # "Fld": result.Fld or 0,
+            # "BsR": result.BsR or 0,
+            "WAR": result.WAR or 0,
+        }
+        batting_data[result.player_id] = player_data
+    return batting_data
+
+
 def ShowDepthChart(teamId, year):
     
     stat = request.args.get('stat', 'percentage')  # Default to 'percentage' if no stat is specified
@@ -223,6 +316,8 @@ def ShowDepthChart(teamId, year):
     
     pitching_stats = getPitchingStats(teamId,year)
 
+    batting_stats = getBattingStats(teamId, year)
+
     team=getTeam(teamId,year)
 
-    return render_template('depthChart.html',title="Depth Chart - {} {}".format(year, team.team_name), positions_stats=selected_stats, pitching_stats = pitching_stats, stat=stat, team=team, teamId=teamId, year=year)
+    return render_template('depthChart.html',title="Depth Chart - {} {}".format(year, team.team_name), positions_stats=selected_stats, pitching_stats = pitching_stats, batting_stats=batting_stats, stat=stat, team=team, teamId=teamId, year=year)
