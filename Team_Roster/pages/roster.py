@@ -81,10 +81,10 @@ def getBattingStats(teamId, year):
                         func.sum(Batting.b_SH))
                     )
                 )
-                +
-                ( #BsR=(SB×runSB)−(CS×runCS)
+                + 
+                ( #BsR=(SB×runSB)−(CS×runCS) -(lgwSB*(1B+BB+HBP)) 
                     (func.sum(Batting.b_SB) * Season.s_runSB)
-                    -
+                    +
                     (func.sum(Batting.b_CS) * Season.s_runCS)
                 )
                 +
