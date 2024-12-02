@@ -5,7 +5,7 @@ import pandas as pd
 def updatePitching(cursor):
     print("Adding new pitching data...")
 
-    data = pd.read_csv("csvFiles/Pitching.csv", na_values=['', ' '])
+    data = pd.read_csv("Update_Assets/csvFiles/Pitching.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
 
     pitching_added = 0

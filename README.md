@@ -7,10 +7,9 @@ Members:
 - Mitchell Thompson
 - Samuel Fries
 
+## Config 
+To run the app, some configuration is required:
 
-## Web App
-The core of this project is a web app that shows a team roster and solves the immaculate grid.
-To start the app:
 1. Set up your python virtal environment
 2. Start your virtual environment
 3. Run `pip install -r config\requirements.txt`
@@ -19,7 +18,16 @@ To start the app:
     b. Add the user: `\. config\addUser.sql`
     c. exit mysql: `exit`
 5. Update the database (see below)
-6. Start the app: `flask run`
+
+** If you want to change what database, port, etc. the app uses: **
+Update the connection used in `config/csi3335f2024.py`
+
+## Web App
+The core of this project is a web app that shows a team roster and solves the immaculate grid.
+To start the app:
+1. Set up the project configuration (see the config section)
+2. Update the database (see below)
+3. Start the app: `flask run`
 
 The app should now be started and can be found at [http://localhost:5000](http://localhost:5000)!
 
@@ -30,8 +38,8 @@ We have added significant changes to the database, adding the 2023 data and some
 ### Steps to Update Database
 
 To update the databse to have the needed extra data in order to run the run the app, as well as to update the database with 2023 player data:
-1. Configure the project's setup by following steps 1-4 in the section above
-2. Run `python Update_Database/UpdateDatabase.py`
+1. Set up the project configuration (see the config section)
+2. Run `UpdateDatabase.py`
 
 The project should now be fully updated with 2023 data and the info needed to run the app!
 

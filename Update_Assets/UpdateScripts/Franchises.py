@@ -5,7 +5,7 @@ import pandas as pd;
 def updateFranchises(cursor):
     print("Adding new franchise data...")
 
-    data = pd.read_csv("csvFiles/TeamsFranchises.csv", na_values=['', ' '])
+    data = pd.read_csv("Update_Assets/csvFiles/TeamsFranchises.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
 
     franchAdded = 0

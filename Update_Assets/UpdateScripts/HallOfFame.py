@@ -4,7 +4,7 @@ import pandas as pd;
 def updateHallOfFame(cursor):
     print("Adding new Hall Of Fame data...")
 
-    data=pd.read_csv("csvFiles/HallOfFame.csv", na_values=['', ' '])
+    data=pd.read_csv("Update_Assets/csvFiles/HallOfFame.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
     
     hallOfFameAdded = 0

@@ -4,7 +4,7 @@ import pandas as pd;
 def updateFieldingPost(cursor):
     print("Adding new FieldingPost data...")
 
-    data=pd.read_csv("csvFiles/FieldingPost.csv", na_values=['', ' '])
+    data=pd.read_csv("Update_Assets/csvFiles/FieldingPost.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
     
     fPostAdded = 0

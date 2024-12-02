@@ -4,7 +4,7 @@ import pandas as pd;
 def updateBatting(cursor):
     print("Adding new batting data...")
 
-    data=pd.read_csv("csvFiles/Batting.csv", na_values=['', ' '])
+    data=pd.read_csv("Update_Assets/csvFiles/Batting.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
     
     battingAdded = 0

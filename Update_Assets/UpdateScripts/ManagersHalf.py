@@ -4,7 +4,7 @@ import pandas as pd;
 def updateManagersHalf(cursor):
     print("Updating Managers Half data...")
 
-    data = pd.read_csv("csvFiles/ManagersHalf.csv", na_values=['', ' '])
+    data = pd.read_csv("Update_Assets/csvFiles/ManagersHalf.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
 
     managersHalfAdded = 0

@@ -4,7 +4,7 @@ import pandas as pd;
 def updateSeriesPost(cursor):
     print("Adding new Series Post data...")
 
-    data=pd.read_csv("csvFiles/SeriesPost.csv", na_values=['', ' '])
+    data=pd.read_csv("Update_Assets/csvFiles/SeriesPost.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
     
     seriesPostAdded = 0

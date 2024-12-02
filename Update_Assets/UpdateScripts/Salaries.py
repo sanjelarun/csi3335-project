@@ -7,7 +7,7 @@ import pandas as pd;
 def updateSalaries(cursor):
     print("Adding new Salaries data...")
 
-    data = pd.read_csv("csvFiles/Salaries.csv", na_values=['', ' '])
+    data = pd.read_csv("Update_Assets/csvFiles/Salaries.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
 
     salariesAdded = 0

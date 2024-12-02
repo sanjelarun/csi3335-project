@@ -4,7 +4,7 @@ import pandas as pd;
 def updateAwardsManagers(cursor):
     print("Adding new manager awards data...")
 
-    data=pd.read_csv("csvFiles/AwardsManagers.csv", na_values=['', ' '])
+    data=pd.read_csv("Update_Assets/csvFiles/AwardsManagers.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
     
     managerAwardsAdded = 0

@@ -4,7 +4,7 @@ import pandas as pd;
 def updateAllStarFull(cursor):
     print("Adding new All Star Full data...")
 
-    data=pd.read_csv("csvFiles/AllstarFull.csv", na_values=['', ' '])
+    data=pd.read_csv("Update_Assets/csvFiles/AllstarFull.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
     
     allStarAdded = 0

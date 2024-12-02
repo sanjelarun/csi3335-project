@@ -26,7 +26,7 @@ def createSeasons(cursor):
     cursor.execute(sql)
 
 
-    data = pd.read_csv("csvFiles/Seasons.csv", na_values=['', ' '])
+    data = pd.read_csv("Update_Assets/csvFiles/Seasons.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
 
     seasonsAdded = 0

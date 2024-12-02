@@ -4,7 +4,7 @@ import pandas as pd;
 def updateFieldingOFSplit(cursor):
     print("Adding new fielding OF Split data...")
 
-    data=pd.read_csv("csvFiles/FieldingOFsplit.csv", na_values=['', ' '])
+    data=pd.read_csv("Update_Assets/csvFiles/FieldingOFsplit.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
     
     fieldingSplitAdded = 0

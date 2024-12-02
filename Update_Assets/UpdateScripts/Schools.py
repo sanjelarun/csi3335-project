@@ -5,7 +5,7 @@ def updateSchools(cursor):
     print("Adding new school data...")
 
     columns = ["schoolID", "name_full", "city", "state", "country"]
-    data=pd.read_csv("csvFiles/Schools.csv", na_values=['', ' '], encoding='ISO-8859-1', usecols=columns)
+    data=pd.read_csv("Update_Assets/csvFiles/Schools.csv", na_values=['', ' '], encoding='ISO-8859-1', usecols=columns)
     data = data.where(pd.notnull(data), None)
     
     schoolsAdded = 0

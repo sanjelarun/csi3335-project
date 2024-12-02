@@ -5,7 +5,7 @@ import pandas as pd;
 def updateFielding(cursor):
     print("Adding new fielding data...")
 
-    data = pd.read_csv("csvFiles/Fielding.csv", na_values=['', ' '])
+    data = pd.read_csv("Update_Assets/csvFiles/Fielding.csv", na_values=['', ' '])
     data = data.where(pd.notnull(data), None)
 
     fieldingAdded = 0
