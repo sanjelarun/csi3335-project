@@ -1,8 +1,10 @@
-from flask import jsonify, render_template, request
+from flask import render_template, request
 from app import db
 import sqlalchemy as sa
 from app.models import People, Fielding, Batting, Team, Pitching, Season
 from sqlalchemy import func, and_
+from immaculateGridCalculations.complexFormulas import get_war, get_grouped_fielding
+
 
 def getTeam(teamId,year):
     team = db.session.scalar(
@@ -216,6 +218,9 @@ def getPitchingStats(teamId,year):
     return batting_data
 
 def getBattingStats(teamId,year):
+    grouped_fielding= get_grouped_fielding()
+    war = get_war(grouped_fielding)
+
     subquery=(
         db.session.query(
             Batting.playerID.label("player_id"),
@@ -224,7 +229,7 @@ def getBattingStats(teamId,year):
                 (Batting.b_BB)+
                 (Batting.b_HBP)+
                 (Batting.b_SH)+
-                (Batting.b_SF)
+                (Batting.b_SF)            
             ).label("PA"),
             (
                 func.sum(Batting.b_H) /
@@ -252,33 +257,50 @@ def getBattingStats(teamId,year):
                 func.sum(Batting.b_SF) +
                 func.sum(Batting.b_HBP))
             ).label("wOBA"),
-            # Unsure about below stats, formulas are hard to
-            # find or have stats that are difficult to calculate
-            # ().label("Bat"),
-            # ().label("Fld"),
-            # ((
-            #     (Batting.b_SB*Season.s_runSB+
-            #     Batting.b_CS*Season.s_runCS)-
-            #     ((Batting.b_SB * Season.s_runSB+Batting.b_CS*Season.s_runCS)/
-            #      (Batting.b_BB + Batting.b_HBP - Batting.b_IBB))*
-            #     (Batting.b_BB + Batting.b_HBP - Batting.b_IBB))
-            #  ).label("BsR"),
-            (
-                # Seriously stumped on how to calculate this value
+            ( #BsR = wSB=((SB*runSB)+(CS*runCS))-(lgwSB*(1B+BB+HBP-IBB))
                 (
-                    (Batting.b_R) +
-                    #Base Running-Runs
-                    ((Batting.b_SB*Season.s_runSB+
-                     Batting.b_CS*Season.s_runCS-
-                      (Season.s_runSB * (Batting.b_BB +Batting.b_HBP + Batting.b_IBB)))+
-                     (Batting.b_GIDP))+
-                    func.sum(Batting.b_2B)+ # Helps get close to target value
-                    func.sum(Batting.b_3B)+ # Helps get close to target value
-                    (Batting.b_BB)
+                    (func.sum(Batting.b_SB) * Season.s_runSB)
+                    + 
+                    (func.sum(Batting.b_CS) * Season.s_runCS)
+                ) 
+                -
+                (
+                    (# lgwSB=((lgSB*runSB)+(lgCS*runCS))/(lg1B+lgBB+lgHBP+lgIBB)
+                        (
+                            (Season.s_SB * Season.s_runSB) + 
+                            (Season.s_CS * Season.s_runCS)
+                        )
+                        /
+                        (
+                            Season.s_1B + Season.s_BB + Season.s_HBP - Season.s_IBB
+                        )
+                    )
+                    *
+                    (
+                        (func.sum(Batting.b_H) - (func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))) #1B
+                        +
+                        func.sum(Batting.b_BB)
+                        +
+                        func.sum(Batting.b_HBP)
+                        -
+                        func.sum(Batting.b_IBB)
+                    )
                 )
-                /(9*Season.s_R_W*1.5+3) # Generic formula for RPW
-            ).label("WAR")
-        ).filter(Batting.yearID == year, Batting.teamID == teamId, Season.yearID ==year)
+            ).label("BsR"),
+            war.label("WAR")
+        )
+        .join(grouped_fielding,and_(
+            Batting.playerID == grouped_fielding.c.playerID,
+            Batting.yearID == grouped_fielding.c.yearID,
+            Batting.teamID == grouped_fielding.c.teamID,
+            Batting.stint == grouped_fielding.c.stint
+        
+        ))
+        .filter(
+            Batting.yearID == year,
+            Batting.teamID == teamId,
+            Season.yearID == year
+        )
         .group_by(Batting.playerID)
         .subquery()
     )
@@ -291,9 +313,7 @@ def getBattingStats(teamId,year):
             subquery.c["OBP"],
             subquery.c["SLG"],
             subquery.c["wOBA"],
-            # subquery.c["Bat"],
-            # subquery.c["Fld"],
-            # subquery.c["BsR"],
+            subquery.c["BsR"],
             subquery.c["WAR"]
         )
         .join(People, People.playerID == subquery.c.player_id)
@@ -310,10 +330,8 @@ def getBattingStats(teamId,year):
             "OBP": result.OBP or 0,
             "SLG": result.SLG or 0,
             "wOBA": result.wOBA or 0,
-            # "Bat": result.Bat or 0,
-            # "Fld": result.Fld or 0,
-            # "BsR": result.BsR or 0,
-            "WAR": result.WAR or 0,
+            "BsR": result.BsR or 0,
+            "WAR": result.WAR,
         }
         batting_data[result.player_id] = player_data
     return batting_data
