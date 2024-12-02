@@ -518,7 +518,7 @@ def solveGrid(questions):
         elif "World Series Champ" in currentQuestion:
             subquery = getWorldSeriesChamp()
         else:
-            print("ERROR: INVALID QUESTION!!!!")
+            print(f"ERROR: INVALID QUESTION: {currentQuestion}")
             #Create a subquery type that won't return anything
             subquery= db.session.query(
                 literal_column('TRUE').label('INVALID_QUESTION'),

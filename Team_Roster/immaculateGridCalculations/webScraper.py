@@ -1,4 +1,5 @@
 import requests
+import re
 from bs4 import BeautifulSoup
 
 def scrapeImmaculateGridQuestions(url):
@@ -18,13 +19,28 @@ def scrapeImmaculateGridQuestions(url):
     questionsRow = []
     for e in content:
         # Split the questions and append to the questions array
+        print(str(e.attrs['aria-label']))
         questionStr = str(e.attrs['aria-label']).split(" + ", 1)
         # print(str(e.attrs['aria-label']).split(" + ", 1))
-        questionsRow.append(questionStr[0].rstrip())
-        questionsCol.append(questionStr[1].rstrip())
-    # questions = ["Detroit Tigers","40+ WAR Career","≤ 3.00 ERA Career","Gold Glove", "Played First Base min. 1 game", "6+ WAR Season"]
+
+        rowQuestion = prepQuestionString(questionStr[0])
+        if rowQuestion not in questionsRow:
+            questionsRow.append(rowQuestion)
+        columnQuestion = prepQuestionString(questionStr[1])
+        if columnQuestion not in questionsCol:
+            questionsCol.append(columnQuestion)
+    # questions = ["Detroit Tigers","200+ K Season","≤ 3.00 ERA Career","Gold Glove", "Played First Base min. 1 game", "Houston Astros"]
     # return questions
     # Remove duplicates from both sets, append into questionsCol, giving columns precedence
-    questionsCol = list(set(questionsCol))
-    questionsCol += list(set(questionsRow))
+    questionsCol = list(questionsCol)
+    questionsCol += list(questionsRow)
+
     return questionsCol
+
+def prepQuestionString(questionStr):
+    str = questionStr.rstrip() #remove trailing whitespace
+    # remove repeated spaces
+    str = re.sub(r'\s{2,}', ' ', str)
+    return str
+
+
