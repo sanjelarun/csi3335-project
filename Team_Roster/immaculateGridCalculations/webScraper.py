@@ -22,7 +22,8 @@ def scrapeImmaculateGridQuestions(url):
         # print(str(e.attrs['aria-label']).split(" + ", 1))
         questionsRow.append(questionStr[0].rstrip())
         questionsCol.append(questionStr[1].rstrip())
-    # questions = ["Detroit Tigers","200+ K Season","≤ 3.00 ERA Career","Gold Glove", "Played First Base min. 1 game", "Houston Astros"]
+    # questions = ["Detroit Tigers","40+ WAR Career","≤ 3.00 ERA Career","Gold Glove", "Played First Base min. 1 game", "6+ WAR Season"]
+    # return questions
     # Remove duplicates from both sets, append into questionsCol, giving columns precedence
     questionsCol = list(set(questionsCol))
     questionsCol += list(set(questionsRow))
