@@ -12,5 +12,6 @@ The following contains everything needed to update the database to have the most
 - Updated Players to add any death locations and dates since last update
 - Added awards that were missing from Lahman 2022
 - Created a "Seasons" table containing statistics about a seaon for the MLB as a whole
-   - Pulled from the [Fan Graphs Guts! page](https://www.fangraphs.com/guts.aspx)
-   - Primarily used to get the FIP constant for the year, to calculate FIP and WAR values
+   - wOBA Pulled from the [Fan Graphs Guts! page](https://www.fangraphs.com/guts.aspx)
+   - Season Totals pulled from Baseball Reference
+   - Used to get season constants and totals used to calculate FIP and WAR values
