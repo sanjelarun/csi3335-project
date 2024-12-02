@@ -544,7 +544,7 @@ def solveGrid(questions):
             rowSubquery = rowQuery.subquery()  # Convert rowQuery to subquery
             colSubquery = colQuery.subquery()  # Convert colQuery to subquery
             combined = (
-                db.session.query(Appearances.playerID)
+                db.session.query(Batting.playerID)
                 #Rules for joining the queries:
                 # Always join on player ID
                 # Join on teamId, IF...
@@ -553,8 +553,8 @@ def solveGrid(questions):
                 .join(
                     rowSubquery, 
                     and_(
-                        Appearances.playerID == rowSubquery.c.playerID,
-                        (rowSubquery.c.teamID == Appearances.teamID) if hasattr(rowSubquery.c, 'teamID')else True  
+                        Batting.playerID == rowSubquery.c.playerID,
+                        (rowSubquery.c.teamID == Batting.teamID) if hasattr(rowSubquery.c, 'teamID')else True  
                         # Join on teamID if it exists in rowSubquery
                     )
                 )
@@ -573,8 +573,7 @@ def solveGrid(questions):
                         # Join on teamID if it exists in colSubquery
                     )
                 )
-                .group_by(Appearances.playerID,Appearances.teamID)
-                .order_by(Appearances.G_all)
+                .order_by(Batting.yearID)
                 .limit(1)
             ).first()
             
