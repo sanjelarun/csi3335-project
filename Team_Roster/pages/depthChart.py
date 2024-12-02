@@ -252,15 +252,6 @@ def getBattingStats(teamId,year):
                 func.sum(Batting.b_SF) +
                 func.sum(Batting.b_HBP))
             ).label("wOBA"),
-            # ().label("Bat"),
-            # ().label("Fld"),
-            # ((
-            #     (Batting.b_SB*Season.s_runSB+
-            #     Batting.b_CS*Season.s_runCS)-
-            #     ((Batting.b_SB * Season.s_runSB+Batting.b_CS*Season.s_runCS)/
-            #      (Batting.b_BB + Batting.b_HBP - Batting.b_IBB))*
-            #     (Batting.b_BB + Batting.b_HBP - Batting.b_IBB))
-            #  ).label("BsR"),
             (
                 # Seriously stumped on how to calculate this value
                 (
