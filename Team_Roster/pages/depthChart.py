@@ -252,8 +252,6 @@ def getBattingStats(teamId,year):
                 func.sum(Batting.b_SF) +
                 func.sum(Batting.b_HBP))
             ).label("wOBA"),
-            # Unsure about below stats, formulas are hard to
-            # find or have stats that are difficult to calculate
             # ().label("Bat"),
             # ().label("Fld"),
             # ((
