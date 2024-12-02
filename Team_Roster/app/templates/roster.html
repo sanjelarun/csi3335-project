@@ -181,7 +181,11 @@
             <!--            <td>{{ stats["BsR"] }}</td>-->
             <!--            <td>{{ stats["Off"] }}</td>-->
             <!--            <td>{{ stats["Def"] }}</td>-->
-            <td>{{ '%0.1f'| format(stats["WAR"]) }}</td>
+            <td>
+                {% if stats["WAR"] %}
+                {{ '%0.3f'| format(stats["WAR"]) }}
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>

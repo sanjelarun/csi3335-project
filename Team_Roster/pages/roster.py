@@ -1,7 +1,7 @@
 from flask import render_template
 from app import db
 import sqlalchemy as sa
-from app.models import Batting, People, Team, Season
+from app.models import Batting, People, Team, Season, Fielding
 from sqlalchemy import and_, func
 
 
@@ -52,24 +52,68 @@ def getBattingStats(teamId, year):
             # func.sum().label("BsR"),  # Unsure
             # func.sum().label("Off"),  # Unsure
             # func.sum().label("Def"),  # Unsure
-            (
-                # Seriously stumped on how to calculate this value
-                (
-                    (Batting.b_R) +
-                    #Base Running-Runs
-                    ((Batting.b_SB*Season.s_runSB+
-                     Batting.b_CS*Season.s_runCS-
-                      (Season.s_runSB * (Batting.b_BB +Batting.b_HBP + Batting.b_IBB)))+
-                     (Batting.b_GIDP))+
-                    func.sum(Batting.b_2B)+ # Helps get close to target value
-                    func.sum(Batting.b_3B)+ # Helps get close to target value
-                    (Batting.b_BB)
+            (# WAR = RaR/season R_W   
+                (# RAR=wRAA + BsR + Fielding Runs + Positional Adjustment + Replacement Runs
+                ( #wRAA = (wOBA - leagueWOBA) / wOBAScale * AB+BB+HBP+SF+SH
+                    (
+                    (#wOBA (took logan's equation)
+                        ((0.69 * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
+                        (0.72 * func.sum(Batting.b_HBP)) +
+                        (0.888 * ((func.sum(Batting.b_H) - (func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
+                        (1.271 * func.sum(Batting.b_2B)) +
+                        (1.616 * func.sum(Batting.b_3B)) +
+                        (2.101 * func.sum(Batting.b_HR)))
+                        /
+                        (func.sum(Batting.b_AB) +
+                        func.sum(Batting.b_BB) -
+                        func.sum(Batting.b_IBB) +
+                        func.sum(Batting.b_SF) +
+                        func.sum(Batting.b_HBP))
+                    )
+                    - Season.s_wOBA
+                    )
+                    / Season.s_wOBAScale
+                    * ( #PA = AB+BB+HBP+SF+SH
+                        (func.sum(Batting.b_AB) +
+                        func.sum(Batting.b_BB) +
+                        func.sum(Batting.b_HBP) +
+                        func.sum(Batting.b_SF) +
+                        func.sum(Batting.b_SH))
+                    )
                 )
-                /(9*Season.s_R_W*1.5+3) # Generic formula for RPW
-            ).label("WAR")  # Unsure
+                +
+                ( #BsR=(SB×runSB)−(CS×runCS)
+                    (func.sum(Batting.b_SB) * Season.s_runSB)
+                    -
+                    (func.sum(Batting.b_CS) * Season.s_runCS)
+                )
+                +
+                ( # Fielding Runs= Range Runs+Error Runs + Double Play Runs
+                    0
+                    #func.sum(Fielding.f_ZR)
+                    # + Error runs
+                    # + Double play controbutions
+
+                )
+                # + Positional Adjustment
+                +
+                ( # Replacement Runs = 20/600 * PA
+                    (20/600)
+                    * ( #PA = AB+BB+HBP+SF+SH
+                        (func.sum(Batting.b_AB) +
+                        func.sum(Batting.b_BB) +
+                        func.sum(Batting.b_HBP) +
+                        func.sum(Batting.b_SF) +
+                        func.sum(Batting.b_SH))
+                    )
+                )
+                )
+                /Season.s_R_W
+            ).label("WAR")  
 
         )
-        .filter(Batting.yearID == year, Batting.teamID == teamId, Season.yearID == year)
+        .filter(Batting.yearID == year, Batting.teamID == teamId, Season.yearID == year, Fielding.yearID==year)
+        .join(Fielding, Batting.playerID == Fielding.playerID)
         .group_by(Batting.playerID)
         .subquery()
     )
