@@ -107,7 +107,7 @@ def createSeasons(cursor):
             row["BIP"],
         ]
         sql = '''INSERT INTO season (yearID, s_wOBA, s_wOBAScale, s_wBB, s_wHBP, s_w1B, s_w2B, s_w3B, s_wHR, s_runSB, s_runCS, s_R_PA, s_R_W, s_cFIP,s_Tms, s_NumBat, s_BatAge, s_R_G, s_G, s_PA, s_AB, s_R, s_H, s_1B, s_2B, s_3B, s_HR, s_RBI, s_SB, s_CS, s_BB, s_SO, s_BA, s_OBP, s_SLG, s_OPS, s_TB, s_GDP, s_HBP, s_SH, s_SF, s_IBB, s_BIP)
-                VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'''
+                VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'''
         exe = cursor.execute(sql, newSeason)
         seasonsAdded += exe
 

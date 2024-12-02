@@ -36,12 +36,12 @@ def getBattingStats(teamId, year):
                 func.sum(Batting.b_AB)
             ).label("SLG"),
             (
-                ((0.69 * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
-                (0.72 * func.sum(Batting.b_HBP)) +
-                (0.888 * ((func.sum(Batting.b_H) - (func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
-                (1.271 * func.sum(Batting.b_2B)) +
-                (1.616 * func.sum(Batting.b_3B)) +
-                (2.101 * func.sum(Batting.b_HR)))/
+                ((Season.s_wBB * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
+                (Season.s_wHBP * func.sum(Batting.b_HBP)) +
+                (Season.s_w1B  * ((func.sum(Batting.b_H) - (func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
+                (Season.s_w2B  * func.sum(Batting.b_2B)) +
+                (Season.s_w3B  * func.sum(Batting.b_3B)) +
+                (Season.s_wHR  * func.sum(Batting.b_HR)))/
                 (func.sum(Batting.b_AB) +
                 func.sum(Batting.b_BB) -
                 func.sum(Batting.b_IBB) +
@@ -53,20 +53,20 @@ def getBattingStats(teamId, year):
             # func.sum().label("Off"),  # Unsure
             # func.sum().label("Def"),  # Unsure
             (# WAR = RaR/season R_W   
-                (# RAR=wRAA + BsR + Fielding Runs + Positional Adjustment + Replacement Runs
+                (# RAR=wRAA + BsR + Rpos + RLR / RPW
                 ( #wRAA = (wOBA - leagueWOBA) / wOBAScale * AB+BB+HBP+SF+SH
                     (
                     (#wOBA (took logan's equation)
-                        ((0.69 * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
-                        (0.72 * func.sum(Batting.b_HBP)) +
-                        (0.888 * ((func.sum(Batting.b_H) - (func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
-                        (1.271 * func.sum(Batting.b_2B)) +
-                        (1.616 * func.sum(Batting.b_3B)) +
-                        (2.101 * func.sum(Batting.b_HR)))
+                        ((Season.s_wBB * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
+                        (Season.s_wHBP * func.sum(Batting.b_HBP)) +
+                        (Season.s_w1B * ((func.sum(Batting.b_H) - (func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
+                        (Season.s_w2B * func.sum(Batting.b_2B)) +
+                        (Season.s_w3B * func.sum(Batting.b_3B)) +
+                        (Season.s_wHR * func.sum(Batting.b_HR)))
                         /
                         (func.sum(Batting.b_AB) +
-                        func.sum(Batting.b_BB) -
-                        func.sum(Batting.b_IBB) +
+                        (func.sum(Batting.b_BB) -
+                        func.sum(Batting.b_IBB)) +
                         func.sum(Batting.b_SF) +
                         func.sum(Batting.b_HBP))
                     )
@@ -82,10 +82,20 @@ def getBattingStats(teamId, year):
                     )
                 )
                 + 
-                ( #BsR=(SB×runSB)−(CS×runCS) -(lgwSB*(1B+BB+HBP)) 
-                    (func.sum(Batting.b_SB) * Season.s_runSB)
-                    +
-                    (func.sum(Batting.b_CS) * Season.s_runCS)
+                ( #BsR= wGDP + wSB
+                    # wGDP = (((lgGDP / lgGDPo) * GDPo) - GDP ) * lgRPO
+                    # (
+                    #     (
+                    #         (Season.s_ / lgGDPo) 
+                    #         * GDPo
+                    #     ) 
+                    #     - 
+                    #     GDP 
+                    # ) 
+                    # * lgRPO
+                    # (func.sum(Batting.b_SB) * Season.s_runSB)
+                    # +
+                    # (func.sum(Batting.b_CS) * Season.s_runCS)
                 )
                 +
                 ( # Fielding Runs= Range Runs+Error Runs + Double Play Runs
