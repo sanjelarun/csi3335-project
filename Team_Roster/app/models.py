@@ -222,9 +222,38 @@ class Season(Base):
     s_R_PA = Column(Double, nullable=True)
     s_R_W = Column(Double, nullable=True)
     s_cFIP = Column(Double, nullable=True)
+    s_Tms = Column(Integer, nullable=True)
+    s_NumBat = Column(Integer, nullable=True)
+    s_BatAge = Column(Double, nullable=True)
+    s_R_G = Column(Double, nullable=True)
+    s_G = Column(Integer, nullable=True)
+    s_PA = Column(Integer, nullable=True)
+    s_AB = Column(Integer, nullable=True)
+    s_R = Column(Integer, nullable=True)
+    s_H = Column(Integer, nullable=True)
+    s_1B = Column(Integer, nullable=True)
+    s_2B = Column(Integer, nullable=True)
+    s_3B = Column(Integer, nullable=True)
+    s_HR = Column(Integer, nullable=True)
+    s_RBI = Column(Integer, nullable=True)
+    s_SB = Column(Integer, nullable=True)
+    s_CS = Column(Integer, nullable=True)
+    s_BB = Column(Integer, nullable=True)
+    s_SO = Column(Integer, nullable=True)
+    s_BA = Column(Double, nullable=True)
+    s_OBP = Column(Double, nullable=True)
+    s_SLG = Column(Double, nullable=True)
+    s_OPS = Column(Double, nullable=True)
+    s_TB = Column(Integer, nullable=True)
+    s_GDP = Column(Integer, nullable=True)
+    s_HBP = Column(Integer, nullable=True)
+    s_SH = Column(Integer, nullable=True)
+    s_SF = Column(Integer, nullable=True)
+    s_IBB = Column(Integer, nullable=True)
+    s_BIP = Column(Integer, nullable=True)
 
     def __repr__(self):
-        return f"<Season {self.yearID})>"
+        return f"<Season {self.yearID}>"
     
 
 class AllStarFull(Base):

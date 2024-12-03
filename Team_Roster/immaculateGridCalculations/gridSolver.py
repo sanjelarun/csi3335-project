@@ -2,6 +2,8 @@ from app import db
 import sqlalchemy as sa
 from app.models import People, Fielding, Batting, Team, Pitching, AllStarFull, Awards, Appearances, Season
 from sqlalchemy import func, and_, literal_column
+from immaculateGridCalculations.complexFormulas import get_war, get_grouped_fielding
+
 
 
 # Retrieves a list of all team names from the database.
@@ -57,6 +59,16 @@ def getPlayerAvgBySeason():
         .having((func.sum(Batting.b_H)/func.sum(Batting.b_AB)) >= .300)
         )
 
+# Fetches the career average of players with a minimum of .300 AVG
+def getPlayerAvgByCareer():
+    return(
+        db.session.query(
+            Batting.playerID.label("playerID")
+        )
+        .group_by(Batting.playerID)
+        .having((func.sum(Batting.b_H)/func.sum(Batting.b_AB))>=.300)
+    )
+
 
 # Retrieves all players who have achieved a minimum SV in a season.
 # Parameters:
@@ -86,15 +98,6 @@ def getPlayerKByCareer(kNum):
         .having(func.sum(Batting.b_SO) >= kNum)
     )
 
-# Fetches the career average of players with a minimum of .300 AVG
-def getPlayerAvgByCareer():
-    return(
-        db.session.query(
-            Batting.playerID.label("playerID")
-        )
-        .group_by(Batting.playerID)
-        .having((func.sum(Batting.b_H)/func.sum(Batting.b_AB))>=.300)
-    )
 
 # Fetches the players with 30+ stolen bases in a season
 # Parameters:
@@ -122,71 +125,71 @@ def getPlayerCareerWins(winNum):
         .having(func.sum(Pitching.p_W)>=winNum)
     )
 
-# Fetches the players with a WAR value greater than a given number
-# WAR value is difficult to calculate, returned players may be wrong.
-# Spent a lot of time trying to tackle this stat, this is as accurate as I could get.
-# Parameters:
-#   - maxWAR : maximum WAR value
-def getPlayerWARSeason(maxWAR):
+#Gets the war of every player, used by the war questions
+def getPlayerWars():
+    grouped_fielding= get_grouped_fielding()
+    war = get_war(grouped_fielding)
     return(
         db.session.query(
             Batting.playerID.label("playerID"),
             Batting.teamID.label("teamID"),
-            Batting,
-            Season,
+            war.label("WAR"),
+            Season.s_wBB,
+            Season.s_wHBP,
+            Season.s_w1B,
+            Season.s_w2B,
+            Season.s_w3B,
+            Season.s_wHR,
+            Season.s_wOBA,
+            Season.s_wOBAScale,
+            Season.s_runSB,
+            Season.s_runCS,
+            Season.s_SB,
+            Season.s_CS,
+            Season.s_1B,
+            Season.s_BB,
+            Season.s_HBP,
+            Season.s_IBB,
+            Season.s_G,
+            Season.s_R_W,
+            Season.s_PA,
         )
-        .join(Batting, (Season.yearID == Batting.yearID))
-        # Join causes some slowdown, needs to be sped up
-        .group_by(Batting.playerID, Batting.yearID)
-        .having(
-            (
-                (
-                Batting.b_R +
-                # Base Running-Runs
-                (
-                     (Batting.b_SB * Season.s_runSB +
-                      Batting.b_CS * Season.s_runCS -
-                      (Season.s_runSB * (Batting.b_BB + Batting.b_HBP + Batting.b_IBB))) +
-                     (Batting.b_GIDP)
-                 ) +
-                func.sum(Batting.b_2B) +  # Helps get close to target value ?
-                func.sum(Batting.b_3B) +  # Helps get close to target value ?
-                (Batting.b_BB)
-                ) / (9 * Season.s_R_W * 1.2 + 3)  # Generic formula for RPW, using 1.2 to allow for more responses
-            ) >=maxWAR)
+        .join(grouped_fielding,and_(
+            Batting.playerID == grouped_fielding.c.playerID,
+            Batting.yearID == grouped_fielding.c.yearID,
+            Batting.teamID == grouped_fielding.c.teamID,
+            Batting.stint == grouped_fielding.c.stint
+        ))
+        .join(Season,Batting.yearID == Season.yearID)
+        .group_by(Batting.playerID,Batting.yearID, Batting.teamID)
+        .subquery()
+    )
+
+# Fetches the players with a WAR value greater than a given number
+# Parameters:
+#   - minWAR : minimum WAR value
+def getPlayerWARSeason(minWAR):
+    wars = getPlayerWars()
+    return(
+        db.session.query(
+            wars.c.playerID.label("playerID"),
+            wars.c.teamID.label("teamID"),
+        )
+        .filter( wars.c.WAR >=minWAR)
     )
 
 # Fetches the players above a certain WAR value for their career
-# WAR value is difficult to calculate, returned players may be wrong.
-# Spent a lot of time trying to tackle this stat, this is as accurate as I could get.
 # Parameters:
-#   - maxWAR : maximum WAR value
-def getPlayerWARCareer(maxWAR):
+#   - minWAR : minimum WAR value
+def getPlayerWARCareer(minWAR):
+    wars = getPlayerWars()
     return(
         db.session.query(
-            Batting.playerID.label("playerID"),
-            Batting,
-            Season
+            wars.c.playerID.label("playerID"),
+            wars.c.teamID.label("teamID"),
         )
-        # Join causes some slowdown, needs to be sped up
-        .join(Batting, (Season.yearID == Batting.yearID))
-        .group_by(Batting.playerID)
-        .having(
-            func.sum(
-                (
-                Batting.b_R +
-                # Base Running-Runs
-                (
-                     (Batting.b_SB * Season.s_runSB +
-                      Batting.b_CS * Season.s_runCS -
-                      (Season.s_runSB * (Batting.b_BB + Batting.b_HBP + Batting.b_IBB))) +
-                     (Batting.b_GIDP)
-                 ) +
-                func.sum(Batting.b_2B) +  # Helps get close to target value ?
-                func.sum(Batting.b_3B) +  # Helps get close to target value ?
-                (Batting.b_BB)
-                ) / (9 * Season.s_R_W * 1.2 + 3)  # Generic formula for RPW, using 1.2 to allow for more responses
-            ) >=maxWAR)
+        .group_by(wars.c.playerID)
+        .having( func.sum(wars.c.WAR) >=minWAR)
     )
 
 # Fetches players that have been designated hitters
@@ -428,12 +431,12 @@ def solveGrid(questions):
 
         if currentQuestion in teamList: # If the player needs to be a part of a particular team
             subquery = getPlayersByTeam(currentQuestion.strip())
-        elif ".300+ AVG Career" in currentQuestion:
+        elif ".300+ AVG Career Batting" in currentQuestion:
             subquery = getPlayerAvgByCareer()
         elif "Win Season" in currentQuestion: # If any n+ Win Season
             num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
             subquery = getPlayerWinsBySeason(num)
-        elif "Avg Season" in currentQuestion:
+        elif "AVG Season" in currentQuestion:
             subquery = getPlayerAvgBySeason()
         elif "Save Season" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
@@ -570,6 +573,7 @@ def solveGrid(questions):
                         # Join on teamID if it exists in colSubquery
                     )
                 )
+                .order_by(Batting.yearID)
                 .limit(1)
             ).first()
             

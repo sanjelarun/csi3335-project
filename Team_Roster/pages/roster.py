@@ -1,21 +1,26 @@
 from flask import render_template
 from app import db
 import sqlalchemy as sa
-from app.models import Batting, People, Team, Season
-from sqlalchemy import and_, func
+from app.models import Batting, People, Team, Season, Fielding
+from sqlalchemy import and_, func, case
+from immaculateGridCalculations.complexFormulas import get_war, get_grouped_fielding
+
 
 
 def getBattingStats(teamId, year):
+    grouped_fielding= get_grouped_fielding()
+    war = get_war(grouped_fielding)
+
     subquery = (
         db.session.query(
             Batting.playerID.label("player_id"),
             func.sum(Batting.b_G).label("G"),
             (
-                (Batting.b_AB)+
-                (Batting.b_BB)+
-                (Batting.b_HBP)+
-                (Batting.b_SH)+
-                (Batting.b_SF)
+                func.sum(Batting.b_AB)+
+                func.sum(Batting.b_BB)+
+                func.sum(Batting.b_HBP)+
+                func.sum(Batting.b_SH)+
+                func.sum(Batting.b_SF)
             ).label("PA"),
             func.sum(Batting.b_HR).label("HR"),
             func.sum(Batting.b_SB).label("SB"),
@@ -36,40 +41,63 @@ def getBattingStats(teamId, year):
                 func.sum(Batting.b_AB)
             ).label("SLG"),
             (
-                ((0.69 * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
-                (0.72 * func.sum(Batting.b_HBP)) +
-                (0.888 * ((func.sum(Batting.b_H) - (func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
-                (1.271 * func.sum(Batting.b_2B)) +
-                (1.616 * func.sum(Batting.b_3B)) +
-                (2.101 * func.sum(Batting.b_HR)))/
+                ((Season.s_wBB * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
+                (Season.s_wHBP * func.sum(Batting.b_HBP)) +
+                (Season.s_w1B  * ((func.sum(Batting.b_H) - (func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
+                (Season.s_w2B  * func.sum(Batting.b_2B)) +
+                (Season.s_w3B  * func.sum(Batting.b_3B)) +
+                (Season.s_wHR  * func.sum(Batting.b_HR)))/
                 (func.sum(Batting.b_AB) +
                 func.sum(Batting.b_BB) -
                 func.sum(Batting.b_IBB) +
                 func.sum(Batting.b_SF) +
                 func.sum(Batting.b_HBP))
             ).label("wOBA"),
-            # func.sum().label("wRC+"),  # Unsure
-            # func.sum().label("BsR"),  # Unsure
-            # func.sum().label("Off"),  # Unsure
-            # func.sum().label("Def"),  # Unsure
-            (
-                # Seriously stumped on how to calculate this value
+            ( #BsR = wSB=((SB*runSB)+(CS*runCS))-(lgwSB*(1B+BB+HBP-IBB))
                 (
-                    (Batting.b_R) +
-                    #Base Running-Runs
-                    ((Batting.b_SB*Season.s_runSB+
-                     Batting.b_CS*Season.s_runCS-
-                      (Season.s_runSB * (Batting.b_BB +Batting.b_HBP + Batting.b_IBB)))+
-                     (Batting.b_GIDP))+
-                    func.sum(Batting.b_2B)+ # Helps get close to target value
-                    func.sum(Batting.b_3B)+ # Helps get close to target value
-                    (Batting.b_BB)
+                    (func.sum(Batting.b_SB) * Season.s_runSB)
+                    + 
+                    (func.sum(Batting.b_CS) * Season.s_runCS)
+                ) 
+                -
+                (
+                    (# lgwSB=((lgSB*runSB)+(lgCS*runCS))/(lg1B+lgBB+lgHBP+lgIBB)
+                        (
+                            (Season.s_SB * Season.s_runSB) + 
+                            (Season.s_CS * Season.s_runCS)
+                        )
+                        /
+                        (
+                            Season.s_1B + Season.s_BB + Season.s_HBP - Season.s_IBB
+                        )
+                    )
+                    *
+                    (
+                        (func.sum(Batting.b_H) - (func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))) #1B
+                        +
+                        func.sum(Batting.b_BB)
+                        +
+                        func.sum(Batting.b_HBP)
+                        -
+                        func.sum(Batting.b_IBB)
+                    )
                 )
-                /(9*Season.s_R_W*1.5+3) # Generic formula for RPW
-            ).label("WAR")  # Unsure
-
+            ).label("BsR"),
+            war.label("WAR"),
+            
+        )       
+        .join(grouped_fielding,and_(
+            Batting.playerID == grouped_fielding.c.playerID,
+            Batting.yearID == grouped_fielding.c.yearID,
+            Batting.teamID == grouped_fielding.c.teamID,
+            Batting.stint == grouped_fielding.c.stint
+        
+        ))
+        .filter(
+            Batting.yearID == year,
+            Batting.teamID == teamId,
+            Season.yearID == year
         )
-        .filter(Batting.yearID == year, Batting.teamID == teamId, Season.yearID == year)
         .group_by(Batting.playerID)
         .subquery()
     )
@@ -90,14 +118,11 @@ def getBattingStats(teamId, year):
             subquery.c["OBP"],
             subquery.c["SLG"],
             subquery.c["wOBA"],
-            # subquery.c["wRC+"],
-            # subquery.c["BsR"],
-            # subquery.c["Off"],
-            # subquery.c["Def"],
-            subquery.c["WAR"]
+            subquery.c["BsR"],
+            subquery.c["WAR"],
         )
         .join(People, People.playerID == subquery.c.player_id)
-        .order_by(subquery.c.PA.desc())
+        .order_by(subquery.c.WAR.desc())
         .all()
     )
 
@@ -118,10 +143,7 @@ def getBattingStats(teamId, year):
             "OBP": result.OBP or 0,
             "SLG": result.SLG or 0,
             "wOBA": result.wOBA or 0,
-            # "wRC+": result["wRC+"],
-            # "BsR": result["BsR"],
-            # "Off": result["Off"],
-            # "Def": result["Def"],
+            "BsR": result.BsR or 0,
             "WAR": result.WAR,
         }
         batting_data[result.player_id] = player_data
