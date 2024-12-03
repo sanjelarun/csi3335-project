@@ -186,8 +186,14 @@
             </thead>
             <tbody>
                 {% for player_id, batter in batting_stats.items() %}
+                {% if batter.PA > 0 %}
                 <tr>
-                    <td> {{ batter.full_name }}</td>
+                    <td>
+                        <a href={{"https://www.baseball-reference.com/players/{}/{}.shtml".format(player_id[0],player_id)}}
+                            target="_blank">
+                            {{batter.full_name }}
+                        </a>
+                    </td>
                     <td> {{ batter.PA }}</td>
                     <td> {{ '%0.3f'| format(batter.AVG) }}</td>
                     <td> {{ '%0.3f'| format(batter.OBP) }}</td>
@@ -201,6 +207,7 @@
                     </td>
                     <!-- TODO Bat, Fld, BsR, WAR -->
                 </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
@@ -226,7 +233,12 @@
 
                 {% for player_id,pitcher in pitching_stats.items() %}
                 <tr>
-                    <td> {{ pitcher.full_name }} </td>
+                    <td>
+                        <a href={{"https://www.baseball-reference.com/players/{}/{}.shtml".format(player_id[0],player_id)}}
+                            target="_blank">
+                            {{pitcher.full_name }}
+                        </a>
+                    </td>
                     <td> {{ '%0.1f'| format(pitcher.IP) }} </td>
                     <td> {{ '%0.1f'| format(pitcher.K9) }} </td>
                     <td> {{ '%0.1f'| format(pitcher.BB9) }} </td>
