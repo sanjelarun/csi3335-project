@@ -39,8 +39,8 @@
         <th class="immaculate-table-left">{{ questions[i + 3] }}</th> <!-- Display question values for rows -->
         {% for j in range(3) %}
         <td>{{ solution[i * 3 + j].nameFirst }}
-            {{ solution[i * 3 + j].nameLast }}
-            {{ solution[i * 3 + j].[2] }}</td> <!-- Display corresponding solution -->
+            {{ solution[i * 3 + j].nameLast }},
+            {{ solution[i * 3 + j].2 }}</td> <!-- Display corresponding solution -->
         {% endfor %}
     </tr>
     {% endfor %}
