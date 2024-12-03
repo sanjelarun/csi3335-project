@@ -443,8 +443,6 @@ def solveGrid(questions):
     rowQueries = [] # Same as above, but for every question on the side of the grid, the row questions.
    
     teamList = getAllTeams() # Just all the team names in the database
-    #print("Team List:", teamList)  # Debug team mapping
-
     for index, currentQuestion in enumerate(questions):
 
         if currentQuestion in teamList: # If the player needs to be a part of a particular team
@@ -561,11 +559,6 @@ def solveGrid(questions):
 
             rowSubquery = rowQuery.subquery()  # Convert rowQuery to subquery
             colSubquery = colQuery.subquery()  # Convert colQuery to subquery
-
-            print("---------")
-            print(rowSubquery)
-            print(colSubquery)
-            print("-----------")
 
             combined = (
                 db.session.query(Batting.playerID,Batting.yearID)
