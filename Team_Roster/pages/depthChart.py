@@ -13,8 +13,10 @@ def getTeam(teamId,year):
     return team
 
 def getSelectedStats(teamId,year,stat):
+    grouped_fielding= get_grouped_fielding()
+    war = get_war(grouped_fielding)
     positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P']
-    all_stats = {'percentage': {}, 'PA': {}, 'wOBA': {}}
+    all_stats = {'percentage': {}, 'PA': {}, 'wOBA': {}, 'WAR': {}}
     for position in positions:
         percentage_query = (
             db.session.query(
@@ -115,6 +117,35 @@ def getSelectedStats(teamId,year,stat):
             .limit(6)
         )
         all_stats['wOBA'][position] = [row._asdict() for row in woba_query.all()]
+
+        war_query = (
+            db.session.query(
+                People.nameFirst,
+                People.nameLast,
+                Fielding.position,
+                war.label('stat_value')
+            )
+            .join(Fielding, People.playerID == Fielding.playerID)
+            .join(Batting, Batting.playerID == Fielding.playerID)
+            .join(grouped_fielding, and_(
+                Batting.playerID == grouped_fielding.c.playerID,
+                Batting.yearID == grouped_fielding.c.yearID,
+                Batting.teamID == grouped_fielding.c.teamID,
+                Batting.stint == grouped_fielding.c.stint
+            ))
+            .filter(
+                Fielding.teamID == teamId,
+                Fielding.yearID == year,
+                Fielding.position == position,
+                Fielding.yearID == Batting.yearID,
+                Fielding.teamID == Batting.teamID
+            )
+            .group_by(Fielding.playerID, Fielding.position)
+            .order_by(war.desc())
+            .limit(6)
+        )
+        all_stats['WAR'][position] = [row._asdict() for row in war_query.all()]
+
 
         
     return all_stats.get(stat, {})
