@@ -6,9 +6,10 @@
 <form method="GET" action="/{{ teamId }}/depthChart">
     <label for="stat">Select Stat: </label>
     <select name="stat" id="stat" onchange="this.form.submit()">
-        <option value="percentage" {% if stat == 'percentage' %}selected{% endif %}>Playing Time</option> <!--Change to Playing Time-->
-        <option value="PA" {% if stat == 'PA' %}selected{% endif %}>Plate Appearances</option>
-        <option value="wOBA" {% if stat == 'wOBA' %}selected{% endif %}>wOBA</option>
+        <option value="percentage" {% if stat=='percentage' %}selected{% endif %}>Playing Time</option>
+        <!--Change to Playing Time-->
+        <option value="PA" {% if stat=='PA' %}selected{% endif %}>Plate Appearances</option>
+        <option value="wOBA" {% if stat=='wOBA' %}selected{% endif %}>wOBA</option>
     </select>
     <input type="hidden" name="year" value="{{ year }}">
 </form>
@@ -24,19 +25,19 @@
                 <div id="in-field-grass" class="mowed-grass"></div>
                 <div id="batting-circle"></div>
                 <div id="first-base" class="base">
-                <div class="pulse"></div>
-                <div class="action-area"></div>
+                    <div class="pulse"></div>
+                    <div class="action-area"></div>
                 </div>
                 <div id="second-base" class="base">
-                <div class="pulse"></div>
-                <div class="action-area"></div>
+                    <div class="pulse"></div>
+                    <div class="action-area"></div>
                 </div>
                 <div id="thrid-base" class="base">
-                <div class="pulse"></div>
-                <div class="action-area"></div>
+                    <div class="pulse"></div>
+                    <div class="action-area"></div>
                 </div>
                 <div id="home-plate">
-                <div class="action-area"></div>
+                    <div class="action-area"></div>
                 </div>
                 <div class="home-plate-pulse pulse"></div>
                 <div id="base-lines"></div>
@@ -49,7 +50,7 @@
                 <div id="batters-box-left" class="batters-box"></div>
                 <div id="first-base-thing"></div>
             </div>
-        
+
             <div id="player-boxes">
                 <div id="box-pitcher" class="player-box">
                     <div class="position-header">
@@ -166,73 +167,78 @@
 
 
 <h2>Depth Chart Tables</h2>
+<div style="display:flex; flex-direction: row; justify-content: center;">
+    <div style="margin-right: 5%;">
+        <h3>Batting</h3>
 
-<h3>Batting</h3>
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>PA</th>
+                    <th>AVG</th>
+                    <th>OBP</th>
+                    <th>SLG</th>
+                    <th>wOBA</th>
+                    <th>BsR</th>
+                    <th>WAR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player_id, batter in batting_stats.items() %}
+                <tr>
+                    <td> {{ batter.full_name }}</td>
+                    <td> {{ batter.PA }}</td>
+                    <td> {{ '%0.3f'| format(batter.AVG) }}</td>
+                    <td> {{ '%0.3f'| format(batter.OBP) }}</td>
+                    <td> {{ '%0.3f'| format(batter.SLG) }}</td>
+                    <td> {{ '%0.3f'| format(batter.wOBA)}}</td>
+                    <td> {{ '%0.3f'| format(batter.BsR)}}</td>
+                    <td>
+                        {% if batter["WAR"] %}
+                        {{ '%0.1f'| format(batter["WAR"]) }}
+                        {% endif %}
+                    </td>
+                    <!-- TODO Bat, Fld, BsR, WAR -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-<table class="stats-table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>PA</th>
-            <th>AVG</th>
-            <th>OBP</th>
-            <th>SLG</th>
-            <th>wOBA</th>
-        <!--<th>Bat</th>-->
-        <!--<th>Fld</th>-->
-        <!--<th>BsR</th>-->
-            <th>WAR</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for player_id, batter in batting_stats.items() %}
-        <tr>
-            <td> {{ batter.full_name }}</td>
-            <td> {{ batter.PA }}</td>
-            <td> {{ '%0.3f'| format(batter.AVG) }}</td>
-            <td> {{ '%0.3f'| format(batter.OBP) }}</td>
-            <td> {{ '%0.3f'| format(batter.SLG) }}</td>
-            <td> {{ '%0.3f'| format(batter.wOBA)}}</td>
-            <td> {{ '%0.1f'| format(batter.WAR)}}</td>
-            <!-- TODO Bat, Fld, BsR, WAR -->
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <div>
+        <h3>Pitching</h3>
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th> Name </th>
+                    <th> IP </th>
+                    <th> K/9 </th>
+                    <th> BB/9 </th>
+                    <th> HR/9 </th>
+                    <th> BABIP </th>
+                    <th> LOB% </th>
+                    <th> ERA </th>
+                    <th> FIP </th>
+                </tr>
+            </thead>
+            <tbody>
 
-<h3>Pitching</h3>
-
-
-<table class="stats-table">
-    <thead>
-        <tr>
-            <th> Name </th>
-            <th> IP </th>
-            <th> K/9 </th>
-            <th> BB/9 </th>
-            <th> HR/9 </th>
-            <th> BABIP </th>
-            <th> LOB% </th>
-            <th> ERA </th>
-            <th> FIP </th>
-        </tr>
-    </thead>
-    <tbody>
-
-        {% for player_id,pitcher in pitching_stats.items() %}
-        <tr>
-            <td> {{ pitcher.full_name }} </td>
-            <td> {{ '%0.1f'| format(pitcher.IP) }} </td>
-            <td> {{ '%0.1f'| format(pitcher.K9) }} </td>
-            <td> {{ '%0.1f'| format(pitcher.BB9) }} </td>
-            <td> {{ '%0.1f'| format(pitcher.HR9) }} </td>
-            <td> {{ '%0.3f'| format(pitcher.BABIP) }} </td>
-            <td> {{ '%0.1f'| format(pitcher.LOB * 100) }}% </td>
-            <td> {{ '%0.2f'| format(pitcher.ERA) }} </td>
-            <td> {{ '%0.2f'| format(pitcher.FIP) }} </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<p>* IP was approximated using IPOuts / 3</p>
+                {% for player_id,pitcher in pitching_stats.items() %}
+                <tr>
+                    <td> {{ pitcher.full_name }} </td>
+                    <td> {{ '%0.1f'| format(pitcher.IP) }} </td>
+                    <td> {{ '%0.1f'| format(pitcher.K9) }} </td>
+                    <td> {{ '%0.1f'| format(pitcher.BB9) }} </td>
+                    <td> {{ '%0.1f'| format(pitcher.HR9) }} </td>
+                    <td> {{ '%0.3f'| format(pitcher.BABIP) }} </td>
+                    <td> {{ '%0.1f'| format(pitcher.LOB * 100) }}% </td>
+                    <td> {{ '%0.2f'| format(pitcher.ERA) }} </td>
+                    <td> {{ '%0.2f'| format(pitcher.FIP) }} </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
