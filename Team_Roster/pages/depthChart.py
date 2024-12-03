@@ -25,34 +25,51 @@ def getSelectedStats(teamId,year,stat):
                  func.sum(Fielding.f_InnOuts).over(partition_by=Fielding.position) * 100).label('stat_value')
             )
             .join(Fielding, People.playerID == Fielding.playerID)
+            .join(Batting, Batting.playerID == Fielding.playerID)
             .filter(
                 Fielding.teamID == teamId,
                 Fielding.yearID == year,
-                Fielding.position == position
+                Fielding.position == position,
+                Fielding.teamID == Batting.teamID,
+                Fielding.yearID == Batting.yearID
             )
             .group_by(People.playerID, Fielding.position)
-            .order_by(func.sum(Fielding.f_InnOuts).desc())
+            .order_by((func.sum(Fielding.f_InnOuts) /
+                 func.sum(Fielding.f_InnOuts).over(partition_by=Fielding.position) * 100).desc())
             .limit(6)
         )
         all_stats['percentage'][position] = [row._asdict() for row in percentage_query.all()]
 
-            # Query for Plate Appearances (PA) -- Every player is in batting but not necessarily in pitching. Use to determine PA better?
         pa_query = (
             db.session.query(
                 People.nameFirst,
                 People.nameLast,
                 Fielding.position,
-                func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH).label('stat_value')
+                (
+                    func.sum(Batting.b_AB) + 
+                    func.sum(Batting.b_BB) + 
+                    func.sum(Batting.b_HBP) + 
+                    func.sum(Batting.b_SF) + 
+                    func.sum(Batting.b_SH)
+                ).label('stat_value')
             )
             .join(Fielding, People.playerID == Fielding.playerID)
             .join(Batting, Batting.playerID == Fielding.playerID)
             .filter(
                 Fielding.teamID == teamId,
                 Fielding.yearID == year,
-                Fielding.position == position
+                Fielding.position == position,
+                Fielding.teamID == Batting.teamID,
+                Fielding.yearID == Batting.yearID
             )
             .group_by(Fielding.playerID, Fielding.position)
-            .order_by(func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH).desc())
+            .order_by((
+                    func.sum(Batting.b_AB) + 
+                    func.sum(Batting.b_BB) + 
+                    func.sum(Batting.b_HBP) + 
+                    func.sum(Batting.b_SF) + 
+                    func.sum(Batting.b_SH)
+                ).desc())
             .limit(6)
         )
         all_stats['PA'][position] = [row._asdict() for row in pa_query.all()]
@@ -77,7 +94,9 @@ def getSelectedStats(teamId,year,stat):
             .filter(
                 Fielding.teamID == teamId,
                 Fielding.yearID == year,
-                Fielding.position == position
+                Fielding.position == position,
+                Fielding.yearID == Batting.yearID,
+                Fielding.teamID == Batting.teamID
             )
             .group_by(Fielding.playerID, Fielding.position)
             .order_by((
