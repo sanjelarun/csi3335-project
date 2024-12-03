@@ -7,15 +7,15 @@ def ShowImmaculateGrid():
     form = ImmaculateGridInput()
     url= ""
     questions = None
-    solutionNames = None
+    solution = None
 
     if form.validate_on_submit():
         url = form.url.data
         questions = scrapeImmaculateGridQuestions(url)
-        solutionNames = solveGrid(questions)
+        solution = solveGrid(questions)
 
         print("URL:", url)
         print("Questions:", questions)
-        ("Solution Names:", solutionNames)
+        ("Solution:", solution)
     
-    return render_template('immaculateGrid.html', title='Immaculate Grid Solver', form=form, url = url,questions = questions, solutionNames = solutionNames)
+    return render_template('immaculateGrid.html', title='Immaculate Grid Solver', form=form, url = url,questions = questions, solution = solution)
