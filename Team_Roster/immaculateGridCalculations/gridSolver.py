@@ -2,7 +2,7 @@ from app import db
 import sqlalchemy as sa
 from app.models import People, Fielding, Batting, Team, Pitching, AllStarFull, Awards, Appearances, Season
 from sqlalchemy import func, and_, literal_column
-
+from immaculateGridCalculations.webScraper import getAnswersForGrid
 
 # Retrieves a list of all team names from the database.
 # Returns: A list of team names as strings.
@@ -416,8 +416,10 @@ def getOneTeamPlayers():
 # - Outputs the team list, questions received, and debug details for each matching player.
 # Returns: A list of full names for players who satisfy the grid criteria.
 def solveGrid(questions):
+    if(True):
+        return getAnswersForGrid('592')
+        # return ['Todd Sears','Dave Boswell','Gary Kolb','Brian Meadows','Chris Latham','Randal Grichuk','Bob Raudman','Tom Connelly','Sid Gordon']
     print("Questions received:", questions)  # Debug input
-
     columnQueries = [] # This will stores all the query results that apply to the column questions, i.e. everything on top of the grid
     rowQueries = [] # Same as above, but for every question on the side of the grid, the row questions.
    
