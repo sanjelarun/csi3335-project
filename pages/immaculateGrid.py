@@ -415,26 +415,6 @@ def getPlayerHallOfFame():
         )
     )
 
-# All players that threw a no-hitter
-# Parameters:
-# N/A
-# Notes:
-def getPlayerNoHitter():
-    return (
-        db.session.query(
-            Pitching.playerID.label("playerID"),
-            Pitching.teamID.label("teamID")
-        )
-        .group_by(
-            Pitching.playerID,
-            Pitching.teamID
-        )
-        .filter(
-            Pitching.p_H == 0,
-            Pitching.p_IPOuts == 27
-        )
-    )
-
 # Solves the "immaculate grid" by processing queries for players matching specific criteria.
 # Parameters:
 # - questions (list[str]): A list of questions for the grid.
