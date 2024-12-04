@@ -1,46 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Active Users</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <div style="
-            display: flex;
-            justify-content: space-evenly;
-            align-items: center;
-            color: white;
-            background-color: #041E42;
-            margin: -10px;
-            height: 100px;
-            ">
-            <h3>Immaculate Party Time MLB Player Roster</h3>
-            {% if current_user.is_anonymous %}
-            <button onclick="window.location.href='/login'">Login</button>
-            {% else %}
-                <button onclick="window.location.href='/findTeam'">Find Your Team</button>
-                {% if current_user.is_admin %}
-                    <button onclick="window.location.href='/index'">View Users</button>
-                {% endif %}
-            <button onclick="window.location.href='/logout'">Logout</button>
-            {% endif %}
-            <image src="{{ url_for('static', filename='images/mlb.png') }}" style="width: 150px;border-radius: 5%;"></image>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Users</h1>
+<div>
+    {% for status, label in [(True, "Activated Users"), (False, "Deactivated Users")] %}
+        <h2>{{ label }}</h2>
+        <div class="user-list">
+            {% for user in users if user.u_ACTIVE == status and user.u_ADMIN == false %}
+                <div class="user-box">
+                    <p><strong>ID:</strong> {{ user.user_ID }}</p>
+                    <p><strong>Username:</strong> {{ user.u_USER }}</p>
+                    <p><strong>Email:</strong> {{ user.u_EMAIL }}</p>
+                    <form action="{{ url_for('main.toggle_user', user_id=user.user_ID) }}" method="POST" style="margin-top: 10px;">
+                        <button type="submit">
+                            {{ "Deactivate" if user.u_ACTIVE else "Activate" }}
+                        </button>
+                    </form>
+                </div>
+            {% endfor %}
         </div>
-    <h1>Active Users</h1>
-    <ul>
-        {% for user in users %}
-        <li>
-            ID: {{ user.id }}, Username: {{ user.username }}, Email: {{ user.email }}
-            <form action="{{ url_for('toggle_user', user_id=user.id) }}" method="POST" style="display:inline;">
-                <button type="submit">
-                    {{ 'Deactivate' if user.is_active else 'Activate' }}
-                </button>
-            </form>
-        </li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+    {% endfor %}
+</div>
+{% endblock %}

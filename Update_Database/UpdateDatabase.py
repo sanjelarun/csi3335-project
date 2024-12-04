@@ -27,6 +27,8 @@ from UpdateScripts.AwardsShareManagers import updateAwardsShareManagers
 from UpdateScripts.Salaries import updateSalaries
 from UpdateScripts.CollegePlaying import updateCollegePlaying
 from UpdateScripts.Seasons import createSeasons
+from UpdateScripts.Users import createUsers
+from UpdateScripts.Queries import createQueries
 
 import csi3335f2024 as cfg
 
@@ -73,6 +75,9 @@ try:
     updateCollegePlaying(cur)
 
     createSeasons(cur)
+
+    createUsers(cur)
+    createQueries(cur)
 
 except Exception:
     con.rollback()

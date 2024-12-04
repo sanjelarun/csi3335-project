@@ -1,34 +1,46 @@
 from sqlalchemy import CHAR, Column, Date, Double, Integer, SmallInteger, String, Float, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from werkzeug.security import generate_password_hash, check_password_hash
+from app import db
+from sqlalchemy.orm import Mapped, mapped_column
 from flask_login import UserMixin
-from app import db, login
-import sqlalchemy as sa
-import sqlalchemy.orm as so
+from werkzeug.security import generate_password_hash, check_password_hash
 from typing import Optional
+import sqlalchemy as sa
 
 Base = declarative_base()
 
-class User(UserMixin,db.Model):
-    id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    username: so.Mapped[str] = so.mapped_column(sa.String(64),index=True,unique=True)
-    email: so.Mapped[str] = so.mapped_column(sa.String(120),index=True,unique=True)
-    password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
-    is_admin = db.Column(db.Boolean, default=False)
-    is_active = db.Column(db.Boolean, default=True)
+class Users(UserMixin, db.Model):
+    __tablename__ = 'users'
 
-    def __repr__(self):
-        return '<User {}>'.format(self.username)
+    user_ID: Mapped[int] = mapped_column(primary_key=True)
+    u_USER: Mapped[str] = mapped_column(sa.String(64), index=True, unique=True)
+    u_EMAIL: Mapped[str] = mapped_column(sa.String(64), index=True, unique=True)
+    u_PASSHASH: Mapped[Optional[str]] = mapped_column(sa.String(255))
+    u_ADMIN = db.Column(db.Boolean, default=False)
+    u_ACTIVE = db.Column(db.Boolean, default=True)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.u_PASSHASH = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.u_PASSHASH, password)
 
-@login.user_loader
-def load_user(id):
-    return db.session.get(User, int(id))
+    def get_id(self):
+        return str(self.user_ID)
+
+    @property
+    def is_active(self):
+        return self.u_ACTIVE
+
+class Queries(Base):
+    __tablename__ = 'queries'
+
+    query_ID = Column(Integer, primary_key=True, autoincrement=True)
+    user_ID = Column(Integer, nullable=False)
+    q_TEAMID = Column(String(3), nullable=True)
+    q_YEAR = Column(SmallInteger, nullable=True)
+    q_QUESTIONS = Column(String(255), nullable=True)
+    q_SOLUTIONS = Column(String(255), nullable=True)
 
 class Team(Base):
     __tablename__ = 'teams'
@@ -252,7 +264,6 @@ class Season(Base):
     def __repr__(self):
         return f"<Season {self.yearID})>"
 
-
 class AllStarFull(Base):
     __tablename__ = 'allstarfull'
 
@@ -301,6 +312,7 @@ class Awards(Base):
     lgID = Column(CHAR(2), ForeignKey("leagues.lgID"), nullable=False)
     tie = Column(String(1), nullable=True)
     notes = Column(String(100), nullable=True)
+
 
     def __repr__(self):
         return (

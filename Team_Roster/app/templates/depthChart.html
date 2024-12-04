@@ -6,103 +6,51 @@
 <form method="GET" action="/{{ teamId }}/depthChart">
     <label for="stat">Select Stat: </label>
     <select name="stat" id="stat" onchange="this.form.submit()">
-        <option value="percentage" {% if stat == 'percentage' %}selected{% endif %}>Playing Time</option> <!--Change to Playing Time-->
+        <option value="percentage" {% if stat == 'percentage' %}selected{% endif %}>Playing Time</option>
         <option value="PA" {% if stat == 'PA' %}selected{% endif %}>Plate Appearances</option>
         <option value="wOBA" {% if stat == 'wOBA' %}selected{% endif %}>wOBA</option>
     </select>
     <input type="hidden" name="year" value="{{ year }}">
 </form>
-
 <body>
     <main>
         <div id="stadium-wrapper">
             <div id="stadium">
-                <div id="field" class="mowed-grass">
-                </div>
+                <div id="field" class="mowed-grass"></div>
                 <div id="pitching-box" class="pitching-box">Pitcher Info</div>
-                <div id="in-field"></div>
-                <div id="in-field-grass" class="mowed-grass"></div>
-                <div id="batting-circle"></div>
-                <div id="first-base" class="base">
-                <div class="pulse"></div>
-                <div class="action-area"></div>
-                </div>
-                <div id="second-base" class="base">
-                <div class="pulse"></div>
-                <div class="action-area"></div>
-                </div>
-                <div id="thrid-base" class="base">
-                <div class="pulse"></div>
-                <div class="action-area"></div>
-                </div>
-                <div id="home-plate">
-                <div class="action-area"></div>
-                </div>
-                <div class="home-plate-pulse pulse"></div>
-                <div id="base-lines"></div>
-                <div id="pitchers-mound"></div>
-                <div id="pitchers-plate"></div>
-                <div id="first-circle" class="half-circle"></div>
-                <div id="second-circle" class="half-circle"></div>
-                <div id="third-circle" class="half-circle"></div>
-                <div id="batters-box-right" class="batters-box"></div>
-                <div id="batters-box-left" class="batters-box"></div>
-                <div id="first-base-thing"></div>
+                <div id="first-base" class="base"></div>
+                <div id="second-base" class="base"></div>
+                <div id="third-base" class="base"></div>
+                <div id="home-plate"></div>
+                <!-- Additional Field Elements Here -->
             </div>
-        
+
             <div id="player-boxes">
-                <div id="box-pitcher" class="player-box">
+                {% for position, players in positions_stats.items() %}
+                <div class="player-box" id="box-{{ position|lower }}">
                     <div class="position-header">
-                        <span class="position-label">P</span>
+                        <span class="position-label">{{ position }}</span>
                     </div>
+                    <ul>
+                        {% for player in players %}
+                        <li>
+                            {{ player.nameFirst }} {{ player.nameLast }} -
+                            {% if stat == 'percentage' %}
+                                {{ '%0.1f'|format(player.stat_value) }}%
+                            {% elif stat == 'wOBA' %}
+                                {{ '%0.3f'|format(player.stat_value) }}
+                            {% else %}
+                                {{ player.stat_value }}
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
-                <div id="box-catcher" class="player-box">
-                    <div class="position-header">
-                        <span class="position-label">C</span>
-                    </div>
-                </div>
-                <div id="box-firstbase" class="player-box">
-                    <div class="position-header">
-                        <span class="position-label">1B</span>
-                    </div>
-                </div>
-                <div id="box-secondbase" class="player-box">
-                    <div class="position-header">
-                        <span class="position-label">2B</span>
-                    </div>
-                </div>
-                <div id="box-thirdbase" class="player-box">
-                    <div class="position-header">
-                        <span class="position-label">3B</span>
-                    </div>
-                </div>
-                <div id="box-shortstop" class="player-box">
-                    <div class="position-header">
-                        <span class="position-label">SS</span>
-                    </div>
-                </div>
-                <div id="box-leftfield" class="player-box">
-                    <div class="position-header">
-                        <span class="position-label">LF</span>
-                    </div>
-                </div>
-                <div id="box-centerfield" class="player-box">
-                    <div class="position-header">
-                        <span class="position-label">CF</span>
-                    </div>
-                </div>
-                <div id="box-rightfield" class="player-box">
-                    <div class="position-header">
-                        <span class="position-label">RF</span>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
-
     </main>
-
 </body>
-
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const positionsData = JSON.parse('{{ positions_stats|tojson }}');
@@ -162,41 +110,34 @@
         }
     }
 </script>
-
-
-
 <h2>Depth Chart Tables</h2>
-
 <h3>Pitching</h3>
-
-
 <table class="stats-table">
     <thead>
         <tr>
-            <th> Name </th>
-            <th> IP </th>
-            <th> K/9 </th>
-            <th> BB/9 </th>
-            <th> HR/9 </th>
-            <th> BABIP </th>
-            <th> LOB% </th>
-            <th> ERA </th>
-            <th> FIP </th>
+            <th>Name</th>
+            <th>IP</th>
+            <th>K/9</th>
+            <th>BB/9</th>
+            <th>HR/9</th>
+            <th>BABIP</th>
+            <th>LOB%</th>
+            <th>ERA</th>
+            <th>FIP</th>
         </tr>
     </thead>
     <tbody>
-
-        {% for player_id,pitcher in pitching_stats.items() %}
+        {% for player_id, pitcher in pitching_stats.items() %}
         <tr>
-            <td> {{ pitcher.full_name }} </td>
-            <td> {{ '%0.1f'| format(pitcher.IP) }} </td>
-            <td> {{ '%0.1f'| format(pitcher.K9) }} </td>
-            <td> {{ '%0.1f'| format(pitcher.BB9) }} </td>
-            <td> {{ '%0.1f'| format(pitcher.HR9) }} </td>
-            <td> {{ '%0.3f'| format(pitcher.BABIP) }} </td>
-            <td> {{ '%0.1f'| format(pitcher.LOB * 100) }}% </td>
-            <td> {{ '%0.2f'| format(pitcher.ERA) }} </td>
-            <td> {{ '%0.2f'| format(pitcher.FIP) }} </td>
+            <td>{{ pitcher.full_name }}</td>
+            <td>{{ '%0.1f'|format(pitcher.IP) }}</td>
+            <td>{{ '%0.1f'|format(pitcher.K9) }}</td>
+            <td>{{ '%0.1f'|format(pitcher.BB9) }}</td>
+            <td>{{ '%0.1f'|format(pitcher.HR9) }}</td>
+            <td>{{ '%0.3f'|format(pitcher.BABIP) }}</td>
+            <td>{{ '%0.1f'|format(pitcher.LOB * 100) }}%</td>
+            <td>{{ '%0.2f'|format(pitcher.ERA) }}</td>
+            <td>{{ '%0.2f'|format(pitcher.FIP) }}</td>
         </tr>
         {% endfor %}
     </tbody>

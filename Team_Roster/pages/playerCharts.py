@@ -1,7 +1,39 @@
-from app import db
-import sqlalchemy as sa
-from app.models import Batting, People, Team, Pitching, Season, Fielding
+from flask import render_template, request, jsonify, redirect
 from sqlalchemy import func, and_
+from flask_login import current_user
+import sqlalchemy as sa
+
+from app.models import Batting, People, Team, Pitching, Season, Fielding, Queries
+from app.forms import FindTeam
+from app import db
+
+def getDepthChart(teamId):
+    year = request.args.get("year")
+    team = getTeam(teamId, year)
+    stat = request.args.get('stat', 'percentage')
+
+    return render_template('depthChart.html',
+                           title="Depth Chart - {} {}".format(year, team.team_name),
+                           positions_stats=getSelectedStats(teamId, year, stat),
+                           pitching_stats=getPitchingStats(teamId, year),
+                           stat=stat,
+                           team=team,
+                           teamId=teamId,
+                           year=year)
+
+def getRoster(teamId):
+    year = request.args.get("year")
+    team = getTeam(teamId, year)
+
+    return render_template(
+        'roster.html',
+        title="Roster - {} {}".format(year, team.team_name),
+        teamId=teamId,
+        team=team,
+        year=year,
+        pitching_data=getPitchingStats(teamId, year),
+        batting_data=getBattingStats(teamId, year)
+    )
 
 def getBattingStats(teamId, year):
     subquery = (
@@ -110,7 +142,6 @@ def getPitchingStats(teamId, year):
     subquery = (
         db.session.query(
             Pitching.playerID.label("player_id"),
-
             (
                     func.sum(Pitching.p_IPOuts) / 3
             ).label("IP"),
@@ -223,63 +254,69 @@ def getPitchingStats(teamId, year):
 
     return pitching_data
 
+def getTeams(year_id):
+    teams = db.session.scalars(
+        sa.select(Team).where(Team.yearID == year_id)
+    )
+    team_list = [(team.teamID, team.team_name) for team in teams]
+    return jsonify(team_list)
+
 def getTeam(teamId,year):
     team = db.session.scalar(
         sa.select(Team).where(and_(Team.teamID==teamId, Team.yearID == year))
     )
     return team
 
+def getShowFindTeam():
+    form = FindTeam()
+    form.year.choices = [("", "")]
+    form.team.choices = [("", "First select a year...")]
+
+    years = db.session.scalars(
+        sa.select(Team.yearID).distinct().order_by(Team.yearID.desc()))
+
+    for year in years:
+        form.year.choices.append((year, year))
+
+    if form.validate_on_submit():
+        query = Queries(user_ID=current_user.user_ID, q_TEAMID=form.team.data, q_YEAR=form.year.data)
+        db.session.add(query)
+        db.session.commit()
+        return redirect('/{}/roster?year={}'.format(form.team.data, form.year.data))
+
+    return render_template('findTeam.html', title='Find Team', form=form)
+
 def getSelectedStats(teamId, year, stat):
     positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P', 'OF']
     all_stats = {'percentage': {}, 'PA': {}, 'wOBA': {}}
-    for position in positions:
-        percentage_query = (
-            db.session.query(
-                People.nameFirst,
-                People.nameLast,
-                Fielding.position,
-                (func.sum(Fielding.f_InnOuts) /
-                 func.sum(Fielding.f_InnOuts).over(partition_by=Fielding.position) * 100).label('stat_value')
-            )
-            .join(Fielding, People.playerID == Fielding.playerID)
-            .filter(
-                Fielding.teamID == teamId,
-                Fielding.yearID == year,
-                Fielding.position == position
-            )
-            .group_by(People.playerID, Fielding.position)
-            .order_by(func.sum(Fielding.f_InnOuts).desc())
-            .limit(6)
-        )
-        all_stats['percentage'][position] = percentage_query.all()
 
-        # Query for Plate Appearances (PA)
-        pa_query = (
-            db.session.query(
-                People.nameFirst,
-                People.nameLast,
-                Fielding.position,
-                func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH).label('stat_value')
+    def execute_query(stat, position):
+        if stat == 'PA':
+            query = (
+                db.session.query(
+                    People.nameFirst,
+                    People.nameLast,
+                    Fielding.position,
+                    func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH).label('stat_value')
+                )
+                .join(Fielding, People.playerID == Fielding.playerID)
+                .join(Batting, Batting.playerID == Fielding.playerID)
+                .filter(
+                    Fielding.teamID == teamId,
+                    Fielding.yearID == year,
+                    Fielding.position == position
+                )
+                .group_by(People.playerID, Fielding.position)
+                .order_by(func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH).desc())
+                .limit(6)
             )
-            .join(Fielding, People.playerID == Fielding.playerID)
-            .join(Batting, Batting.playerID == Fielding.playerID)
-            .filter(
-                Fielding.teamID == teamId,
-                Fielding.yearID == year,
-                Fielding.position == position
-            )
-            .group_by(Fielding.playerID, Fielding.position)
-            .order_by(func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH).desc())
-            .limit(6)
-        )
-        all_stats['PA'][position] = pa_query.all()
-
-        woba_query = (
-            db.session.query(
-                People.nameFirst,
-                People.nameLast,
-                Fielding.position,
-                (
+        elif stat == 'wOBA':
+            query = (
+                db.session.query(
+                    People.nameFirst,
+                    People.nameLast,
+                    Fielding.position,
+                    (
                         ((0.69 * func.sum(Batting.b_BB)) +
                          (0.72 * func.sum(Batting.b_HBP)) +
                          (0.888 * func.sum(Batting.b_H)) +
@@ -287,31 +324,65 @@ def getSelectedStats(teamId, year, stat):
                          (1.616 * func.sum(Batting.b_3B)) +
                          (2.101 * func.sum(Batting.b_HR))) /
                         func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH)
-                ).label("stat_value")
+                    ).label('stat_value')
+                )
+                .join(Fielding, People.playerID == Fielding.playerID)
+                .join(Batting, Batting.playerID == Fielding.playerID)
+                .filter(
+                    Fielding.teamID == teamId,
+                    Fielding.yearID == year,
+                    Fielding.position == position
+                )
+                .group_by(People.playerID, Fielding.position)
+                .order_by(
+                    ((0.69 * func.sum(Batting.b_BB)) +
+                     (0.72 * func.sum(Batting.b_HBP)) +
+                     (0.888 * func.sum(Batting.b_H)) +
+                     (1.271 * func.sum(Batting.b_2B)) +
+                     (1.616 * func.sum(Batting.b_3B)) +
+                     (2.101 * func.sum(Batting.b_HR)) /
+                     func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH)
+                     ).desc())
+                .limit(6)
             )
-            .join(Fielding, People.playerID == Fielding.playerID)
-            .join(Batting, Batting.playerID == Fielding.playerID)
-            .filter(
-                Fielding.teamID == teamId,
-                Fielding.yearID == year,
-                Fielding.position == position
+        elif stat == 'percentage':
+            query = (
+                db.session.query(
+                    People.nameFirst,
+                    People.nameLast,
+                    Fielding.position,
+                    (
+                        func.sum(Fielding.f_InnOuts) /
+                        func.nullif(func.sum(Fielding.f_InnOuts).over(partition_by=Fielding.position), 0) * 100
+                    ).label('stat_value')
+                )
+                .join(Fielding, People.playerID == Fielding.playerID)
+                .filter(
+                    Fielding.teamID == teamId,
+                    Fielding.yearID == year,
+                    Fielding.position == position
+                )
+                .group_by(People.playerID, Fielding.position)
+                .order_by(func.sum(Fielding.f_InnOuts).desc())
+                .limit(6)
             )
-            .group_by(Fielding.playerID, Fielding.position)
-            .order_by((
-                              (0.69 * func.sum(Batting.b_BB)) +
-                              (0.72 * func.sum(Batting.b_HBP)) +
-                              (0.888 * func.sum(Batting.b_H)) +
-                              (1.271 * func.sum(Batting.b_2B)) +
-                              (1.616 * func.sum(Batting.b_3B)) +
-                              (2.101 * func.sum(Batting.b_HR)) /
-                              func.sum(Batting.b_AB) +
-                              func.sum(Batting.b_BB) -
-                              func.sum(Batting.b_IBB) +
-                              func.sum(Batting.b_SF) +
-                              func.sum(Batting.b_HBP)
-                      ).desc())
-            .limit(6)
-        )
-        all_stats['wOBA'][position] = woba_query.all()
+        else:
+            raise ValueError(f"Invalid stat type: {stat}")
+
+        return query.all()
+
+    # Main loop: calculate stats for each position
+    for position in positions:
+        for stat_type in ['PA', 'wOBA', 'percentage']:
+            results = execute_query(stat_type, position)
+            # Serialize results into JSON-compatible format
+            all_stats[stat_type][position] = [
+                {
+                    "nameFirst": row.nameFirst,
+                    "nameLast": row.nameLast,
+                    "stat_value": float(row.stat_value) if row.stat_value is not None else None
+                }
+                for row in results
+            ]
 
     return all_stats.get(stat, {})
