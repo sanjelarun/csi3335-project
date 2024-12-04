@@ -1,24 +1,19 @@
-
-from sqlalchemy import CHAR, Column, Date, Double, Integer, SmallInteger, String, Float, ForeignKey
+from sqlalchemy import CHAR, Column, Date, Double, Integer, SmallInteger, String, Float, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from app import db
-from sqlalchemy.orm import Mapped, mapped_column
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from typing import Optional
-import sqlalchemy as sa
 
 Base = declarative_base()
 
-class Users(UserMixin, db.Model):
+class Users(Base, UserMixin):
     __tablename__ = 'users'
 
-    user_ID: Mapped[int] = mapped_column(primary_key=True)
-    u_USER: Mapped[str] = mapped_column(sa.String(64), index=True, unique=True)
-    u_EMAIL: Mapped[str] = mapped_column(sa.String(64), index=True, unique=True)
-    u_PASSHASH: Mapped[Optional[str]] = mapped_column(sa.String(255))
-    u_ADMIN = db.Column(db.Boolean, default=False)
-    u_ACTIVE = db.Column(db.Boolean, default=True)
+    user_ID = Column(Integer, primary_key=True, autoincrement=True)
+    u_USER = Column(String(3), nullable=True)
+    u_EMAIL = Column(String(3), nullable=True)
+    u_PASSHASH = Column(String(3), nullable=True)
+    u_ADMIN = Column(Boolean, nullable=True)
+    u_ACTIVE = Column(Boolean, nullable=True)
 
     def set_password(self, password):
         self.u_PASSHASH = generate_password_hash(password)
@@ -32,6 +27,13 @@ class Users(UserMixin, db.Model):
     @property
     def is_active(self):
         return self.u_ACTIVE
+
+    @property
+    def is_admin(self):
+        return self.u_ADMIN
+
+    def __repr__(self):
+        return f"<Users(user_ID={self.user_ID}, u_USER={self.u_USER}, u_EMAIL={self.u_EMAIL}, u_ADMIN={self.u_ADMIN})>"
 
 class Queries(Base):
     __tablename__ = 'queries'

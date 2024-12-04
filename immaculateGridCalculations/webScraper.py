@@ -42,5 +42,3 @@ def prepQuestionString(questionStr):
     # remove repeated spaces
     str = re.sub(r'\s{2,}', ' ', str)
     return str
-
-

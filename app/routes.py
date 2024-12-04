@@ -1,23 +1,30 @@
-from flask import Blueprint, redirect, url_for
+from flask import redirect, url_for, request
 from flask_login import login_required
 
-from pages.account import getLogin, getRegister, getLogout, getEnsureAdmin, getUsers, getToggleUser
-from pages.immaculateGrid import getImmaculateGrid
-from pages.playerCharts import getDepthChart, getRoster, getTeams, getShowFindTeam
+from pages.immaculateGrid import ShowImmaculateGrid
+from pages.depthChart import ShowDepthChart
+from pages.login import ShowLogin
+from pages.register import ShowRegister
+from pages.logout import ShowLogout
+from pages.admin import getEnsureAdmin, ShowToggleUser, getUsers
+from pages.roster import ShowRoster
+from pages.findTeam import ShowFindTeam, getTeams
 
+from flask import Blueprint
 
+# Define the blueprint
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
 @bp.route('/index')
 @login_required
 def index():
-    return redirect(url_for('main.ShowFindTeam'))
+    return redirect(url_for('main.findTeam'))
 
 @bp.route('/findTeam', methods=['GET', 'POST'])
 @login_required
-def ShowFindTeam():
-    return getShowFindTeam()
+def findTeam():
+    return ShowFindTeam()
 
 @bp.route('/get_teams/<int:year_id>', methods=['GET'])
 @login_required
@@ -27,17 +34,17 @@ def get_teams(year_id):
 @bp.route('/<teamId>/roster', methods=['GET'])
 @login_required
 def roster(teamId):
-    return getRoster(teamId)
+    return ShowRoster(teamId, request.args.get('year'))
 
 @bp.route('/<teamId>/depthChart', methods=['GET'])
 @login_required
 def depthChart(teamId):
-    return getDepthChart(teamId)
+    return ShowDepthChart(teamId, request.args.get('year'))
 
 @bp.route('/immaculateGrid', methods=['GET', 'POST'])
 @login_required
 def immaculateGrid():
-    return getImmaculateGrid()
+    return ShowImmaculateGrid()
 
 @bp.route('/users', methods=['GET'])
 @login_required
@@ -46,20 +53,20 @@ def users():
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
-    return getLogin()
+    return ShowLogin()
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
-    return getRegister()
+    return ShowRegister()
 
 @bp.route('/logout')
 def logout():
-    return getLogout()
+    return ShowLogout()
 
 @bp.route('/toggle_user/<int:user_id>', methods=['POST'])
 @login_required
 def toggle_user(user_id):
-    return getToggleUser(user_id)
+    return ShowToggleUser(user_id)
 
 @bp.before_request
 def ensure_admin():

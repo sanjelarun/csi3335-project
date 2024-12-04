@@ -69,8 +69,9 @@
 
 
 </table>
-
 <h3>Game Statistics</h3>
+
+
 <table class="stats-table">
     <thead>
         <tr>
@@ -136,7 +137,6 @@
         <td> {{team.team_PPF }} </td>
     </tbody>
 </table>
-
 <h2>Player Batting Statistics for the {{ team.yearID }} {{team.team_name}} </h2>
 <table class="stats-table">
     <thead>
@@ -184,39 +184,4 @@
         {% endfor %}
     </tbody>
 </table>
-
-<h2>Player Pitching Statistics for the {{ team.yearID }} {{team.team_name}} </h2>
-<table class="stats-table">
-    <thead>
-        <tr>
-            <th>Player Name</th>
-            <th>Innings Pitched (IP)</th>
-            <th>Strikeout % (K%)</th>
-            <th>Walk % (BB%)</th>
-            <th>HR/9</th>
-            <th>BABIP</th>
-            <th>LOB%</th>
-            <th>ERA</th>
-            <th>FIP</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for player_id, stats in pitching_data.items() %}
-        <tr>
-            <td>{{ stats.full_name }}</td>
-            <td>{{ stats["IP"] }}</td>
-            <td>{{ '%0.2f'| format(stats["K9"]) }}%</td>
-            <td>{{ '%0.2f'| format(stats["BB9"]) }}%</td>
-            <td>{{ '%0.3f'| format(stats["HR9"]) }}</td>
-            <td>{{ '%0.3f'| format(stats["BABIP"]) }}</td>
-            <td>{{ '%0.3f'| format(stats["LOB"] * 100) }}%</td>
-            <td>{{ '%0.3f'| format(stats["ERA"]) }}</td>
-            <td>{{ '%0.3f'| format(stats["FIP"]) }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<h2>{{ teamId }} Player Roster</h2>
-<p>Year: {{ year }}</p>
 {% endblock %}

@@ -1,9 +1,8 @@
-from flask import render_template, redirect, url_for, request, flash, current_app
-from flask_login import current_user, login_user, logout_user
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import render_template, redirect, url_for, flash, current_app
+from flask_login import current_user
+from werkzeug.security import generate_password_hash
 
 from app.models import Users
-from app.forms import FindTeam, LoginForm, RegistrationForm
 from app import db
 
 def getUsers():
@@ -12,44 +11,6 @@ def getUsers():
 
     users = Users.query.filter(Users.u_USER != 'admin').all()
     return render_template('users.html', users=users)
-
-def getLogin():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-    form = LoginForm()
-
-    if form.validate_on_submit():
-        user = Users.query.filter_by(u_USER=form.username.data).first()
-        if user is None or not check_password_hash(user.u_PASSHASH, form.password.data):
-            flash('Invalid username or password')
-            return redirect(url_for('main.login'))
-
-        if not user.is_active:
-            flash('Your account has been deactivated.')
-            return redirect(url_for('main.login'))
-
-        login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get('next')
-        return redirect(next_page) if next_page else redirect(url_for('main.index'))
-
-    return render_template('login.html', form=form, title='Login')
-
-def getRegister():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = Users(u_USER=form.username.data, u_EMAIL=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('main.login'))
-    return render_template('register.html', title='Register', form=form)
-
-def getLogout():
-    logout_user()
-    return redirect(url_for('main.login'))
 
 def getEnsureAdmin():
     def ensure_admin():
@@ -80,7 +41,7 @@ def getEnsureAdmin():
                     print(f"Error while committing admin user: {e}")
                     db.session.rollback()
 
-def getToggleUser(user_id):
+def ShowToggleUser(user_id):
     if not current_user.u_ADMIN:
         return redirect(url_for('main.index'))
 

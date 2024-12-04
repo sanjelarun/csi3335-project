@@ -1,33 +1,42 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from flask_login import LoginManager
-from config import Config
+from sqlalchemy.orm import scoped_session, sessionmaker
 
-# Initialize extensions
 db = SQLAlchemy()
-migrate = Migrate()
-login = LoginManager()
+login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object('config.Config')  # Your config class
 
     # Initialize extensions
     db.init_app(app)
-    migrate.init_app(app, db)
-    login.init_app(app)
-    login.login_view = 'main.login'
+    login_manager.init_app(app)
 
-    # Import and register blueprints
+    # Login view
+    login_manager.login_view = 'main.login'
+    login_manager.login_message = "Please log in to access this page."
+
+    # Blueprints
     from app.routes import bp as main_bp
     app.register_blueprint(main_bp)
 
-    # Define user_loader here to avoid circular imports
-    from app.models import Users
-
-    @login.user_loader
-    def load_user(user_id):
-        return Users.query.get(int(user_id))  # Return the user object from the database
+    with app.app_context():
+        db.create_all()  # Ensure all tables are created during app initialization
 
     return app
+
+from app.models import Users
+
+@login_manager.user_loader
+def load_user(user_id):
+    try:
+        # Query the database to get the user by ID
+        user = db.session.query(Users).filter_by(user_ID=int(user_id)).first()
+        return user
+    except Exception as e:
+        print(f"Error loading user: {e}")
+        return None
+
+from app import routes

@@ -1,10 +1,103 @@
-from flask import render_template
+from flask import render_template, request
 from app import db
 import sqlalchemy as sa
-from app.models import Batting, People, Team, Season, Pitching, Fielding
-from sqlalchemy import and_, func, case
+from app.models import People, Fielding, Batting, Team, Pitching, Season
+from sqlalchemy import func, and_
 from immaculateGridCalculations.complexFormulas import get_war, get_grouped_fielding
 
+
+def getTeam(teamId, year):
+    team = db.session.scalar(
+        sa.select(Team).where(and_(Team.teamID == teamId, Team.yearID == year))
+    )
+    return team
+
+def getSelectedStats(teamId, year, stat):
+    positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P']
+    all_stats = {'percentage': {}, 'PA': {}, 'wOBA': {}}
+    for position in positions:
+        percentage_query = (
+            db.session.query(
+                People.nameFirst,
+                People.nameLast,
+                Fielding.position,
+                (func.sum(Fielding.f_InnOuts) /
+                 func.sum(Fielding.f_InnOuts).over(partition_by=Fielding.position) * 100).label('stat_value')
+            )
+            .join(Fielding, People.playerID == Fielding.playerID)
+            .filter(
+                Fielding.teamID == teamId,
+                Fielding.yearID == year,
+                Fielding.position == position
+            )
+            .group_by(People.playerID, Fielding.position)
+            .order_by(func.sum(Fielding.f_InnOuts).desc())
+            .limit(6)
+        )
+        all_stats['percentage'][position] = [row._asdict() for row in percentage_query.all()]
+
+        # Query for Plate Appearances (PA) -- Every player is in batting but not necessarily in pitching. Use to determine PA better?
+        pa_query = (
+            db.session.query(
+                People.nameFirst,
+                People.nameLast,
+                Fielding.position,
+                func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH).label('stat_value')
+            )
+            .join(Fielding, People.playerID == Fielding.playerID)
+            .join(Batting, Batting.playerID == Fielding.playerID)
+            .filter(
+                Fielding.teamID == teamId,
+                Fielding.yearID == year,
+                Fielding.position == position
+            )
+            .group_by(Fielding.playerID, Fielding.position)
+            .order_by(func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH).desc())
+            .limit(6)
+        )
+        all_stats['PA'][position] = [row._asdict() for row in pa_query.all()]
+
+        woba_query = (
+            db.session.query(
+                People.nameFirst,
+                People.nameLast,
+                Fielding.position,
+                (
+                        ((0.69 * func.sum(Batting.b_BB)) +
+                         (0.72 * func.sum(Batting.b_HBP)) +
+                         (0.888 * func.sum(Batting.b_H)) +
+                         (1.271 * func.sum(Batting.b_2B)) +
+                         (1.616 * func.sum(Batting.b_3B)) +
+                         (2.101 * func.sum(Batting.b_HR))) /
+                        func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH)
+                ).label("stat_value")
+            )
+            .join(Fielding, People.playerID == Fielding.playerID)
+            .join(Batting, Batting.playerID == Fielding.playerID)
+            .filter(
+                Fielding.teamID == teamId,
+                Fielding.yearID == year,
+                Fielding.position == position
+            )
+            .group_by(Fielding.playerID, Fielding.position)
+            .order_by((
+                              (0.69 * func.sum(Batting.b_BB)) +
+                              (0.72 * func.sum(Batting.b_HBP)) +
+                              (0.888 * func.sum(Batting.b_H)) +
+                              (1.271 * func.sum(Batting.b_2B)) +
+                              (1.616 * func.sum(Batting.b_3B)) +
+                              (2.101 * func.sum(Batting.b_HR)) /
+                              func.sum(Batting.b_AB) +
+                              func.sum(Batting.b_BB) -
+                              func.sum(Batting.b_IBB) +
+                              func.sum(Batting.b_SF) +
+                              func.sum(Batting.b_HBP)
+                      ).desc())
+            .limit(6)
+        )
+        all_stats['wOBA'][position] = [row._asdict() for row in woba_query.all()]
+
+    return all_stats.get(stat, {})
 
 def getPitchingStats(teamId, year):
     subquery = (
@@ -246,15 +339,17 @@ def getBattingStats(teamId, year):
         batting_data[result.player_id] = player_data
     return batting_data
 
-def getTeam(teamId,year):
-    team = db.session.scalar(
-        sa.select(Team).where(and_(Team.teamID==teamId, Team.yearID == year))
-    )
-    return team
+def ShowDepthChart(teamId, year):
+    stat = request.args.get('stat', 'percentage')  # Default to 'percentage' if no stat is specified
 
-def ShowRoster(teamId, year):
+    selected_stats = getSelectedStats(teamId, year, stat)
 
-    battingData = getBattingStats(teamId,year)
-    team = getTeam(teamId,year)
+    pitching_stats = getPitchingStats(teamId, year)
 
-    return render_template('roster.html', title="Roster - {} {}".format(year, team.team_name), teamId=teamId, team=team, year=year, batting_data=battingData)
+    batting_stats = getBattingStats(teamId, year)
+
+    team = getTeam(teamId, year)
+
+    return render_template('depthChart.html', title="Depth Chart - {} {}".format(year, team.team_name),
+                           positions_stats=selected_stats, pitching_stats=pitching_stats, batting_stats=batting_stats,
+                           stat=stat, team=team, teamId=teamId, year=year)

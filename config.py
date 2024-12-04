@@ -11,3 +11,4 @@ class Config:
     f'mysql+pymysql://{mysql["user"]}:{mysql["password"]}@{mysql["location"]}:3306/{mysql["database"]}'
 
 
+
