@@ -4,6 +4,9 @@ import pandas as pd;
 def createSeasons(cursor):
     print("Creating Seasons table...")
 
+    sql  = "DROP TABLE season"
+    cursor.execute(sql)
+
     sql = '''
         CREATE TABLE IF NOT EXISTS season (
             season_ID INT(12) AUTO_INCREMENT PRIMARY KEY,
