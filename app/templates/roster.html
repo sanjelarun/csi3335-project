@@ -54,9 +54,7 @@
     <tr>
         <td>Park Name:</td>
         <td> {{team.park_name }} </td>
-
     </tr>
-
     <tr>
         <td> Attendance: </td>
         {% if team.team_attendance!=None %}
@@ -65,13 +63,9 @@
         <td>Unknown</td>
         {% endif %}
     </tr>
-
-
-
 </table>
+
 <h3>Game Statistics</h3>
-
-
 <table class="stats-table">
     <thead>
         <tr>
@@ -137,6 +131,7 @@
         <td> {{team.team_PPF }} </td>
     </tbody>
 </table>
+
 <h2>Player Batting Statistics for the {{ team.yearID }} {{team.team_name}} </h2>
 <table class="stats-table">
     <thead>
@@ -184,4 +179,37 @@
         {% endfor %}
     </tbody>
 </table>
+
+<h2>Player Pitching Statistics for the {{ team.yearID }} {{team.team_name}} </h2>
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th> Name </th>
+                <th> IP </th>
+                <th> K/9 </th>
+                <th> BB/9 </th>
+                <th> HR/9 </th>
+                <th> BABIP </th>
+                <th> LOB% </th>
+                <th> ERA </th>
+                <th> FIP </th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for player_id,pitcher in pitching_data.items() %}
+            <tr>
+                <td> {{ pitcher.full_name }} </td>
+                <td> {{ '%0.1f'| format(pitcher.IP) }} </td>
+                <td> {{ '%0.1f'| format(pitcher.K9) }} </td>
+                <td> {{ '%0.1f'| format(pitcher.BB9) }} </td>
+                <td> {{ '%0.1f'| format(pitcher.HR9) }} </td>
+                <td> {{ '%0.3f'| format(pitcher.BABIP) }} </td>
+                <td> {{ '%0.1f'| format(pitcher.LOB * 100) }}% </td>
+                <td> {{ '%0.2f'| format(pitcher.ERA) }} </td>
+                <td> {{ '%0.2f'| format(pitcher.FIP) }} </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
