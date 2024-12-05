@@ -40,7 +40,7 @@ class Queries(Base):
 
     query_ID = Column(Integer, primary_key=True, autoincrement=True)
     user_ID = Column(Integer, nullable=False)
-    q_TEAMID = Column(String(3), nullable=True)
+    q_TEAM = Column(String(255), nullable=True)
     q_YEAR = Column(SmallInteger, nullable=True)
     q_QUESTIONS = Column(String(255), nullable=True)
     q_SOLUTIONS = Column(String(255), nullable=True)
