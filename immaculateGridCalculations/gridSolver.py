@@ -266,7 +266,7 @@ def getPlayerSeasonK(minK):
         db.session.query(
             Pitching.playerID,
             Pitching.teamID.label("teamID"),
-            Batting.yearID.label("yearID")
+            Pitching.yearID.label("yearID")
         )
         .group_by(Pitching.playerID, Pitching.yearID, Pitching.teamID)  # Group by playerID, yearId, and teamID
         .having(func.sum(Pitching.p_SO) >= minK)  # Having condition for total strikeouts
@@ -560,6 +560,8 @@ def solveGrid(questions):
             rowSubquery = rowQuery.subquery()  # Convert rowQuery to subquery
             colSubquery = colQuery.subquery()  # Convert colQuery to subquery
 
+            excluded_ids = [player.playerID for player in finalPlayers]
+
             combined = (
                 db.session.query(Batting.playerID,Batting.yearID)
                 #Rules for joining the queries:
@@ -599,6 +601,7 @@ def solveGrid(questions):
                         else True 
                     )
                 )
+                .filter(~Batting.playerID.in_(excluded_ids))
                 .order_by(Batting.yearID)
                 .limit(1)
             ).first()
@@ -606,7 +609,7 @@ def solveGrid(questions):
 
                 # Fetch the full name of the selected player.
                 player = (
-                    db.session.query(People.nameFirst, People.nameLast, combined.yearID)
+                    db.session.query(People.nameFirst, People.nameLast,People.playerID,combined.yearID)
                     .filter(People.playerID == combined.playerID)
                     .first()
                 )
