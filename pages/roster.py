@@ -1,10 +1,10 @@
 from flask import render_template
 from app import db
 import sqlalchemy as sa
-from app.models import Batting, People, Team, Season, Pitching
+from app.models import Batting, People, Team, Season, Pitching, Queries, Users
 from sqlalchemy import and_, func
 from immaculateGridCalculations.complexFormulas import get_war, get_grouped_fielding
-
+from flask_login import current_user
 
 def getPitchingStats(teamId, year):
     subquery = (
@@ -280,5 +280,9 @@ def ShowRoster(teamId, year):
     battingData = getBattingStats(teamId,year)
     pitchingData = getPitchingStats(teamId,year)
     team = getTeam(teamId,year)
+
+    query = Queries(user_ID=current_user.get_id(), q_TEAM=team.team_name, q_YEAR=year)
+    db.session.add(query)
+    db.session.commit()
 
     return render_template('roster.html', title="Roster - {} {}".format(year, team.team_name), teamId=teamId, team=team, year=year, batting_data=battingData, pitching_data=pitchingData)
