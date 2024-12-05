@@ -5,13 +5,13 @@ from sqlalchemy import func, and_, literal_column
 from immaculateGridCalculations.complexFormulas import get_war, get_grouped_fielding
 
 
-
 # Retrieves a list of all team names from the database.
 # Returns: A list of team names as strings.
 def getAllTeams():
-    teams = db.session.query(Team.team_name).all() 
+    teams = db.session.query(Team.team_name).all()
     team_list = [team.team_name for team in teams]
     return team_list
+
 
 # Retrieves all players associated with a given team.
 # Notes: The query ensures that players are grouped by their playerID and the team's name.
@@ -20,8 +20,8 @@ def getPlayersByTeam(team_name):
         db.session.query(
             Batting.playerID.label("playerID"),
             Batting.teamID.label("teamID"),
-            literal_column('TRUE').label('isTeamCheck') 
-            )
+            literal_column('TRUE').label('isTeamCheck')
+        )
         .select_from(Team)
         .join(Batting, (Batting.teamID == Team.teamID) & (Batting.yearID == Team.yearID))
         .filter(Team.team_name == team_name)
@@ -32,7 +32,7 @@ def getPlayersByTeam(team_name):
 # Retrieves all players who have achieved a minimum number of wins in a season.
 # Parameters:
 # - numWins (int): The minimum number of wins required.
-# Notes: 
+# Notes:
 # - Only pitchers are awarded "wins," as this statistic is specific to the Pitching table.
 # - The query joins People, Pitching, and Team tables to ensure accurate filtering and grouping.
 def getPlayerWinsBySeason(numWins):
@@ -40,14 +40,15 @@ def getPlayerWinsBySeason(numWins):
         db.session.query(
             Pitching.playerID.label("playerID"),
             Batting.teamID.label("teamID")
-            )
+        )
         .join(Team, (Team.yearID == Pitching.yearID) & (Team.teamID == Pitching.teamID))
-        .group_by(Pitching.playerID,Pitching.yearID,Pitching.teamID)
-        .having(func.sum(Pitching.p_W)>=numWins)
+        .group_by(Pitching.playerID, Pitching.yearID, Pitching.teamID)
+        .having(func.sum(Pitching.p_W) >= numWins)
     )
 
+
 # Retrieves all players who have achieved a minimum of .300 AVG in a season.
-# Notes: 
+# Notes:
 def getPlayerAvgBySeason():
     return (
         db.session.query(
@@ -56,17 +57,18 @@ def getPlayerAvgBySeason():
         )
         .join(Team, (Team.yearID == Batting.yearID) & (Team.teamID == Batting.teamID))
         .group_by(Batting.playerID, Batting.yearID, Batting.teamID)
-        .having((func.sum(Batting.b_H)/func.sum(Batting.b_AB)) >= .300)
-        )
+        .having((func.sum(Batting.b_H) / func.sum(Batting.b_AB)) >= .300)
+    )
+
 
 # Fetches the career average of players with a minimum of .300 AVG
 def getPlayerAvgByCareer():
-    return(
+    return (
         db.session.query(
             Batting.playerID.label("playerID")
         )
         .group_by(Batting.playerID)
-        .having((func.sum(Batting.b_H)/func.sum(Batting.b_AB))>=.300)
+        .having((func.sum(Batting.b_H) / func.sum(Batting.b_AB)) >= .300)
     )
 
 
@@ -84,11 +86,12 @@ def getPlayerSVBySeason(svNum):
         .having(func.sum(Pitching.p_SV) >= svNum)
     )
 
+
 # All players with a CAREER K over a certain amount
 # Parameters:
 # - kNum (int): The min K
-# Notes: 
-# - K is also known as SO, strike outs 
+# Notes:
+# - K is also known as SO, strike outs
 def getPlayerKByCareer(kNum):
     return (
         db.session.query(
@@ -103,7 +106,7 @@ def getPlayerKByCareer(kNum):
 # Parameters:
 #   - maxSB (int): maximum stolen bases
 def getPlayerSeasonSB(maxSB):
-    return(
+    return (
         db.session.query(
             Batting.playerID.label("playerID"),
             Batting.teamID.label("teamID")
@@ -112,6 +115,7 @@ def getPlayerSeasonSB(maxSB):
         .group_by(Batting.playerID, Batting.yearID, Batting.teamID)
         .having(func.sum(Batting.b_SB) >= maxSB)
     )
+
 
 # Fetches the pitchers with career wins above a given number
 # Parameters:
@@ -122,14 +126,15 @@ def getPlayerCareerWins(winNum):
             Pitching.playerID.label("playerID")
         )
         .group_by(Pitching.playerID)
-        .having(func.sum(Pitching.p_W)>=winNum)
+        .having(func.sum(Pitching.p_W) >= winNum)
     )
 
-#Gets the war of every player, used by the war questions
+
+# Gets the war of every player, used by the war questions
 def getPlayerWars():
-    grouped_fielding= get_grouped_fielding()
+    grouped_fielding = get_grouped_fielding()
     war = get_war(grouped_fielding)
-    return(
+    return (
         db.session.query(
             Batting.playerID.label("playerID"),
             Batting.teamID.label("teamID"),
@@ -154,47 +159,50 @@ def getPlayerWars():
             Season.s_R_W,
             Season.s_PA,
         )
-        .join(grouped_fielding,and_(
+        .join(grouped_fielding, and_(
             Batting.playerID == grouped_fielding.c.playerID,
             Batting.yearID == grouped_fielding.c.yearID,
             Batting.teamID == grouped_fielding.c.teamID,
             Batting.stint == grouped_fielding.c.stint
         ))
-        .join(Season,Batting.yearID == Season.yearID)
-        .group_by(Batting.playerID,Batting.yearID, Batting.teamID)
+        .join(Season, Batting.yearID == Season.yearID)
+        .group_by(Batting.playerID, Batting.yearID, Batting.teamID)
         .subquery()
     )
+
 
 # Fetches the players with a WAR value greater than a given number
 # Parameters:
 #   - minWAR : minimum WAR value
 def getPlayerWARSeason(minWAR):
     wars = getPlayerWars()
-    return(
+    return (
         db.session.query(
             wars.c.playerID.label("playerID"),
             wars.c.teamID.label("teamID"),
         )
-        .filter( wars.c.WAR >=minWAR)
+        .filter(wars.c.WAR >= minWAR)
     )
+
 
 # Fetches the players above a certain WAR value for their career
 # Parameters:
 #   - minWAR : minimum WAR value
 def getPlayerWARCareer(minWAR):
     wars = getPlayerWars()
-    return(
+    return (
         db.session.query(
             wars.c.playerID.label("playerID"),
             wars.c.teamID.label("teamID"),
         )
         .group_by(wars.c.playerID)
-        .having( func.sum(wars.c.WAR) >=minWAR)
+        .having(func.sum(wars.c.WAR) >= minWAR)
     )
+
 
 # Fetches players that have been designated hitters
 def getPlayerDesignatedHitter():
-    return(
+    return (
         db.session.query(
             Appearances.playerID.label("playerID"),
             Appearances.teamID.label("TeamID")
@@ -203,9 +211,10 @@ def getPlayerDesignatedHitter():
         .having(func.sum(Appearances.G_dh) > 0)
     )
 
+
 # Fetches the teams that have won the world series
 def getWorldSeriesChamp():
-    return(
+    return (
         db.session.query(
             Team.teamID.label("teamID"),
         )
@@ -213,44 +222,47 @@ def getWorldSeriesChamp():
         .filter(Team.WSWin == 'Y')
     )
 
+
 # All players with a CAREER era over a certian amount
 # Parameters:
 # - maxERA (int): The maximum career ERA required
-# Notes: 
+# Notes:
 # - Career ERA cannot be caluclated using stint ERA, so I had to do the full calculaton
 def getPlayerCareerEra(maxERA):
     return (
         db.session.query(Pitching.playerID.label("playerID"))
         .group_by(Pitching.playerID)
-        .having(#Career ERA = Career ER / (Career IPOuts/3) * 9
+        .having(  # Career ERA = Career ER / (Career IPOuts/3) * 9
             (
-                func.sum(Pitching.p_ER)
-                /
-                (func.sum(Pitching.p_IPOuts)/3)
-                *9
+                    func.sum(Pitching.p_ER)
+                    /
+                    (func.sum(Pitching.p_IPOuts) / 3)
+                    * 9
             ) <= maxERA
         )
     )
 
+
 # All players with a SEASON RBI over a certian amount, while on a certian team
 # Parameters:
 # - minRBI (int): The minimum season RBI required
-# Notes: 
+# Notes:
 def getPlayerSeasonRBI(minRBI):
     query = (db.session.query(
-            Batting.playerID.label("playerID"),
-            Batting.teamID.label("teamID")
-            )
-            .group_by(Batting.playerID, Batting.yearID)
-            .having(func.sum(Batting.b_RBI) >= minRBI))
+        Batting.playerID.label("playerID"),
+        Batting.teamID.label("teamID")
+    )
+             .group_by(Batting.playerID, Batting.yearID)
+             .having(func.sum(Batting.b_RBI) >= minRBI))
 
     return query
+
 
 # All players with a SEASON Strikeout over a certian amount, while on a certian team
 # Parameters:
 # - minK (int): The minimum season Strikeouts required
 # - teamName: the name of the team they achieved this stat on
-# Notes: 
+# Notes:
 def getPlayerSeasonK(minK):
     query = (
         db.session.query(
@@ -259,131 +271,141 @@ def getPlayerSeasonK(minK):
         )
         .group_by(Pitching.playerID, Pitching.yearID, Pitching.teamID)  # Group by playerID, yearId, and teamID
         .having(func.sum(Pitching.p_SO) >= minK)  # Having condition for total strikeouts
-        )
+    )
     return query
+
 
 # All players with 30 HR/ 30 SB season
 # Parameters:
-# Notes: 
+# Notes:
 def getPlayer3030Season():
     query = (db.session.query(
-            Batting.playerID.label("playerID"),
-            Batting.teamID.label("teamID")
-            )
-            .group_by(Batting.playerID, Batting.yearID)
-            .having(
-            and_(
-                func.sum(Batting.b_HR) >= 30.0,
-                func.sum(Batting.b_SB) >= 30.0
-            )
+        Batting.playerID.label("playerID"),
+        Batting.teamID.label("teamID")
+    )
+    .group_by(Batting.playerID, Batting.yearID)
+    .having(
+        and_(
+            func.sum(Batting.b_HR) >= 30.0,
+            func.sum(Batting.b_SB) >= 30.0
         )
+    )
     )
 
     return query
+
 
 # All players n+ Home Runs in a season
 # Parameters: minHR - the number of home runs required
-# Notes: 
+# Notes:
 def getPlayerSeasonHR(minHR):
     query = (db.session.query(
-            Batting.playerID.label("playerID"),
-            Batting.teamID.label("teamID")
-            )
-            .group_by(Batting.playerID, Batting.yearID)
-            .having(
-                func.sum(Batting.b_HR) >= minHR,
-        )
+        Batting.playerID.label("playerID"),
+        Batting.teamID.label("teamID")
+    )
+    .group_by(Batting.playerID, Batting.yearID)
+    .having(
+        func.sum(Batting.b_HR) >= minHR,
+    )
     )
     return query
+
 
 # All players n+ Career HR
 # Parameters: minHR - the number of home runs required
-# Notes: 
+# Notes:
 def getPlayerCareerHR(minHR):
     query = (db.session.query(
-            Batting.playerID.label("playerID")
-            )
-            .group_by(Batting.playerID)
-            .having(
-                func.sum(Batting.b_HR) >= minHR,
-        )
+        Batting.playerID.label("playerID")
+    )
+    .group_by(Batting.playerID)
+    .having(
+        func.sum(Batting.b_HR) >= minHR,
+    )
     )
     return query
+
 
 # All players n+ Season Hits
 # Parameters: minHits - the number of hits required
-# Notes: 
+# Notes:
 def getPlayerSeasonHits(minHits):
     query = (db.session.query(
-            Batting.playerID.label("playerID"),
-            Batting.teamID.label("teamID")
-            )
-            .group_by(Batting.playerID, Batting.yearID)
-            .having(
-                func.sum(Batting.b_H) >= minHits,
-        )
+        Batting.playerID.label("playerID"),
+        Batting.teamID.label("teamID")
+    )
+    .group_by(Batting.playerID, Batting.yearID)
+    .having(
+        func.sum(Batting.b_H) >= minHits,
+    )
     )
     return query
+
 
 # All players n+ Career Hits
 # Parameters: minHits - the number of hits required
-# Notes: 
+# Notes:
 def getPlayerCareerHits(minHits):
     query = (db.session.query(
-            Batting.playerID.label("playerID")
-            )
-            .group_by(Batting.playerID)
-            .having(
-                func.sum(Batting.b_H) >= minHits,
-        )
+        Batting.playerID.label("playerID")
+    )
+    .group_by(Batting.playerID)
+    .having(
+        func.sum(Batting.b_H) >= minHits,
+    )
     )
     return query
 
+
 # All players who were in an all star game
-# Parameters: 
-# Notes: 
+# Parameters:
+# Notes:
 def getPlayerAllStar():
     query = (db.session.query(
-            AllStarFull.playerID.label("playerID"),
-            AllStarFull.teamID.label("teamID")
-            )
+        AllStarFull.playerID.label("playerID"),
+        AllStarFull.teamID.label("teamID")
+    )
     )
     return query
+
 
 # All players who have recieved an award
 # Parameters:
 #    awardName: the name of the award
 def getPlayerAward(awardName):
     query = (db.session.query(
-            Awards.playerID.label("playerID"),
-            Batting.teamID.label("teamID")
-            )
-            .join(Batting, and_(Awards.yearID == Batting.yearID, Awards.playerID == Batting.playerID))
-            .filter(Awards.awardID == awardName)
+        Awards.playerID.label("playerID"),
+        Batting.teamID.label("teamID")
     )
+             .join(Batting, and_(Awards.yearID == Batting.yearID, Awards.playerID == Batting.playerID))
+             .filter(Awards.awardID == awardName)
+             )
     return query
+
 
 # Pitched min. 1 game
 def getPitchers():
     query = (db.session.query(
-            Pitching.playerID.label("playerID"),
-            Pitching.teamID.label("teamID")
-            )
-            .filter(Pitching.p_G >= 1)
+        Pitching.playerID.label("playerID"),
+        Pitching.teamID.label("teamID")
     )
+             .filter(Pitching.p_G >= 1)
+             )
     return query
+
 
 # Played fielding position min. 1 game
 def getFieldingPosition(position):
     query = (db.session.query(
-            Fielding.playerID.label("playerID"),
-            Fielding.teamID.label("teamID")
-            )
-            .filter(
-                and_(Fielding.f_G >= 1, Fielding.position == position)
-                )
+        Fielding.playerID.label("playerID"),
+        Fielding.teamID.label("teamID")
+    )
+    .filter(
+        and_(Fielding.f_G >= 1, Fielding.position == position)
+    )
     )
     return query
+
 
 # Gets players who were born outside of the US
 def getNonUSBirthCountry():
@@ -393,6 +415,7 @@ def getNonUSBirthCountry():
         )
         .filter(People.birthCountry != "USA")
     )
+
 
 # Gets all players who have only played on one team
 def getOneTeamPlayers():
@@ -404,6 +427,7 @@ def getOneTeamPlayers():
         .group_by(Batting.playerID)
         .having(func.count(func.distinct(Batting.teamID)) == 1)
     )
+
 
 # Solves the "immaculate grid" by processing queries for players matching specific criteria.
 # Parameters:
@@ -421,20 +445,20 @@ def getOneTeamPlayers():
 def solveGrid(questions):
     print("Questions received:", questions)  # Debug input
 
-    columnQueries = [] # This will stores all the query results that apply to the column questions, i.e. everything on top of the grid
-    rowQueries = [] # Same as above, but for every question on the side of the grid, the row questions.
-   
-    teamList = getAllTeams() # Just all the team names in the database
-    #print("Team List:", teamList)  # Debug team mapping
+    columnQueries = []  # This will stores all the query results that apply to the column questions, i.e. everything on top of the grid
+    rowQueries = []  # Same as above, but for every question on the side of the grid, the row questions.
+
+    teamList = getAllTeams()  # Just all the team names in the database
+    # print("Team List:", teamList)  # Debug team mapping
 
     for index, currentQuestion in enumerate(questions):
 
-        if currentQuestion in teamList: # If the player needs to be a part of a particular team
+        if currentQuestion in teamList:  # If the player needs to be a part of a particular team
             subquery = getPlayersByTeam(currentQuestion.strip())
         elif ".300+ AVG Career Batting" in currentQuestion:
             subquery = getPlayerAvgByCareer()
-        elif "Win Season" in currentQuestion: # If any n+ Win Season
-            num = int(currentQuestion.partition("+")[0]) # Retrieves the minimum number of wins required
+        elif "Win Season" in currentQuestion:  # If any n+ Win Season
+            num = int(currentQuestion.partition("+")[0])  # Retrieves the minimum number of wins required
             subquery = getPlayerWinsBySeason(num)
         elif "AVG Season" in currentQuestion:
             subquery = getPlayerAvgBySeason()
@@ -471,7 +495,7 @@ def solveGrid(questions):
             num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerSeasonHits(num)
         elif "+ Hits Career" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0]) 
+            num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerCareerHits(num)
         elif "WAR Season" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
@@ -510,20 +534,20 @@ def solveGrid(questions):
         elif "MVP" in currentQuestion:
             subquery = getPlayerAward("Most Valuable Player")
         elif "Silver Slugger" in currentQuestion:
-            subquery = getPlayerAward("Silver Slugger")    
+            subquery = getPlayerAward("Silver Slugger")
         elif "Cy Young" in currentQuestion:
-            subquery = getPlayerAward("Cy Young Award")   
+            subquery = getPlayerAward("Cy Young Award")
         elif "Rookie Of The Year" in currentQuestion:
-            subquery = getPlayerAward("Rookie Of The Year Award") 
+            subquery = getPlayerAward("Rookie Of The Year Award")
         elif "World Series Champ" in currentQuestion:
             subquery = getWorldSeriesChamp()
         else:
             print(f"ERROR: INVALID QUESTION: {currentQuestion}")
-            #Create a subquery type that won't return anything
-            subquery= db.session.query(
+            # Create a subquery type that won't return anything
+            subquery = db.session.query(
                 literal_column('TRUE').label('INVALID_QUESTION'),
-                Batting.playerID 
-            ).filter(Batting.b_G ==-1)
+                Batting.playerID
+            ).filter(Batting.b_G == -1)
 
         # Any other question prompts should follow the format above. Any numeric prompts should function like the
         # win season and be capable of accepting any numeric value.
@@ -533,28 +557,27 @@ def solveGrid(questions):
         else:
             rowQueries.append(subquery)
 
-
     finalPlayers = []
 
     # This builds the combined queries for each question combination
     # This should not need to be modified even if other questions are added.
     for rowQuery in rowQueries:
-        for colQuery in columnQueries:         
+        for colQuery in columnQueries:
 
             rowSubquery = rowQuery.subquery()  # Convert rowQuery to subquery
             colSubquery = colQuery.subquery()  # Convert colQuery to subquery
             combined = (
                 db.session.query(Batting.playerID)
-                #Rules for joining the queries:
+                # Rules for joining the queries:
                 # Always join on player ID
                 # Join on teamId, IF...
                 # Both subqueries have teamID attributes
                 # AND ONE, BUT NOT BOTH subqureries have 'isTeamCheck' attributes (indicating it was a team name question)
                 .join(
-                    rowSubquery, 
+                    rowSubquery,
                     and_(
                         Batting.playerID == rowSubquery.c.playerID,
-                        (rowSubquery.c.teamID == Batting.teamID) if hasattr(rowSubquery.c, 'teamID')else True  
+                        (rowSubquery.c.teamID == Batting.teamID) if hasattr(rowSubquery.c, 'teamID') else True
                         # Join on teamID if it exists in rowSubquery
                     )
                 )
@@ -562,21 +585,21 @@ def solveGrid(questions):
                     colSubquery,
                     and_(
                         rowSubquery.c.playerID == colSubquery.c.playerID,
-                        (colSubquery.c.teamID == rowSubquery.c.teamID) 
-                        if hasattr(colSubquery.c, 'teamID') #Must both have teamID
-                        and hasattr(rowSubquery.c, 'teamID') #Must both have teamID
-                        #At least one must have the team check
-                        and (hasattr(rowSubquery.c, 'isTeamCheck') or hasattr(colSubquery.c,"isTeamCheck") )
-                        #but not both
-                        and not(hasattr(rowSubquery.c, 'isTeamCheck') and hasattr(colSubquery.c,"isTeamCheck") )
-                        else True  
+                        (colSubquery.c.teamID == rowSubquery.c.teamID)
+                        if hasattr(colSubquery.c, 'teamID')  # Must both have teamID
+                           and hasattr(rowSubquery.c, 'teamID')  # Must both have teamID
+                           # At least one must have the team check
+                           and (hasattr(rowSubquery.c, 'isTeamCheck') or hasattr(colSubquery.c, "isTeamCheck"))
+                           # but not both
+                           and not (hasattr(rowSubquery.c, 'isTeamCheck') and hasattr(colSubquery.c, "isTeamCheck"))
+                        else True
                         # Join on teamID if it exists in colSubquery
                     )
                 )
                 .order_by(Batting.yearID)
                 .limit(1)
             ).first()
-            
+
             if combined:
 
                 # Fetch the full name of the selected player.
@@ -596,11 +619,8 @@ def solveGrid(questions):
                 print("Could not find valid player!")
                 finalPlayers.append("No player found!")
 
-
     print("Final Players:", finalPlayers)  # Ensure final list is correct
 
     return finalPlayers
 
-                    
-            
 
