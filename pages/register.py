@@ -10,7 +10,7 @@ def ShowRegister():
         return redirect(url_for('main.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = Users(u_USER=form.username.data, u_EMAIL=form.email.data)
+        user = Users(u_USER=form.username.data, u_EMAIL=form.email.data, u_ADMIN=False, u_ACTIVE=True)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
