@@ -1,8 +1,8 @@
 from flask import render_template
 from app import db
 import sqlalchemy as sa
-from app.models import Batting, People, Team, Season, Pitching, Fielding
-from sqlalchemy import and_, func, case
+from app.models import Batting, People, Team, Season, Pitching
+from sqlalchemy import and_, func
 from immaculateGridCalculations.complexFormulas import get_war, get_grouped_fielding
 
 
