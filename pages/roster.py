@@ -104,7 +104,7 @@ def getPitchingStats(teamId, year):
         .all()
     )
 
-    batting_data = {}
+    pitching_data = {}
     for result in results:
         player_data = {
             "full_name": result.full_name,
@@ -119,9 +119,9 @@ def getPitchingStats(teamId, year):
             "FIP": result.FIP or 0,
 
         }
-        batting_data[result.player_id] = player_data
+        pitching_data[result.player_id] = player_data
 
-    return batting_data
+    return pitching_data
 
 def getBattingStats(teamId, year):
     grouped_fielding = get_grouped_fielding()
@@ -130,35 +130,40 @@ def getBattingStats(teamId, year):
     subquery = (
         db.session.query(
             Batting.playerID.label("player_id"),
+            func.sum(Batting.b_G).label("G"),
             (
-                    (Batting.b_AB) +
-                    (Batting.b_BB) +
-                    (Batting.b_HBP) +
-                    (Batting.b_SH) +
-                    (Batting.b_SF)
+                    func.sum(Batting.b_AB) +
+                    func.sum(Batting.b_BB) +
+                    func.sum(Batting.b_HBP) +
+                    func.sum(Batting.b_SH) +
+                    func.sum(Batting.b_SF)
             ).label("PA"),
+            func.sum(Batting.b_HR).label("HR"),
+            func.sum(Batting.b_SB).label("SB"),
+            (func.sum(Batting.b_BB) / func.sum(Batting.b_AB)).label("BB"),
+            (func.sum(Batting.b_SO) / func.sum(Batting.b_AB)).label("K"),
+            ((func.sum(Batting.b_2B) + (2 * func.sum(Batting.b_3B)) + (3 * func.sum(Batting.b_HR))) /
+             func.sum(Batting.b_AB)).label("ISO"),
+            ((func.sum(Batting.b_H) - func.sum(Batting.b_HR)) /
+             (func.sum(Batting.b_AB) - func.sum(Batting.b_SO) - func.sum(Batting.b_HR) + func.sum(Batting.b_SF))
+             ).label("BABIP"),
+            (func.sum(Batting.b_H) /
+             func.sum(Batting.b_AB)).label("AVG"),
+            ((func.sum(Batting.b_H) + func.sum(Batting.b_BB) + func.sum(Batting.b_HBP)) /
+             (func.sum(Batting.b_AB) + func.sum(Batting.b_BB) + func.sum(Batting.b_HBP) + func.sum(Batting.b_SF))
+             ).label("OBP"),
+            ((((func.sum(Batting.b_H) - (func.sum(Batting.b_HR) + func.sum(Batting.b_3B) + func.sum(Batting.b_2B))) +
+               (2 * func.sum(Batting.b_2B)) + (3 * func.sum(Batting.b_3B))) + (4 * func.sum(Batting.b_HR))) /
+             func.sum(Batting.b_AB)
+             ).label("SLG"),
             (
-                    func.sum(Batting.b_H) /
-                    func.sum(Batting.b_AB)
-            ).label("AVG"),
-            (
-                    (func.sum(Batting.b_H) + func.sum(Batting.b_BB) + func.sum(Batting.b_HBP)) /
-                    (func.sum(Batting.b_AB) + func.sum(Batting.b_BB) + func.sum(Batting.b_HBP) + func.sum(Batting.b_SF))
-            ).label("OBP"),
-            (
-                    (((func.sum(Batting.b_H) - (
-                                func.sum(Batting.b_HR) + func.sum(Batting.b_3B) + func.sum(Batting.b_2B))) +
-                      (2 * func.sum(Batting.b_2B)) + (3 * func.sum(Batting.b_3B))) + (
-                                 4 * func.sum(Batting.b_HR))) / func.sum(Batting.b_AB)
-            ).label("SLG"),
-            (
-                    ((0.69 * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
-                     (0.72 * func.sum(Batting.b_HBP)) +
-                     (0.888 * ((func.sum(Batting.b_H) - (
-                             func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
-                     (1.271 * func.sum(Batting.b_2B)) +
-                     (1.616 * func.sum(Batting.b_3B)) +
-                     (2.101 * func.sum(Batting.b_HR))) /
+                    ((Season.s_wBB * (func.sum(Batting.b_BB) - func.sum(Batting.b_IBB))) +
+                     (Season.s_wHBP * func.sum(Batting.b_HBP)) +
+                     (Season.s_w1B * ((func.sum(Batting.b_H) - (
+                                 func.sum(Batting.b_2B) + func.sum(Batting.b_3B) + func.sum(Batting.b_HR))))) +
+                     (Season.s_w2B * func.sum(Batting.b_2B)) +
+                     (Season.s_w3B * func.sum(Batting.b_3B)) +
+                     (Season.s_wHR * func.sum(Batting.b_HR))) /
                     (func.sum(Batting.b_AB) +
                      func.sum(Batting.b_BB) -
                      func.sum(Batting.b_IBB) +
@@ -197,7 +202,8 @@ def getBattingStats(teamId, year):
                             )
                     )
             ).label("BsR"),
-            war.label("WAR")
+            war.label("WAR"),
+
         )
         .join(grouped_fielding, and_(
             Batting.playerID == grouped_fielding.c.playerID,
@@ -214,28 +220,44 @@ def getBattingStats(teamId, year):
         .group_by(Batting.playerID)
         .subquery()
     )
+
     results = (
         db.session.query(
             func.concat(People.nameFirst, ' ', People.nameLast).label("full_name"),
             subquery.c.player_id,
-            subquery.c["PA"],
+            subquery.c["G"],
+            subquery.c.PA,
+            subquery.c.HR,
+            subquery.c.SB,
+            subquery.c["BB"],
+            subquery.c["K"],
+            subquery.c["ISO"],
+            subquery.c["BABIP"],
             subquery.c["AVG"],
             subquery.c["OBP"],
             subquery.c["SLG"],
             subquery.c["wOBA"],
             subquery.c["BsR"],
-            subquery.c["WAR"]
+            subquery.c["WAR"],
         )
         .join(People, People.playerID == subquery.c.player_id)
-        .order_by(subquery.c["PA"].desc())
+        .order_by(subquery.c.WAR.desc())
         .all()
     )
+
     batting_data = {}
     for result in results:
         player_data = {
             "full_name": result.full_name,
             "player_id": result.player_id,
+            "G": result.G,
             "PA": result.PA or 0,
+            "HR": result.HR or 0,
+            "SB": result.SB or 0,
+            "BB%": result.BB or 0,
+            "K%": result.K or 0,
+            "ISO": result.ISO or 0,
+            "BABIP": result.BABIP or 0,
             "AVG": result.AVG or 0,
             "OBP": result.OBP or 0,
             "SLG": result.SLG or 0,
@@ -244,6 +266,7 @@ def getBattingStats(teamId, year):
             "WAR": result.WAR,
         }
         batting_data[result.player_id] = player_data
+
     return batting_data
 
 def getTeam(teamId,year):
@@ -255,6 +278,7 @@ def getTeam(teamId,year):
 def ShowRoster(teamId, year):
 
     battingData = getBattingStats(teamId,year)
+    pitchingData = getPitchingStats(teamId,year)
     team = getTeam(teamId,year)
 
-    return render_template('roster.html', title="Roster - {} {}".format(year, team.team_name), teamId=teamId, team=team, year=year, batting_data=battingData)
+    return render_template('roster.html', title="Roster - {} {}".format(year, team.team_name), teamId=teamId, team=team, year=year, batting_data=battingData, pitching_data=pitchingData)
