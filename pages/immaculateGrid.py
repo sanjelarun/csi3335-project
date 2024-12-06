@@ -22,7 +22,7 @@ def ShowImmaculateGrid():
         for i in range(3):  # 3 rows
             for j in range(3):  # 3 columns
                 q_questions = questions[j] + " & " + questions[i + 3]
-                q_solutions = solution[i * 3 + j].nameFirst + " " + solution[i * 3 + j].nameLast
+                q_solutions = solution[i * 3 + j]
 
                 query = Queries(user_ID=current_user.get_id(), q_QUESTIONS=q_questions, q_SOLUTIONS=q_solutions)
                 db.session.add(query)
@@ -31,7 +31,7 @@ def ShowImmaculateGrid():
         for i in range(3):  # 3 rows
             for j in range(3):  # 3 columns
                 q_questions = questions[j] + " & " + questions[i + 3]
-                q_solutions = solutionNames[i * 3 + j]
+                q_solutions = solution[i * 3 + j]
 
                 query = Queries(user_ID=current_user.get_id(), q_QUESTIONS=q_questions, q_SOLUTIONS=q_solutions)
                 db.session.add(query)

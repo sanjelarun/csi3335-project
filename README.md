@@ -29,6 +29,11 @@ To start the app:
 2. Update the database (see below)
 3. Start the app: `flask run`
 
+### Login
+You can create your own account, or log into the admin account using the following credentials:
+username: admin
+password: password
+
 The app should now be started and can be found at [http://localhost:5000](http://localhost:5000)!
 
 ## Database Update

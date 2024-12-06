@@ -1,3 +1,4 @@
+from flask import jsonify
 from app import db
 import sqlalchemy as sa
 from app.models import People, Fielding, Batting, Team, Pitching, AllStarFull, Awards, Appearances, Season
@@ -90,12 +91,12 @@ def getPlayerSVBySeason(svNum):
     )
 
 
-# All players with a CAREER K over a certain amount
+# All players with a BATTING CAREER K over a certain amount
 # Parameters:
 # - kNum (int): The min K
 # Notes:
 # - K is also known as SO, strike outs
-def getPlayerKByCareer(kNum):
+def getPlayerKByCareerBatting(kNum):
     return (
         db.session.query(
             Batting.playerID.label("playerID"),
@@ -104,6 +105,19 @@ def getPlayerKByCareer(kNum):
         .having(func.sum(Batting.b_SO) >= kNum)
     )
 
+# All players with a BATTING CAREER K over a certain amount
+# Parameters:
+# - kNum (int): The min K
+# Notes:
+# - K is also known as SO, strike outs
+def getPlayerKByCareerPitching(kNum):
+    return (
+        db.session.query(
+            Pitching.playerID.label("playerID"),
+        )
+        .group_by(Pitching.playerID)
+        .having(func.sum(Pitching.p_SO) >= kNum)
+    )
 
 # Fetches the players with 30+ stolen bases in a season
 # Parameters:
@@ -273,7 +287,7 @@ def getPlayerSeasonRBI(minRBI):
 # - minK (int): The minimum season Strikeouts required
 # - teamName: the name of the team they achieved this stat on
 # Notes:
-def getPlayerSeasonK(minK):
+def getPlayerSeasonKPitching(minK):
     query = (
         db.session.query(
             Pitching.playerID,
@@ -284,7 +298,22 @@ def getPlayerSeasonK(minK):
         .having(func.sum(Pitching.p_SO) >= minK)  # Having condition for total strikeouts
     )
     return query
-
+# All players with a SEASON Strikeout over a certian amount, while on a certian team
+# Parameters:
+# - minK (int): The minimum season Strikeouts required
+# - teamName: the name of the team they achieved this stat on
+# Notes:
+def getPlayerSeasonKBatting(minK):
+    query = (
+        db.session.query(
+            Batting.playerID,
+            Batting.teamID.label("teamID"),
+            Batting.yearID.label("yearID")
+        )
+        .group_by(Batting.playerID, Batting.yearID, Batting.teamID)  # Group by playerID, yearId, and teamID
+        .having(func.sum(Batting.b_SO) >= minK)  # Having condition for total strikeouts
+    )
+    return query
 
 # All players with 30 HR/ 30 SB season
 # Parameters:
@@ -481,9 +510,18 @@ def solveGrid(questions):
         elif "Save Season" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerSVBySeason(num)
-        elif "K Career" in currentQuestion:
+        elif "K Career Batting" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
-            subquery = getPlayerKByCareer(num)
+            subquery = getPlayerKByCareerBatting(num)
+        elif "K Career Pitching" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerKByCareerPitching(num)   
+        elif "+ K Season Batting" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerSeasonKBatting(num) 
+        elif "+ K Season Pitching" in currentQuestion:
+            num = int(currentQuestion.partition("+")[0])
+            subquery = getPlayerSeasonKPitching(num) 
         elif "Wins Career" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerCareerWins(num)
@@ -493,9 +531,7 @@ def solveGrid(questions):
         elif "100+ RBI Season" in currentQuestion:
             num = 100
             subquery = getPlayerSeasonRBI(num)
-        elif "+ K Season" in currentQuestion:
-            num = int(currentQuestion.partition("+")[0])
-            subquery = getPlayerSeasonK(num)
+    
         elif "30+ HR / 30+ SB Season" in currentQuestion:
             subquery = getPlayer3030Season()
         elif "SB Season" in currentQuestion:
@@ -583,7 +619,10 @@ def solveGrid(questions):
             rowSubquery = rowQuery.subquery()  # Convert rowQuery to subquery
             colSubquery = colQuery.subquery()  # Convert colQuery to subquery
 
-            excluded_ids = [player.playerID for player in finalPlayers]
+            excluded_ids = []
+            for player in finalPlayers:
+                if player != None:
+                    excluded_ids.append(player.playerID)
 
             combined = (
                 db.session.query(Batting.playerID,Batting.yearID)
@@ -642,18 +681,21 @@ def solveGrid(questions):
                     print(f"Added player for grid cell: {fullName}")  # Debug.
                 else:
                     print("Could not find valid player!")
-                    finalPlayers.append({
-                        'nameFirst':"No player found!",
-                        'nameLast':'',
-                        'yearID':''
-                        })
+                    finalPlayers.append(None)
             else:
                 print("Could not find valid player!")
-                finalPlayers.append("No player found!")
+                finalPlayers.append(None)
 
 
     print("Final Players:", finalPlayers)  # Ensure final list is correct
 
-    return finalPlayers
+    finalPlayerStrings=[]
+    for player in finalPlayers:
+        if player != None:
+            finalPlayerStrings.append(f"{player.nameFirst} {player.nameLast} {player[3]}")
+        else:
+            finalPlayerStrings.append("No Player Found!")
+
+    return finalPlayerStrings
 
 
