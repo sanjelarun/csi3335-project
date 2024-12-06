@@ -11,6 +11,8 @@
     <p>
         {{ form.url.label }}<br>
         {{ form.url(class="form-control large-input") }}<br>
+        {{ form.solveCheckbox.label }}
+        {{ form.solveCheckbox(class="form-control") }}<br>
         {% for error in form.url.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
@@ -26,15 +28,10 @@
 <h2>Immaculate Grid Solution</h2>
 
 <table class="immaculate-grid-table">
-    <p id="solutions">{{ solutionNames }}</p>
-    <button onclick=(function(){navigator.clipboard.writeText((SolutionsArray[copyNum].substring(1,(SolutionsArray[copyNum]).length-1)).replace("'",''));copyNum=copyNum+1;})()>Copy Solution</button>
+    <button onclick=(function(){navigator.clipboard.writeText(Solutions);})()>Copy Solution List</button>
     <script type="text/javascript">
-        var copyNum = 0;
-        var clipBoard = document.createElement("button");
-        var Solutions = document.getElementById('solutions').innerHTML.replace('[','').replace(']','');
-        var SolutionsArray = String(Solutions).split(",");
-        document.body.appendChild(clipBoard);
-<!--        navigator.clipboard.writeText(Solutions);-->
+        var replaceQuotes = new RegExp("'|\\]|\\[|&#39|[0-9]*-[0-9]*|\\(|\\)|;","g")
+        var Solutions = new String("{{ solutionNames }}").replace(replaceQuotes, '');
     </script>
     <!-- Header Row -->
     <tr>
@@ -49,7 +46,7 @@
     <tr>
         <th class="immaculate-table-left">{{ questions[i + 3] }}</th> <!-- Display question values for rows -->
         {% for j in range(3) %}
-        <td>{{ solutionNames[i * 3 + j] }}</td> <!-- Display corresponding solution -->
+        <td class="solution">{{ solutionNames[i * 3 + j] }}</td> <!-- Display corresponding solution -->
         {% endfor %}
     </tr>
     {% endfor %}

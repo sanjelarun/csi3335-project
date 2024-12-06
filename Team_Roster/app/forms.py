@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, SubmitField
+from wtforms import SelectField, StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
 
 class FindTeam(FlaskForm):
@@ -9,5 +9,7 @@ class FindTeam(FlaskForm):
     submit = SubmitField('Find Team Roster')
 
 class ImmaculateGridInput(FlaskForm):
+    print(FlaskForm)
     url = StringField('Immaculate Grid URL',validators=[DataRequired()])
+    solveCheckbox = BooleanField('Solve High Accuracy')
     submit = SubmitField('Calculate Solution')

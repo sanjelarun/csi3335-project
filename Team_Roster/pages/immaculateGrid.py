@@ -1,6 +1,6 @@
 from flask import render_template, request
 from app.forms import ImmaculateGridInput
-from immaculateGridCalculations.webScraper import scrapeImmaculateGridQuestions
+from immaculateGridCalculations.webScraper import scrapeImmaculateGridQuestions, solveGridWeb
 from immaculateGridCalculations.gridSolver import solveGrid
 
 def ShowImmaculateGrid():
@@ -12,7 +12,11 @@ def ShowImmaculateGrid():
     if form.validate_on_submit():
         url = form.url.data
         questions = scrapeImmaculateGridQuestions(url)
-        solutionNames = solveGrid(questions)
+
+        if(form.solveCheckbox.data):
+            solutionNames = solveGridWeb(url)
+        else:
+            solutionNames = solveGrid(questions)
 
         print("URL:", url)
         print("Questions:", questions)
