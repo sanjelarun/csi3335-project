@@ -57,14 +57,15 @@ def loadGrid(gridNum: str) -> list:
     localStorageKey = None
     grids = list(json.loads(r.text)['grids'])
 
-    # If gridNum is empty, find the first grid that matches the current date.
-    # Sometimes, grids exist before they're public. First entry isn't always today's grid.
+    # If gridNum is empty, use the current grid. Requesting the actual website is the only solution.
     if(len(gridNum) == 0):
-        gridNum = next(item['gridId'] for item in grids if item['date'] == datetime.today().strftime('%Y-%m-%d'))
-    for x in grids:
-        if x['gridId'] == gridNum:
-            localStorageKey = x['localStorageKey']
-            break
+        r = requests.get('https://www.immaculategrid.com/')
+        localStorageKey = r.text[r.text.find("localStorageKey")+20:r.text.find("localStorageKey")+33]
+    else:
+        for x in grids:
+            if x['gridId'] == gridNum:
+                localStorageKey = x['localStorageKey']
+                break
     jsonTable = {
         "gridKey": localStorageKey,
         "correctAnswers": [
@@ -83,11 +84,12 @@ def loadGrid(gridNum: str) -> list:
 def pickNextLowestPlayer(dupes, scoreList, bestAnswers):
     for item in dupes:
         while(len(item)>1): # Until no duplicates exist in each square
-            # Find the next lowest of both squares
+            # Find the next lowest score of both squares that are equal
             optimizeFirst = min(scoreList[item[0]], key=scoreList[item[0]].get)
             optimizeSecond = min(scoreList[item[1]], key=scoreList[item[1]].get)
 
-            # If the player found was already picked in the current solution, continue
+            # If the player found was already picked in the current solution,
+            # skip that player and redo
             if (optimizeFirst in dict(bestAnswers).keys()):
                 item.pop(0)
                 continue
@@ -95,21 +97,16 @@ def pickNextLowestPlayer(dupes, scoreList, bestAnswers):
                 item.pop(1)
                 continue
 
-            # Compare the scores of the players found
+            # Compare the scores of the two new players found.
+            # If the two players have equal scores, go with the first
             if scoreList[item[0]][optimizeFirst]<= scoreList[item[1]][optimizeSecond]:
                 bestAnswers[item[0]] = [optimizeFirst, scoreList[item[0]][optimizeFirst]]
-                del scoreList[item[0]][optimizeFirst]
+                del scoreList[item[0]][optimizeFirst] # Remove player from being pulled
                 item.pop(0)
             elif scoreList[item[0]][optimizeFirst]> scoreList[item[1]][optimizeSecond]:
                 bestAnswers[item[1]] = [optimizeSecond, scoreList[item[1]][optimizeSecond]]
-                del scoreList[item[1]][optimizeFirst]
+                del scoreList[item[1]][optimizeFirst] # Remove player from being pulled
                 item.pop(1)
-            else:
-                # If the two players have equal scores, go with the first
-                bestAnswers[item[0]] = [optimizeFirst, scoreList[item[0]][optimizeFirst]]
-                del scoreList[item[0]][optimizeFirst]
-                item.pop(0)
-                break
 
 # Gets the best answers for the given table according to the immaculate grid.
 # Parameters:
@@ -131,7 +128,7 @@ def getBestAnswers(jsonTable: list) -> list:
         plr = min(i, key=i.get)
         bestAnswers.insert(squareNum, [plr, i[plr]])
         dupes.insert(squareNum,[i for i, x in enumerate(bestAnswers) if x[0] == plr])
-        del i[plr] # Remove the inserted player to prevent duplicates later
+        del i[plr] # Remove the inserted player to prevent duplicate pulls later
         squareNum += 1
     pickNextLowestPlayer(dupes, scoreList, bestAnswers)
     return bestAnswers
@@ -160,6 +157,6 @@ def getPlayerAnswers(playerList: list) -> list:
 
 def solveGridWeb(url: str)-> list:
     gridNum = url[url.find("grid-") + 5:]
-    if(not gridNum.isnumeric()):
+    if(url.find("grid-") == -1 or not gridNum.isnumeric()):
         gridNum = ''
     return (getPlayerAnswers(getBestAnswers(loadGrid(gridNum))))
