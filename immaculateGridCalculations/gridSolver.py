@@ -416,6 +416,15 @@ def getNonUSBirthCountry():
         .filter(People.birthCountry != "USA")
     )
 
+# Gets players who were born in the US
+def getUSBirthCountry():
+    return (
+        db.session.query(
+            People.playerID.label("playerID")
+        )
+        .filter(People.birthCountry == "USA")
+    )
+
 
 # Gets all players who have only played on one team
 def getOneTeamPlayers():
@@ -541,6 +550,10 @@ def solveGrid(questions):
             subquery = getPlayerAward("Rookie Of The Year Award")
         elif "World Series Champ" in currentQuestion:
             subquery = getWorldSeriesChamp()
+        elif "Born Outside US 50 States And DC" in currentQuestion:
+            subquery = getNonUSBirthCountry()
+        elif "Born Inside US" in currentQuestion:
+            subquery = getUSBirthCountry()
         else:
             print(f"ERROR: INVALID QUESTION: {currentQuestion}")
             # Create a subquery type that won't return anything
