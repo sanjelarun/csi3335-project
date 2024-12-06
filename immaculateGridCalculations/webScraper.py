@@ -156,7 +156,7 @@ def getPlayerAnswers(playerList: list) -> list:
 #   - (str) url: The url to the grid to be answered. If invalid, grid is set to current grid.
 # Returns:
 #   - list of the best possible player answers for the specified grid
-def solveGridWeb(url: str)-> list:
+def solveOptimalGrid(url: str)-> list:
     gridNum = url[url.find("grid-") + 5:]
     if(url.find("grid-") == -1 or not gridNum.isnumeric()):
         gridNum = ''

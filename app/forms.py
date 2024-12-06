@@ -14,7 +14,7 @@ class FindTeam(FlaskForm):
 class ImmaculateGridInput(FlaskForm):
     url = StringField('Immaculate Grid URL',validators=[DataRequired()])
     submit = SubmitField('Calculate Solution')
-    solveCheckbox = BooleanField('Solve Via Web')
+    solveCheckbox = BooleanField('Optimal Solution')
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])

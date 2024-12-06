@@ -1,7 +1,7 @@
 from flask import render_template, request
 from flask_login import current_user
 from app.forms import ImmaculateGridInput
-from immaculateGridCalculations.webScraper import scrapeImmaculateGridQuestions, solveGridWeb
+from immaculateGridCalculations.webScraper import scrapeImmaculateGridQuestions, solveOptimalGrid
 from immaculateGridCalculations.gridSolver import solveGrid
 
 from app.models import Queries
@@ -19,7 +19,7 @@ def ShowImmaculateGrid():
         questions = scrapeImmaculateGridQuestions(url)
 
         if(form.solveCheckbox.data):
-            solutionNames = solveGridWeb(url)
+            solutionNames = solveOptimalGrid(url)
         else:
             solutionNames = solveGrid(questions)
 
