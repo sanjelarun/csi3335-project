@@ -74,7 +74,8 @@ def loadGrid(gridNum: str) -> list:
     }
     return jsonTable
 
-# This looks like spaghetti, but it minimizes the score until no duplicates exist.
+# This function handles duplicate players in the solution list. Duplicates are tracked
+# by their indices, finding the next lowest player until all duplicates are removed.
 # Parameters:
 #   - dupes: list containing indices of duplicate values related to bestAnswers
 #   - scoreList: the score table to get the values from
@@ -142,13 +143,19 @@ def getPlayerAnswers(playerList: list) -> list:
     for player in playerList:
         r = requests.get('https://api.sports-reference.com/v1/br/players/' + player[0])
         playerJSON = json.loads(r.text)
+        # (Uncomment if needing to fetch player images. Will require some small refactoring)
         # Prepend the baseball reference URL to the player image path
-        if('headshot_url' in playerJSON):
-            playerJSON['headshot_url'] = "https://www.baseball-reference.com/req/" + playerJSON['headshot_url']
+        # if('headshot_url' in playerJSON):
+        #     playerJSON['headshot_url'] = "https://www.baseball-reference.com/req/" + playerJSON['headshot_url']
         # answers.insert(i, playerJSON)
         answers.append(unicodedata.normalize('NFKD',  playerJSON['name']+' ('+playerJSON['years']+')').encode('ascii', 'ignore').decode("utf-8"))
     return answers
 
+# Returns the best possible answers available for the requested grid
+# Parameters:
+#   - (str) url: The url to the grid to be answered. If invalid, grid is set to current grid.
+# Returns:
+#   - list of the best possible player answers for the specified grid
 def solveGridWeb(url: str)-> list:
     gridNum = url[url.find("grid-") + 5:]
     if(url.find("grid-") == -1 or not gridNum.isnumeric()):
