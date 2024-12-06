@@ -1,8 +1,49 @@
-
-from sqlalchemy import CHAR, Column, Date, Double, Integer, SmallInteger, String, Float, ForeignKey
+from sqlalchemy import CHAR, Column, Date, Double, Integer, SmallInteger, String, Float, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 Base = declarative_base()
+
+class Users(Base, UserMixin):
+    __tablename__ = 'users'
+
+    user_ID = Column(Integer, primary_key=True, autoincrement=True)
+    u_USER = Column(String(3), nullable=True)
+    u_EMAIL = Column(String(3), nullable=True)
+    u_PASSHASH = Column(String(3), nullable=True)
+    u_ADMIN = Column(Boolean, nullable=True)
+    u_ACTIVE = Column(Boolean, nullable=True)
+
+    def set_password(self, password):
+        self.u_PASSHASH = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.u_PASSHASH, password)
+
+    def get_id(self):
+        return str(self.user_ID)
+
+    @property
+    def is_active(self):
+        return self.u_ACTIVE
+
+    @property
+    def is_admin(self):
+        return self.u_ADMIN
+
+    def __repr__(self):
+        return f"<Users(user_ID={self.user_ID}, u_USER={self.u_USER}, u_EMAIL={self.u_EMAIL}, u_ADMIN={self.u_ADMIN})>"
+
+class Queries(Base):
+    __tablename__ = 'queries'
+
+    query_ID = Column(Integer, primary_key=True, autoincrement=True)
+    user_ID = Column(Integer, nullable=False)
+    q_TEAM = Column(String(255), nullable=True)
+    q_YEAR = Column(SmallInteger, nullable=True)
+    q_QUESTIONS = Column(String(255), nullable=True)
+    q_SOLUTIONS = Column(String(255), nullable=True)
 
 class Team(Base):
     __tablename__ = 'teams'
@@ -254,7 +295,6 @@ class Season(Base):
 
     def __repr__(self):
         return f"<Season {self.yearID}>"
-    
 
 class AllStarFull(Base):
     __tablename__ = 'allstarfull'
@@ -273,7 +313,27 @@ class AllStarFull(Base):
             f"<AllStarFull(allstarfull_ID={self.allstarfull_ID}, playerID={self.playerID}, "
             f"yearID={self.yearID}, lgID={self.lgID}, teamID={self.teamID})>"
         )
-    
+
+class HallOfFame(Base):
+    __tablename__ = 'halloffame'
+
+    halloffame_ID = Column(Integer, primary_key=True, autoincrement=True)
+    playerID = Column(String(9), ForeignKey("people.playerID"), nullable=False)
+    yearID = Column(SmallInteger, nullable=False)
+    votedBy = Column(String(64), nullable=False)
+    ballots = Column(SmallInteger, nullable=True)
+    needed = Column(SmallInteger, nullable=True)
+    votes = Column(SmallInteger, nullable=True)
+    inducted = Column(String(1), nullable=True)
+    category = Column(String(20), nullable=True)
+    note = Column(String(25), nullable=True)
+
+    def __repr__(self):
+        return (
+            f">HallOfFame(halloffame_ID={self.halloffame_ID}, playerID={self.playerID}, "
+            f"yearID={self.yearID})>"
+        )
+
 class Awards(Base):
     __tablename__ = 'awards'
 
@@ -284,6 +344,7 @@ class Awards(Base):
     lgID = Column(CHAR(2), ForeignKey("leagues.lgID"), nullable=False)
     tie = Column(String(1), nullable=True)
     notes = Column(String(100), nullable=True)
+
 
     def __repr__(self):
         return (

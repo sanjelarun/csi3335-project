@@ -2,7 +2,10 @@
 import pandas as pd;
 
 def createSeasons(cursor):
-    print("Creating Seasons table...")
+    print("Creating Season table...")
+
+    sql="DROP TABLE IF EXISTS season"
+    cursor.execute(sql)
 
     sql  = "DROP TABLE season"
     cursor.execute(sql)
@@ -58,8 +61,9 @@ def createSeasons(cursor):
     cursor.execute(sql)
 
 
-    data = pd.read_csv("Update_Assets/csvFiles/Seasons.csv", na_values=['', ' '])
-    data = data.where(pd.notnull(data), None)
+    data = pd.read_csv("Update_Assets/csvFiles/Seasons.csv", na_values=['', ' ', 'nan', '--'])
+    #data = data.where(pd.notnull(data), None)
+    data = data.fillna(0)
 
     seasonsAdded = 0
 
@@ -105,7 +109,7 @@ def createSeasons(cursor):
             row["GDP"],
             row["HBP"],
             row["SH"],
-            row["SF"],
+            row["SF"] or 0,
             row["IBB"],
             row["BIP"],
         ]
