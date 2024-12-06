@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+    <head>
+        {% if title %}
+        <title>{{ title }} - MLB Roster</title>
+        {% else %}
+        <title>MLB Roster</title>
+        {% endif %}
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Include jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- StyleSheet -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+    <body>
+    <div style="    
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        color: white;
+        background-color: #041E42;
+        height: 100px;
+        ">
+        <h3>Immaculate Party Time MLB Player Roster</h3>
+        <div>
+            {% if current_user.u_ADMIN %}
+                <button onclick="window.location.href='/users'">Users</button>
+            {% endif %}
+            {% if not current_user.is_anonymous %}
+                <button onclick="window.location.href='/findTeam'">Find Your Team</button>
+                <button onclick="window.location.href='/immaculateGrid'">Immaculate Grid Solver</button>
+                <button onclick="window.location.href='/logout'">Logout</button>
+            {% endif %}
+        </div>
+        <image src="{{ url_for('static', filename='images/mlb.png') }}" style="width: 150px;border-radius: 5%;"></image>
+
+
+    </div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    <div style="min-height: 90vh; width:80%; margin:auto">
+        {% block content %}{% endblock %}
+    </div>
+    <div style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        background-color: #041E42;">
+        <h4> MLB Player Roster - Team Immaculate Party Time</h4>
+        <p>CSI 3336 - Fall 2024</p>
+        <p style="text-align: center;">
+            August Rothpletz
+            <br />Logan Rigdon
+            <br />Mitchell Thompson
+            <br />Samuel Fries
+        </p>
+    </div>
+</body>
+</html>
