@@ -22,7 +22,7 @@
 <p>URL: {{ url }}</p>
 {% endif %}
 
-{% if (questions and solutionNames) %}
+{% if (questions and solution) %}
 <h2>Immaculate Grid Solution</h2>
 <table class="immaculate-grid-table">
     <!-- Header Row -->
@@ -38,7 +38,10 @@
     <tr>
         <th class="immaculate-table-left">{{ questions[i + 3] }}</th> <!-- Display question values for rows -->
         {% for j in range(3) %}
-        <td>{{ solutionNames[i * 3 + j] }}</td> <!-- Display corresponding solution -->
+        <td>
+            {{ solution[i * 3 + j]}}
+
+        </td> <!-- Display corresponding solution -->
         {% endfor %}
     </tr>
     {% endfor %}

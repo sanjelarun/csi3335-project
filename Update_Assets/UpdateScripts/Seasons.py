@@ -7,6 +7,9 @@ def createSeasons(cursor):
     sql="DROP TABLE IF EXISTS season"
     cursor.execute(sql)
 
+    sql  = "DROP TABLE season"
+    cursor.execute(sql)
+
     sql = '''
         CREATE TABLE IF NOT EXISTS season (
             season_ID INT(12) AUTO_INCREMENT PRIMARY KEY,

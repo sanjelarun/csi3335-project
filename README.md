@@ -29,6 +29,11 @@ To start the app:
 2. Update the database (see below)
 3. Start the app: `flask run`
 
+### Login
+You can create your own account, or log into the admin account using the following credentials:
+username: admin
+password: password
+
 The app should now be started and can be found at [http://localhost:5000](http://localhost:5000)!
 
 ## Database Update
@@ -51,3 +56,18 @@ The project should now be fully updated with 2023 data and the info needed to ru
    - wOBA stats Pulled from the [Fan Graphs 'Guts!' page](https://www.fangraphs.com/guts.aspx).
    - Season Totals pulled from Baseball Reference.
    - Used to get season constants and totals used to calculate FIP and WAR values.
+
+
+## Cool things we did
+
+Here is a (non-comprehensive) list of a features we added beyond the project requirements. We think they're pretty cool, though I suppose that's for you to decide.
+1. **Dynamic Fields**. When you select a year for the team roster, the `team` page will only have teams that were actively in the MLB that year.
+2. **Season Data**. We added a full new **Seasons** table that contains some overall statistics about a year as a whole for the entire MLB.
+3. **CSS Depth Chart Diamond**. We have a great looking baseball diamond for displaying our depth chart, just like on Fangraphs. It's not an image, its _all CSS._
+4. **WAR and other calculated stats**. Our tables display many derived statistics that are all calculated at runtime, including WAR. Other teams were too scared to take on the challenge of calculating war, deciding to webscrape it from Baseball Reference and storing it in their database. However, we took the time to figure out how to calculate it ourselves.
+5. **No Manual Question Entry**. Our immaculate grid solver webscrapes the questions from any official Immaculate Grid problem when you paste in its URL, so you don't have to manually type in every question.
+6. **Optimized Immaculate Grid**. We have, not one, but _TWO_ ways to solve the immaculate grid.
+   1. The first method makes some API requests to ImmaculateGrid.com's backend to _always_ fetch the most rare answer!
+   2. The second method determines an answer from our database, as originally intended.
+7. **Links to baseball-reference**. Our roster embeds a link for each player to their [Baseball Reference](https://www.baseball-reference.com/players/) Page, where a user can learn more about them in the context of their entire career.
+8. **Syling**. We think our web app looks great!
