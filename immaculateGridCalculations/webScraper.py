@@ -117,7 +117,6 @@ def getBestAnswers(jsonTable: list) -> list:
     getScore = requests.post('https://www.immaculategrid.com/api/score', json=jsonTable)
     scoreList = getScore.text.split("correctAnswersPlayerMap\":")
     scoreList = (scoreList[1].split("}}")[0])  # Truncate irrelevant information
-    squareNum = 1 # Ensures list is ordered
     bestAnswers = []
     scoreList = json.loads(scoreList)  # Format into usable JSON
     scoreList = scoreList[0] + scoreList[1] + scoreList[2]
@@ -126,10 +125,9 @@ def getBestAnswers(jsonTable: list) -> list:
     for i in scoreList:
         # Insert the lowest scoring player into ordered list
         plr = min(i, key=i.get)
-        bestAnswers.insert(squareNum, [plr, i[plr]])
-        dupes.insert(squareNum,[i for i, x in enumerate(bestAnswers) if x[0] == plr])
+        bestAnswers.append([plr, i[plr]])
+        dupes.append([i for i, x in enumerate(bestAnswers) if x[0] == plr])
         del i[plr] # Remove the inserted player to prevent duplicate pulls later
-        squareNum += 1
     pickNextLowestPlayer(dupes, scoreList, bestAnswers)
     return bestAnswers
 
@@ -141,7 +139,6 @@ def getBestAnswers(jsonTable: list) -> list:
 #   - A list containing player information of the given players
 def getPlayerAnswers(playerList: list) -> list:
     answers = []
-    i = 1  # Ensures list is ordered
     for player in playerList:
         r = requests.get('https://api.sports-reference.com/v1/br/players/' + player[0])
         playerJSON = json.loads(r.text)
@@ -149,10 +146,7 @@ def getPlayerAnswers(playerList: list) -> list:
         if('headshot_url' in playerJSON):
             playerJSON['headshot_url'] = "https://www.baseball-reference.com/req/" + playerJSON['headshot_url']
         # answers.insert(i, playerJSON)
-        # print(unicodedata.normalize('NFD', playerJSON['name']))
-        answers.insert(i,unicodedata.normalize('NFKD',  playerJSON['name']+' ('+playerJSON['years']+')').encode('ascii', 'ignore').decode("utf-8"))
-        # print(playerJSON['name'])
-        i += 1  # Increment index
+        answers.append(unicodedata.normalize('NFKD',  playerJSON['name']+' ('+playerJSON['years']+')').encode('ascii', 'ignore').decode("utf-8"))
     return answers
 
 def solveGridWeb(url: str)-> list:
