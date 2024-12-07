@@ -124,13 +124,9 @@ def getSelectedStats(teamId,year,stat):
         elif(stat == 'WAR'):
             war_query = (
                 db.session.query(
-                    People.nameFirst,
-                    People.nameLast,
-                    Fielding.position,
+                    Batting.playerID.label("player_id"),
                     war.label('stat_value')
                 )
-                .join(Fielding, People.playerID == Fielding.playerID)
-                .join(Batting, Batting.playerID == Fielding.playerID)
                 .join(grouped_fielding, and_(
                     Batting.playerID == grouped_fielding.c.playerID,
                     Batting.yearID == grouped_fielding.c.yearID,
@@ -138,17 +134,34 @@ def getSelectedStats(teamId,year,stat):
                     Batting.stint == grouped_fielding.c.stint
                 ))
                 .filter(
+                    Batting.teamID == teamId,
+                    Batting.yearID == year,
+                )
+                .group_by(Batting.playerID)
+                .subquery()
+            )
+
+            war_results = (
+                db.session.query(
+                    People.nameFirst,
+                    People.nameLast,
+                    Fielding.position,
+                    (war_query.c['stat_value']).label('stat_value')
+                )
+                .join(People, People.playerID == war_query.c.player_id)
+                .join(Fielding, Fielding.playerID == People.playerID)
+                .filter(
                     Fielding.teamID == teamId,
                     Fielding.yearID == year,
-                    Fielding.position == position,
-                    Fielding.yearID == Batting.yearID,
-                    Fielding.teamID == Batting.teamID
+                    Fielding.position == position
+
                 )
-                .group_by(Fielding.playerID, Fielding.position)
-                .order_by(war.desc())
+                .group_by(Fielding.position, war_query.c.player_id)
+                .order_by(war_query.c['stat_value'].desc())
                 .limit(6)
             )
-            all_stats['WAR'][position] = [row._asdict() for row in war_query.all()]
+
+            all_stats['WAR'][position] = [row._asdict() for row in war_results.all()]
 
 
         
