@@ -11,6 +11,7 @@ from Update_Assets.UpdateScripts.Appearances import updateAppearances
 from Update_Assets.UpdateScripts.PitchingPost import updatePitchingPost
 from Update_Assets.UpdateScripts.FieldingPost import updateFieldingPost
 from Update_Assets.UpdateScripts.BattingPost import updateBattingPost
+from Update_Assets.UpdateScripts.Queries import createQueries
 from Update_Assets.UpdateScripts.SeriesPost import updateSeriesPost
 from Update_Assets.UpdateScripts.AllStarFull import updateAllStarFull
 from Update_Assets.UpdateScripts.HallOfFame import updateHallOfFame
@@ -28,7 +29,9 @@ from Update_Assets.UpdateScripts.Salaries import updateSalaries
 from Update_Assets.UpdateScripts.CollegePlaying import updateCollegePlaying
 from Update_Assets.UpdateScripts.Seasons import createSeasons
 
+
 import csi3335f2024 as cfg
+from Update_Assets.UpdateScripts.Users import createUsers
 
 #connect to the db
 con = pymysql.connect(host=cfg.mysql['location'],user=cfg.mysql['user'],password=cfg.mysql['password'],database=cfg.mysql['database'])
@@ -73,6 +76,9 @@ try:
     updateCollegePlaying(cur)
 
     createSeasons(cur)
+
+    createUsers(cur)
+    createQueries(cur)
 
 except Exception:
     con.rollback()

@@ -1,6 +1,7 @@
 import os
 
 from csi3335f2024 import mysql
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
@@ -8,5 +9,6 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
     f'mysql+pymysql://{mysql["user"]}:{mysql["password"]}@{mysql["location"]}:3306/{mysql["database"]}'
+
 
 

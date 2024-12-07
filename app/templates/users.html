@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Users</h1>
+<div>
+    {% for status, label in [(True, "Activated Users"), (False, "Deactivated Users")] %}
+        <h2>{{ label }}</h2>
+        <div class="user-list">
+            {% for user in users if user.u_ACTIVE == status and user.u_ADMIN == false %}
+                <div class="user-box">
+                    <p><strong>ID:</strong> {{ user.user_ID }}</p>
+                    <p><strong>Username:</strong> {{ user.u_USER }}</p>
+                    <p><strong>Email:</strong> {{ user.u_EMAIL }}</p>
+                    <form action="{{ url_for('main.toggle_user', user_id=user.user_ID) }}" method="POST" style="margin-top: 10px;">
+                        <button type="submit">
+                            {{ "Deactivate" if user.u_ACTIVE else "Activate" }}
+                        </button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
