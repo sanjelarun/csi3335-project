@@ -34,7 +34,7 @@
                 // AJAX request to fetch teams for the selected year
                 $.getJSON(`/get_teams/${selectedYear}`, function (data) {
                     // Add a placeholder option
-                    $('#team-dropdown').append($('<option>', { value: "", text: "Select Team" }));
+                    $('#team-dropdown').append($('<option>', { value: "", text: "Select Team..." }));
 
                     // Populate the team dropdown with received data
                     $.each(data, function (index, team) {
