@@ -593,6 +593,8 @@ def solveGrid(questions):
             subquery = getPlayerAward("Rookie Of The Year Award")
         elif "World Series Champ" in currentQuestion:
             subquery = getWorldSeriesChamps()
+        elif "Born Outside US 50 States and DC" in currentQuestion:
+            subquery = getNonUSBirthCountry()
         else:
             print(f"ERROR: INVALID QUESTION: {currentQuestion}")
             # Create a subquery type that won't return anything

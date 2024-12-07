@@ -1,15 +1,15 @@
 from flask import redirect, url_for, request, jsonify
 from flask_login import login_required, current_user
 
-from pages.immaculateGrid import ShowImmaculateGrid
-from pages.depthChart import ShowDepthChart
-from pages.login import ShowLogin
-from pages.register import ShowRegister
-from pages.logout import ShowLogout
-from pages.admin import getEnsureAdmin, ShowToggleUser, getUsers
-from pages.roster import ShowRoster
-from pages.findTeam import ShowFindTeam, getTeams
-from pages.queries import ShowQueries, DeleteRosterQueries, DeleteImmaculateGridQueries
+from app.pages.immaculateGrid import ShowImmaculateGrid
+from app.pages.depthChart import ShowDepthChart
+from app.pages.login import ShowLogin
+from app.pages.register import ShowRegister
+from app.pages.logout import ShowLogout
+from app.pages.admin import getEnsureAdmin, ShowToggleUser, getUsers
+from app.pages.roster import ShowRoster
+from app.pages.findTeam import ShowFindTeam, getTeams
+from app.pages.queries import ShowQueries, DeleteRosterQueries, DeleteImmaculateGridQueries
 
 from flask import Blueprint
 
