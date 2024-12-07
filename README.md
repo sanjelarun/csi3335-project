@@ -14,7 +14,7 @@ To run the app, some configuration is required:
 2. Start your virtual environment
 3. Run `pip install -r config\requirements.txt`
 4. Add the database user the app uses
-    a. Start an instance of MySQL in your terminal: `mysql -u root -p`
+    a. Start an instance of MariahDB in your terminal: `mysql -u root -p`
     b. Add the user: `\. config\addUser.sql`
     c. exit mysql: `exit`
 5. Update the database (see below)
@@ -43,7 +43,7 @@ We have added significant changes to the database, adding the 2023 data and some
 ### Create New Database from Dump
 
 To create a new database with all the data needed to run the app, run the following commands in your terminal:
-1. Open your mysql interface from the project root folder: `mysql -u user -p`
+1. Open your MariahDB interface from the project root folder: `mysql -u user -p`
 2. Create the database: `create database immaculatePartyTime;`
 3. Seed the databse with the dump: `\. immaculatePartyTime.sql`
 
@@ -73,8 +73,9 @@ Here is a (non-comprehensive) list of a features we added beyond the project req
 3. **CSS Depth Chart Diamond**. We have a great looking baseball diamond for displaying our depth chart, just like on Fangraphs. It's not an image, its _all CSS._
 4. **WAR and other calculated stats**. Our tables display many derived statistics that are all calculated at runtime, including WAR. Other teams were too scared to take on the challenge of calculating war, deciding to webscrape it from Baseball Reference and storing it in their database. However, we took the time to figure out how to calculate it ourselves.
 5. **No Manual Question Entry**. Our immaculate grid solver webscrapes the questions from any official Immaculate Grid problem when you paste in its URL, so you don't have to manually type in every question.
-6. **Optimized Immaculate Grid**. We have, not one, but _TWO_ ways to solve the immaculate grid.
+6. **Optimized Immaculate Grid**. We have, not one, but _TWO_ ways to solve the immaculate grid...
    1. The first method makes some API requests to ImmaculateGrid.com's backend to _always_ fetch the most rare answer!
    2. The second method determines an answer from our database, as originally intended.
 7. **Links to baseball-reference**. Our roster embeds a link for each player to their [Baseball Reference](https://www.baseball-reference.com/players/) Page, where a user can learn more about them in the context of their entire career.
-8. **Syling**. We think our web app looks great!
+8. **Sortable Tables**. All of our player roster tables are sortable.
+9. **Syling**. We think our web app looks great!
