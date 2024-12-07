@@ -463,17 +463,11 @@ def getNonUSBirthCountry():
         .filter(People.birthCountry != 'USA')
     )
 
-def getUSBirthCountry():
-    return(
-        db.session.query(
-            People.playerID.label("playerID")
-        )
-        .filter(People.birthCountry == 'USA')
-    )
-
 # Gets players who were born in the specified country
 def getSpecificBirthCountry(birthCountry):
-    if birthCountry == 'Canada':
+    if birthCountry == 'United States':
+        birthCountry = 'USA'
+    elif birthCountry == 'Canada':
         birthCountry = 'CAN'
     elif birthCountry == 'Puerto Rico':
         birthCountry = 'P.R.'
@@ -616,15 +610,11 @@ def solveGrid(questions):
         elif "Rookie Of The Year" in currentQuestion:
             subquery = getPlayerAward("Rookie Of The Year Award")
         elif "World Series Champ" in currentQuestion:
-            subquery = getWorldSeriesChamp()
+            subquery = getWorldSeriesChamps()
         elif "Born Outside US 50 States And DC" in currentQuestion:
             subquery = getNonUSBirthCountry()
-        elif "United States" in currentQuestion:
-            subquery = getUSBirthCountry()
-        elif "Born in" in currentQuestion:
-            print(country)
-            country = (currentQuestion.partition("in")[1])
-            subquery = getSpecificBirthCountry(country)
+        elif "United States" or "Canada" or "Dominican Republic" or "Puerto Rico" in currentQuestion:
+            subquery = getSpecificBirthCountry(currentQuestion)
         else:
             print(f"ERROR: INVALID QUESTION: {currentQuestion}")
             # Create a subquery type that won't return anything
