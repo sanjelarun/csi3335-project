@@ -552,7 +552,7 @@ def solveGrid(questions):
             subquery = getWorldSeriesChamp()
         elif "Born Outside US 50 States And DC" in currentQuestion:
             subquery = getNonUSBirthCountry()
-        elif "Born Inside US" in currentQuestion:
+        elif "Born in the 50 United States or DC" in currentQuestion:
             subquery = getUSBirthCountry()
         else:
             print(f"ERROR: INVALID QUESTION: {currentQuestion}")
