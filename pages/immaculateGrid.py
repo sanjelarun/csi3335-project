@@ -1,7 +1,7 @@
 from flask import render_template, request
 from flask_login import current_user
 from app.forms import ImmaculateGridInput
-from immaculateGridCalculations.webScraper import scrapeImmaculateGridQuestions
+from immaculateGridCalculations.webScraper import scrapeImmaculateGridQuestions, solveOptimalGrid
 from immaculateGridCalculations.gridSolver import solveGrid
 
 from app.models import Queries
@@ -17,8 +17,10 @@ def ShowImmaculateGrid():
     if form.validate_on_submit():
         url = form.url.data
         questions = scrapeImmaculateGridQuestions(url)
-        solution = solveGrid(questions)
-
+        if(form.solveCheckbox.data):
+            solution = solveOptimalGrid(url)
+        else:
+            solution = solveGrid(questions)
         for i in range(3):  # 3 rows
             for j in range(3):  # 3 columns
                 q_questions = questions[j] + " & " + questions[i + 3]
@@ -40,5 +42,5 @@ def ShowImmaculateGrid():
         print("URL:", url)
         print("Questions:", questions)
         ("Solution:", solution)
-    
+
     return render_template('immaculateGrid.html', title='Immaculate Grid Solver', form=form, url = url,questions = questions, solution = solution)

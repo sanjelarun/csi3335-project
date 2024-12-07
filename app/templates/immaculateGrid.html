@@ -11,6 +11,8 @@
     <p>
         {{ form.url.label }}<br>
         {{ form.url(class="form-control large-input") }}<br>
+        {{ form.solveCheckbox.label }}
+        {{ form.solveCheckbox(class="form-control") }}<br>
         {% for error in form.url.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
@@ -25,6 +27,11 @@
 {% if (questions and solution) %}
 <h2>Immaculate Grid Solution</h2>
 <table class="immaculate-grid-table">
+    <button onclick=(function(){navigator.clipboard.writeText(Solutions);})()>Copy Solution List</button>
+    <script type="text/javascript">
+        var replaceQuotes = new RegExp("'|\\]|\\[|&#39|[0-9]*-[0-9]*|\\(|\\)|;","g")
+        var Solutions = new String("{{ solution }}").replace(replaceQuotes, '');
+    </script>
     <!-- Header Row -->
     <tr>
         <th class="immaculate-table-left immaculate-table-top"></th>

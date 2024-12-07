@@ -494,7 +494,7 @@ def solveGrid(questions):
 
     columnQueries = [] # This will stores all the query results that apply to the column questions, i.e. everything on top of the grid
     rowQueries = [] # Same as above, but for every question on the side of the grid, the row questions.
-   
+
     teamList = getAllTeams() # Just all the team names in the database
     for index, currentQuestion in enumerate(questions):
 
@@ -515,13 +515,13 @@ def solveGrid(questions):
             subquery = getPlayerByCareerKBatting(num)
         elif "K Career Pitching" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
-            subquery = getPlayerByCareerKPitching(num)   
+            subquery = getPlayerByCareerKPitching(num)
         elif "+ K Season Batting" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
-            subquery = getPlayerSeasonKBatting(num) 
+            subquery = getPlayerSeasonKBatting(num)
         elif "+ K Season Pitching" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
-            subquery = getPlayerSeasonKPitching(num) 
+            subquery = getPlayerSeasonKPitching(num)
         elif "Wins Career" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerCareerWins(num)
@@ -531,7 +531,7 @@ def solveGrid(questions):
         elif "100+ RBI Season" in currentQuestion:
             num = 100
             subquery = getPlayerSeasonRBI(num)
-    
+
         elif "30+ HR / 30+ SB Season" in currentQuestion:
             subquery = getPlayer3030Season()
         elif "SB Season" in currentQuestion:
@@ -646,21 +646,21 @@ def solveGrid(questions):
                         #join on player
                         rowSubquery.c.playerID == colSubquery.c.playerID,
 
-                        #join on year, if both have it 
+                        #join on year, if both have it
                         (colSubquery.c.yearID == rowSubquery.c.yearID)
-                        if hasattr(colSubquery.c, 'yearID') 
+                        if hasattr(colSubquery.c, 'yearID')
                         and hasattr(rowSubquery.c, 'yearID')
                         else True,
 
                         #join on team, if all conditions are met
-                        (colSubquery.c.teamID == rowSubquery.c.teamID) 
-                        if hasattr(colSubquery.c, 'teamID') 
+                        (colSubquery.c.teamID == rowSubquery.c.teamID)
+                        if hasattr(colSubquery.c, 'teamID')
                         and hasattr(rowSubquery.c, 'teamID') #Must both have teamID
                         #At least one must have the team check
                         and (hasattr(rowSubquery.c, 'isTeamCheck') or hasattr(colSubquery.c,"isTeamCheck") )
                         # #but not both
                         and not(hasattr(rowSubquery.c, 'isTeamCheck') and hasattr(colSubquery.c,"isTeamCheck") )
-                        else True 
+                        else True
                     )
                 )
                 .filter(~Batting.playerID.in_(excluded_ids))
