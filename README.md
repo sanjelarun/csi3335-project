@@ -19,7 +19,7 @@ To run the app, some configuration is required:
     c. exit mysql: `exit`
 5. Update the database (see below)
 
-** If you want to change what database, port, etc. the app uses: **
+**If you want to change what database, port, etc. the app uses:**
 Update the connection used in `csi3335f2024.py`
 
 ## Web App
@@ -40,9 +40,16 @@ The app should now be started and can be found at [http://localhost:5000](http:/
 
 We have added significant changes to the database, adding the 2023 data and some other data used in the web app.
 
-### Steps to Update Database
+### Create New Database from Dump
 
-To update the databse to have the needed extra data in order to run the run the app, as well as to update the database with 2023 player data:
+To create a new database with all the data needed to run the app, run the following commands in your terminal:
+1. Open your mysql interface from the project root folder: `mysql -u user -p`
+2. Create the database: `create database immaculatePartyTime;`
+3. Seed the databse with the dump: `\. immaculatePartyTime.sql`
+
+### Updating the databse from a previous version 
+
+To update the database to have the needed extra data in order to run the run the app, as well as to update the database with 2023 player data:
 1. Set up the project configuration (see the config section)
 2. Run `UpdateDatabase.py`
 
