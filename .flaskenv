@@ -1,2 +1,2 @@
 #.flaskenv
-FLASK_APP=teamroster.py
+FLASK_APP=startApp.py
