@@ -1,5 +1,5 @@
 from flask import redirect, url_for, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from pages.immaculateGrid import ShowImmaculateGrid
 from pages.depthChart import ShowDepthChart
@@ -9,6 +9,7 @@ from pages.logout import ShowLogout
 from pages.admin import getEnsureAdmin, ShowToggleUser, getUsers
 from pages.roster import ShowRoster
 from pages.findTeam import ShowFindTeam, getTeams
+from pages.queries import ShowQueries
 
 from flask import Blueprint
 
@@ -71,3 +72,8 @@ def toggle_user(user_id):
 @bp.before_request
 def ensure_admin():
     getEnsureAdmin()
+
+@bp.route('/queries', methods=['GET'])
+@login_required
+def queries():
+    return ShowQueries(current_user.get_id())
