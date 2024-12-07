@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, url_for, redirect
 from sqlalchemy import and_
 from app.models import Queries
 from app import db
@@ -19,7 +19,6 @@ def getRosterQueries(user_id):
             Queries.q_SOLUTIONS == None
         )
     ).all()
-    print(f"Roster Queries for user {user_id}: {queries}")
     return queries
 
 def getImmaculateGridQueries(user_id):
@@ -30,5 +29,20 @@ def getImmaculateGridQueries(user_id):
             Queries.q_YEAR == None
         )
     ).all()
-    print(f"Immaculate Grid Queries for user {user_id}: {queries}")
     return queries
+
+def DeleteRosterQueries(user_id):
+    rosterQueryData = getRosterQueries(user_id)
+    if rosterQueryData:
+        for query in rosterQueryData:
+            db.session.delete(query)
+        db.session.commit()
+    return redirect(url_for('main.queries'))
+
+def DeleteImmaculateGridQueries(user_id):
+    immaculateGridQueryData = getImmaculateGridQueries(user_id)
+    if immaculateGridQueryData:
+        for query in immaculateGridQueryData:
+            db.session.delete(query)
+        db.session.commit()
+    return redirect(url_for('main.queries'))

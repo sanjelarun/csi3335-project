@@ -1,4 +1,4 @@
-from flask import redirect, url_for, request
+from flask import redirect, url_for, request, jsonify
 from flask_login import login_required, current_user
 
 from pages.immaculateGrid import ShowImmaculateGrid
@@ -9,7 +9,7 @@ from pages.logout import ShowLogout
 from pages.admin import getEnsureAdmin, ShowToggleUser, getUsers
 from pages.roster import ShowRoster
 from pages.findTeam import ShowFindTeam, getTeams
-from pages.queries import ShowQueries
+from pages.queries import ShowQueries, DeleteRosterQueries, DeleteImmaculateGridQueries
 
 from flask import Blueprint
 
@@ -77,3 +77,15 @@ def ensure_admin():
 @login_required
 def queries():
     return ShowQueries(current_user.get_id())
+
+@bp.route('/clearRosterQueries', methods=['POST'])
+@login_required
+def clearRosterQueries():
+    if request.form.get('_method') == 'DELETE':
+        return DeleteRosterQueries(current_user.get_id())
+
+@bp.route('/clearImmaculateGridQueries', methods=['POST'])
+@login_required
+def clearImmaculateGridQueries():
+    if request.form.get('_method') == 'DELETE':
+        return DeleteImmaculateGridQueries(current_user.get_id())

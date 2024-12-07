@@ -5,21 +5,58 @@
 <div>
     <h2>Roster Queries</h2>
     {% if rosterQueryData %}
-        {% for rosterQuery in rosterQueryData %}
-            <p>{{ rosterQuery.q_YEAR }} {{ rosterQuery.q_TEAM }}</p>
-        {% endfor %}
+        <table class="stats-table">
+            <thread>
+                <tr>
+                    <th>Year</th>
+                    <th>Team</th>
+                </tr>
+            </thread>
+            <tbody>
+                {% for rosterQuery in rosterQueryData %}
+                <tr>
+                    <td>{{ rosterQuery.q_YEAR }}</td>
+                    <td>{{ rosterQuery.q_TEAM }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <form action="{{ url_for('main.clearRosterQueries') }}" method="POST" style="margin-top: 10px;">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit">
+                {{ "Clear All" }}
+            </button>
+        </form>
     {% else %}
         <p>No roster queries found.</p>
     {% endif %}
 
     <h2>Immaculate Grid Queries</h2>
     {% if immaculateGridQueryData %}
-        {% for immaculateGridQuery in immaculateGridQueryData %}
-            <p>{{ immaculateGridQuery.q_QUESTIONS }} : {{ immaculateGridQuery.q_SOLUTIONS }}</p>
-        {% endfor %}
+        <table class="stats-table">
+            <thread>
+                <tr>
+                    <th>Question</th>
+                    <th>Solution</th>
+                </tr>
+            </thread>
+            <tbody>
+                {% for immaculateGridQuery in immaculateGridQueryData %}
+                <tr>
+                    <td>{{ immaculateGridQuery.q_QUESTIONS }}</td>
+                    <td>{{ immaculateGridQuery.q_SOLUTIONS }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <form action="{{ url_for('main.clearImmaculateGridQueries') }}" method="POST" style="margin-top: 10px;">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit">
+                {{ "Clear All" }}
+            </button>
+        </form>
     {% else %}
-        <p>No roster queries found.</p>
+        <p>No immaculate grid queries found.</p>
     {% endif %}
-
 </div>
 {% endblock %}
