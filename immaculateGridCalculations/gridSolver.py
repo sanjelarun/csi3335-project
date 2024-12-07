@@ -96,7 +96,7 @@ def getPlayerSVBySeason(svNum):
 # - kNum (int): The min K
 # Notes:
 # - K is also known as SO, strike outs
-def getPlayerKByCareerBatting(kNum):
+def getPlayerByCareerKBatting(kNum):
     return (
         db.session.query(
             Batting.playerID.label("playerID"),
@@ -110,7 +110,7 @@ def getPlayerKByCareerBatting(kNum):
 # - kNum (int): The min K
 # Notes:
 # - K is also known as SO, strike outs
-def getPlayerKByCareerPitching(kNum):
+def getPlayerByCareerKPitching(kNum):
     return (
         db.session.query(
             Pitching.playerID.label("playerID"),
@@ -512,10 +512,10 @@ def solveGrid(questions):
             subquery = getPlayerSVBySeason(num)
         elif "K Career Batting" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
-            subquery = getPlayerKByCareerBatting(num)
+            subquery = getPlayerByCareerKBatting(num)
         elif "K Career Pitching" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
-            subquery = getPlayerKByCareerPitching(num)   
+            subquery = getPlayerByCareerKPitching(num)   
         elif "+ K Season Batting" in currentQuestion:
             num = int(currentQuestion.partition("+")[0])
             subquery = getPlayerSeasonKBatting(num) 
