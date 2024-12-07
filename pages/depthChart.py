@@ -136,6 +136,7 @@ def getSelectedStats(teamId,year,stat):
                 .filter(
                     Batting.teamID == teamId,
                     Batting.yearID == year,
+                    Season.yearID == year
                 )
                 .group_by(Batting.playerID)
                 .subquery()
