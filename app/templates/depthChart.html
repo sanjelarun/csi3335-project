@@ -49,7 +49,7 @@
                 <div id="batters-box-left" class="batters-box"></div>
                 <div id="first-base-thing"></div>
             </div>
-        
+
             <div id="player-boxes">
                 <div id="box-pitcher" class="player-box">
                     <div class="position-header">
@@ -98,7 +98,6 @@
                 </div>
             </div>
         </div>
-
     </main>
 
 </body>
@@ -170,17 +169,17 @@
     <div style="margin-right: 5%;">
         <h3>Batting</h3>
 
-        <table class="stats-table">
+        <table class="stats-table sortable-table" id="batting-table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>PA</th>
-                    <th>AVG</th>
-                    <th>OBP</th>
-                    <th>SLG</th>
-                    <th>wOBA</th>
-                    <th>BsR</th>
-                    <th>WAR</th>
+                    <th onclick="sortTable(0,'batting-table')">Player Name</th>
+                    <th onclick="sortTable(1,'batting-table')">PA</th>
+                    <th onclick="sortTable(2,'batting-table')">AVG</th>
+                    <th onclick="sortTable(3,'batting-table')">OBP</th>
+                    <th onclick="sortTable(4,'batting-table')">SLG</th>
+                    <th onclick="sortTable(5,'batting-table')">wOBA</th>
+                    <th onclick="sortTable(6,'batting-table')">BsR</th>
+                    <th onclick="sortTable(7,'batting-table')">WAR</th>
                 </tr>
             </thead>
             <tbody>
@@ -214,18 +213,18 @@
 
     <div>
         <h3>Pitching</h3>
-        <table class="stats-table">
+        <table class="stats-table sortable-table" id="pitching-table">
             <thead>
                 <tr>
-                    <th> Name </th>
-                    <th> IP </th>
-                    <th> K/9 </th>
-                    <th> BB/9 </th>
-                    <th> HR/9 </th>
-                    <th> BABIP </th>
-                    <th> LOB% </th>
-                    <th> ERA </th>
-                    <th> FIP </th>
+                    <th onclick="sortTable(0,'pitching-table')"> Name </th>
+                    <th onclick="sortTable(1,'pitching-table')"> IP </th>
+                    <th onclick="sortTable(2,'pitching-table')"> K/9 </th>
+                    <th onclick="sortTable(3,'pitching-table')"> BB/9 </th>
+                    <th onclick="sortTable(4,'pitching-table')"> HR/9 </th>
+                    <th onclick="sortTable(5,'pitching-table')"> BABIP </th>
+                    <th onclick="sortTable(6,'pitching-table')"> LOB% </th>
+                    <th onclick="sortTable(7,'pitching-table')"> ERA </th>
+                    <th onclick="sortTable(8,'pitching-table')"> FIP </th>
                 </tr>
             </thead>
             <tbody>
@@ -252,4 +251,52 @@
         </table>
     </div>
 </div>
+<script>
+    function sortTable(columnIndex, tableId) {
+        const table = document.getElementById(tableId);
+        const headers = table.tHead.rows[0].cells; // Get all header cells
+        const rows = Array.from(table.tBodies[0].rows);
+        const isAscending = headers[columnIndex].getAttribute("data-sort") !== "asc";
+
+        // Helper function to extract numeric values
+        const parseValue = (value) => {
+            // Remove percentage sign and parse as float
+            if (value === "") return Number.MIN_VALUE; // Treat empty cells as very small numbers
+            if (value.includes("%")) {
+                return parseFloat(value.replace("%", ""));
+            }
+            // Parse as number if possible; otherwise, return original value
+            return isNaN(value) ? value.toLowerCase() : parseFloat(value);
+        };
+
+        // Sort rows based on the column
+        rows.sort((rowA, rowB) => {
+            const cellA = parseValue(rowA.cells[columnIndex].innerText);
+            const cellB = parseValue(rowB.cells[columnIndex].innerText);
+
+            if (!isNaN(cellA) && !isNaN(cellB)) {
+                // Compare numbers
+                return isAscending ? cellA - cellB : cellB - cellA;
+            } else {
+                // Compare strings
+                return isAscending
+                    ? cellA.localeCompare(cellB)
+                    : cellB.localeCompare(cellA);
+            }
+        });
+
+        // Re-append rows in the sorted order
+        const tbody = table.tBodies[0];
+        rows.forEach(row => tbody.appendChild(row));
+
+        // Clear previous sort indicators
+        Array.from(headers).forEach(header => header.removeAttribute("data-sort"));
+
+        // Set the sort direction for the clicked header
+        headers[columnIndex].setAttribute("data-sort", isAscending ? "asc" : "desc");
+
+        // Update sorting direction
+        table.setAttribute(`data-sort-column-${columnIndex}`, isAscending ? "asc" : "desc");
+    }
+</script>
 {% endblock %}
