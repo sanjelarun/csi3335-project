@@ -32,7 +32,7 @@ def scrapeImmaculateGridQuestions(url):
         columnQuestion = prepQuestionString(questionStr[1])
         if columnQuestion not in questionsCol:
             questionsCol.append(columnQuestion)
-    # questions = ["Detroit Tigers","200+ K Season","≤ 3.00 ERA Career","Gold Glove", "Played First Base min. 1 game", "Houston Astros"]
+    # questions = ["30+ HR Season Batting","World Series Champ","","Toronto Blue Jays", "", ""]
     # return questions
     # Remove duplicates from both sets, append into questionsCol, giving columns precedence
     questionsCol = list(questionsCol)
