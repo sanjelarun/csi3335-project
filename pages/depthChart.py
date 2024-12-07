@@ -18,151 +18,146 @@ def getSelectedStats(teamId,year,stat):
     positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P']
     all_stats = {'percentage': {}, 'PA': {}, 'wOBA': {}, 'WAR': {}}
     for position in positions:
-        if(stat == 'percentage'):
-            percentage_query = (
-                db.session.query(
-                    People.nameFirst,
-                    People.nameLast,
-                    Fielding.position,
-                    (func.sum(Fielding.f_InnOuts) /
-                    func.sum(Fielding.f_InnOuts).over(partition_by=Fielding.position) * 100).label('stat_value')
-                )
-                .join(Fielding, People.playerID == Fielding.playerID)
-                .join(Batting, Batting.playerID == Fielding.playerID)
-                .filter(
-                    Fielding.teamID == teamId,
-                    Fielding.yearID == year,
-                    Fielding.position == position,
-                    Fielding.teamID == Batting.teamID,
-                    Fielding.yearID == Batting.yearID
-                )
-                .group_by(People.playerID, Fielding.position)
-                .order_by((func.sum(Fielding.f_InnOuts) /
-                    func.sum(Fielding.f_InnOuts).over(partition_by=Fielding.position) * 100).desc())
-                .limit(6)
+        percentage_query = (
+            db.session.query(
+                People.nameFirst,
+                People.nameLast,
+                Fielding.position,
+                (func.sum(Fielding.f_InnOuts) /
+                func.sum(Fielding.f_InnOuts).over(partition_by=Fielding.position) * 100).label('stat_value')
             )
-            all_stats['percentage'][position] = [row._asdict() for row in percentage_query.all()]
+            .join(Fielding, People.playerID == Fielding.playerID)
+            .join(Batting, Batting.playerID == Fielding.playerID)
+            .filter(
+                Fielding.teamID == teamId,
+                Fielding.yearID == year,
+                Fielding.position == position,
+                Fielding.teamID == Batting.teamID,
+                Fielding.yearID == Batting.yearID
+            )
+            .group_by(People.playerID, Fielding.position)
+            .order_by((func.sum(Fielding.f_InnOuts) /
+                func.sum(Fielding.f_InnOuts).over(partition_by=Fielding.position) * 100).desc())
+            .limit(6)
+        )
+        all_stats['percentage'][position] = [row._asdict() for row in percentage_query.all()]
 
-        elif(stat == 'PA'):
-            pa_query = (
-                db.session.query(
-                    People.nameFirst,
-                    People.nameLast,
-                    Fielding.position,
-                    (
-                        func.sum(Batting.b_AB) + 
-                        func.sum(Batting.b_BB) + 
-                        func.sum(Batting.b_HBP) + 
-                        func.sum(Batting.b_SF) + 
-                        func.sum(Batting.b_SH)
-                    ).label('stat_value')
-                )
-                .join(Fielding, People.playerID == Fielding.playerID)
-                .join(Batting, Batting.playerID == Fielding.playerID)
-                .filter(
-                    Fielding.teamID == teamId,
-                    Fielding.yearID == year,
-                    Fielding.position == position,
-                    Fielding.teamID == Batting.teamID,
-                    Fielding.yearID == Batting.yearID
-                )
-                .group_by(Fielding.playerID, Fielding.position)
-                .order_by((
-                        func.sum(Batting.b_AB) + 
-                        func.sum(Batting.b_BB) + 
-                        func.sum(Batting.b_HBP) + 
-                        func.sum(Batting.b_SF) + 
-                        func.sum(Batting.b_SH)
-                    ).desc())
-                .limit(6)
+        pa_query = (
+            db.session.query(
+                People.nameFirst,
+                People.nameLast,
+                Fielding.position,
+                (
+                    func.sum(Batting.b_AB) + 
+                    func.sum(Batting.b_BB) + 
+                    func.sum(Batting.b_HBP) + 
+                    func.sum(Batting.b_SF) + 
+                    func.sum(Batting.b_SH)
+                ).label('stat_value')
             )
-            all_stats['PA'][position] = [row._asdict() for row in pa_query.all()]
+            .join(Fielding, People.playerID == Fielding.playerID)
+            .join(Batting, Batting.playerID == Fielding.playerID)
+            .filter(
+                Fielding.teamID == teamId,
+                Fielding.yearID == year,
+                Fielding.position == position,
+                Fielding.teamID == Batting.teamID,
+                Fielding.yearID == Batting.yearID
+            )
+            .group_by(Fielding.playerID, Fielding.position)
+            .order_by((
+                    func.sum(Batting.b_AB) + 
+                    func.sum(Batting.b_BB) + 
+                    func.sum(Batting.b_HBP) + 
+                    func.sum(Batting.b_SF) + 
+                    func.sum(Batting.b_SH)
+                ).desc())
+            .limit(6)
+        )
+        all_stats['PA'][position] = [row._asdict() for row in pa_query.all()]
 
-        elif(stat == 'wOBA'):
-            woba_query = (
-                db.session.query(
-                    People.nameFirst,
-                    People.nameLast,
-                    Fielding.position,
-                    (
-                        ((0.69 * func.sum(Batting.b_BB)) +
-                        (0.72 * func.sum(Batting.b_HBP)) +
-                        (0.888 * func.sum(Batting.b_H)) +
-                        (1.271 * func.sum(Batting.b_2B)) +
-                        (1.616 * func.sum(Batting.b_3B)) +
-                        (2.101 * func.sum(Batting.b_HR)))/
-                        func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH)
-                    ).label("stat_value")
-                    )
-                .join(Fielding, People.playerID == Fielding.playerID)
-                .join(Batting, Batting.playerID == Fielding.playerID)
-                .filter(
-                    Fielding.teamID == teamId,
-                    Fielding.yearID == year,
-                    Fielding.position == position,
-                    Fielding.yearID == Batting.yearID,
-                    Fielding.teamID == Batting.teamID
+        woba_query = (
+            db.session.query(
+                People.nameFirst,
+                People.nameLast,
+                Fielding.position,
+                (
+                    ((0.69 * func.sum(Batting.b_BB)) +
+                    (0.72 * func.sum(Batting.b_HBP)) +
+                    (0.888 * func.sum(Batting.b_H)) +
+                    (1.271 * func.sum(Batting.b_2B)) +
+                    (1.616 * func.sum(Batting.b_3B)) +
+                    (2.101 * func.sum(Batting.b_HR)))/
+                    func.sum(Batting.b_AB + Batting.b_BB + Batting.b_HBP + Batting.b_SF + Batting.b_SH)
+                ).label("stat_value")
                 )
-                .group_by(Fielding.playerID, Fielding.position)
-                .order_by((
-                        (0.69 * func.sum(Batting.b_BB)) +
-                        (0.72 * func.sum(Batting.b_HBP)) +
-                        (0.888 * func.sum(Batting.b_H)) +
-                        (1.271 * func.sum(Batting.b_2B)) +
-                        (1.616 * func.sum(Batting.b_3B)) +
-                        (2.101 * func.sum(Batting.b_HR))/
-                        func.sum(Batting.b_AB) +
-                        func.sum(Batting.b_BB) -
-                        func.sum(Batting.b_IBB) +
-                        func.sum(Batting.b_SF) +
-                        func.sum(Batting.b_HBP)
-                    ).desc())
-                .limit(6)
+            .join(Fielding, People.playerID == Fielding.playerID)
+            .join(Batting, Batting.playerID == Fielding.playerID)
+            .filter(
+                Fielding.teamID == teamId,
+                Fielding.yearID == year,
+                Fielding.position == position,
+                Fielding.yearID == Batting.yearID,
+                Fielding.teamID == Batting.teamID
             )
-            all_stats['wOBA'][position] = [row._asdict() for row in woba_query.all()]
+            .group_by(Fielding.playerID, Fielding.position)
+            .order_by((
+                    (0.69 * func.sum(Batting.b_BB)) +
+                    (0.72 * func.sum(Batting.b_HBP)) +
+                    (0.888 * func.sum(Batting.b_H)) +
+                    (1.271 * func.sum(Batting.b_2B)) +
+                    (1.616 * func.sum(Batting.b_3B)) +
+                    (2.101 * func.sum(Batting.b_HR))/
+                    func.sum(Batting.b_AB) +
+                    func.sum(Batting.b_BB) -
+                    func.sum(Batting.b_IBB) +
+                    func.sum(Batting.b_SF) +
+                    func.sum(Batting.b_HBP)
+                ).desc())
+            .limit(6)
+        )
+        all_stats['wOBA'][position] = [row._asdict() for row in woba_query.all()]
         
-        elif(stat == 'WAR'):
-            war_query = (
-                db.session.query(
-                    Batting.playerID.label("player_id"),
-                    war.label('stat_value')
-                )
-                .join(grouped_fielding, and_(
-                    Batting.playerID == grouped_fielding.c.playerID,
-                    Batting.yearID == grouped_fielding.c.yearID,
-                    Batting.teamID == grouped_fielding.c.teamID,
-                    Batting.stint == grouped_fielding.c.stint
-                ))
-                .filter(
-                    Batting.teamID == teamId,
-                    Batting.yearID == year,
-                    Season.yearID == year
-                )
-                .group_by(Batting.playerID)
-                .subquery()
+        war_query = (
+            db.session.query(
+                Batting.playerID.label("player_id"),
+                war.label('stat_value')
             )
-
-            war_results = (
-                db.session.query(
-                    People.nameFirst,
-                    People.nameLast,
-                    Fielding.position,
-                    (war_query.c['stat_value']).label('stat_value')
-                )
-                .join(People, People.playerID == war_query.c.player_id)
-                .join(Fielding, Fielding.playerID == People.playerID)
-                .filter(
-                    Fielding.teamID == teamId,
-                    Fielding.yearID == year,
-                    Fielding.position == position
-
-                )
-                .group_by(Fielding.position, war_query.c.player_id)
-                .order_by(war_query.c['stat_value'].desc())
-                .limit(6)
+            .join(grouped_fielding, and_(
+                Batting.playerID == grouped_fielding.c.playerID,
+                Batting.yearID == grouped_fielding.c.yearID,
+                Batting.teamID == grouped_fielding.c.teamID,
+                Batting.stint == grouped_fielding.c.stint
+            ))
+            .filter(
+                Batting.teamID == teamId,
+                Batting.yearID == year,
+                Season.yearID == year
             )
+            .group_by(Batting.playerID)
+            .subquery()
+        )
 
-            all_stats['WAR'][position] = [row._asdict() for row in war_results.all()]
+        war_results = (
+            db.session.query(
+                People.nameFirst,
+                People.nameLast,
+                Fielding.position,
+                (war_query.c['stat_value']).label('stat_value')
+            )
+            .join(People, People.playerID == war_query.c.player_id)
+            .join(Fielding, Fielding.playerID == People.playerID)
+            .filter(
+                Fielding.teamID == teamId,
+                Fielding.yearID == year,
+                Fielding.position == position
+            )
+            .group_by(Fielding.position, war_query.c.player_id)
+            .order_by(war_query.c['stat_value'].desc())
+            .limit(6)
+        )
+
+        all_stats['WAR'][position] = [row._asdict() for row in war_results.all()]
 
 
         
