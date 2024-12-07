@@ -138,7 +138,7 @@
         <tr>
             <th>Player Name</th>
             <th>Games Played (G)</th>
-            <th>Plate Appearances (PS)</th>
+            <th>Plate Appearances (PA)</th>
             <th>Home Runs (HR)</th>
             <th>Stolen Bases (SB)</th>
             <th>Walk % (BB%)</th>
@@ -155,8 +155,14 @@
     </thead>
     <tbody>
         {% for player_id, stats in batting_data.items() %}
+        {% if stats["PA"]>0 %}
         <tr>
-            <td>{{ stats.full_name }}</td>
+            <td>
+                <a href={{"https://www.baseball-reference.com/players/{}/{}.shtml".format(player_id[0],player_id)}}
+                    target="_blank">
+                    {{stats.full_name }}
+                </a>
+            </td>
             <td>{{ stats.G }}</td>
             <td>{{ stats["PA"] }}</td>
             <td>{{ stats["HR"] }}</td>
@@ -176,6 +182,7 @@
                 {% endif %}
             </td>
         </tr>
+        {% endif %}
         {% endfor %}
     </tbody>
 </table>
