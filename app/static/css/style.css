@@ -537,6 +537,12 @@ h2 {
     transform: translateX(-50%);
 }
 
+#box-outfield {
+    top: 0%;
+    left: 49%;
+    transform: translateX(-50%);
+}
+
 #box-rightfield {
     top: 5%;
     right: 10%;
