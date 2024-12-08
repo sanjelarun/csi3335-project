@@ -15,7 +15,7 @@ def getTeam(teamId, year):
 def getSelectedStats(teamId,year,stat):
     grouped_fielding= get_grouped_fielding()
     war = get_war(grouped_fielding)
-    positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P']
+    positions = ['1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C', 'P', 'OF']
     all_stats = {'percentage': {}, 'PA': {}, 'wOBA': {}, 'WAR': {}}
     for position in positions:
         percentage_query = (
