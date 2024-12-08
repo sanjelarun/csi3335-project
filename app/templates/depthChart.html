@@ -10,6 +10,7 @@
         <!--Change to Playing Time-->
         <option value="PA" {% if stat=='PA' %}selected{% endif %}>Plate Appearances</option>
         <option value="wOBA" {% if stat=='wOBA' %}selected{% endif %}>wOBA</option>
+        <option value="WAR" {% if stat=='WAR' %}selected{% endif %}>WAR</option>
     </select>
     <input type="hidden" name="year" value="{{ year }}">
 </form>
@@ -156,6 +157,8 @@
             return `${statValue.toFixed(1)}%`;
         } else if (stat === 'wOBA') {
             return statValue.toFixed(3);
+        } else if (stat === 'WAR') {
+            return statValue.toFixed(1);
         } else {
             return statValue;
         }
