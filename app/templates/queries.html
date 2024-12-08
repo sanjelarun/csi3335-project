@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Queries</h1>
-<div>
-    <h2>Roster Queries</h2>
-    {% if rosterQueryData %}
+<h1>Your Query History</h1>
+<div style="display:flex;flex-direction: row;">
+    <div style="margin-right:5%">
+        <h2>Roster Queries</h2>
+        {% if rosterQueryData %}
         <table class="stats-table">
             <thread>
                 <tr>
@@ -27,12 +28,13 @@
                 {{ "Clear All" }}
             </button>
         </form>
-    {% else %}
+        {% else %}
         <p>No roster queries found.</p>
-    {% endif %}
-
-    <h2>Immaculate Grid Queries</h2>
-    {% if immaculateGridQueryData %}
+        {% endif %}
+    </div>
+    <div>
+        <h2>Immaculate Grid Queries</h2>
+        {% if immaculateGridQueryData %}
         <table class="stats-table">
             <thread>
                 <tr>
@@ -51,12 +53,13 @@
         </table>
         <form action="{{ url_for('main.clearImmaculateGridQueries') }}" method="POST" style="margin-top: 10px;">
             <input type="hidden" name="_method" value="DELETE">
-            <button type="submit">
+            <button type="submit" style="margin-bottom: 30px;">
                 {{ "Clear All" }}
             </button>
         </form>
-    {% else %}
+        {% else %}
         <p>No immaculate grid queries found.</p>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

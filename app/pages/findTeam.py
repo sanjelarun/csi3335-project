@@ -6,7 +6,7 @@ from app import db
 
 def ShowFindTeam():
     form = FindTeam()
-    form.year.choices = [("", "")]
+    form.year.choices = [("", "Select Year...")]
     form.team.choices = [("", "First select a year...")]
 
     years = db.session.scalars(

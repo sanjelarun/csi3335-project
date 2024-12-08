@@ -1,7 +1,6 @@
 {% extends "teamContainer.html" %}
 
 {% block teamData %}
-<h2>Overall Team Statistics</h2>
 
 <h3>Season Statistics</h3>
 <p>
@@ -65,7 +64,7 @@
     </tr>
 </table>
 
-<h3>Game Statistics</h3>
+<h3>Collective Game Statistics</h3>
 <table class="stats-table">
     <thead>
         <tr>
@@ -132,25 +131,25 @@
     </tbody>
 </table>
 
-<h2>Player Batting Statistics for the {{ team.yearID }} {{team.team_name}} </h2>
-<table class="stats-table">
+<h3>Batting Statistics</h3>
+<table class="stats-table sortable-table" id="batting-table">
     <thead>
         <tr>
-            <th>Player Name</th>
-            <th>Games Played (G)</th>
-            <th>Plate Appearances (PA)</th>
-            <th>Home Runs (HR)</th>
-            <th>Stolen Bases (SB)</th>
-            <th>Walk % (BB%)</th>
-            <th>Strikeout % (K%)</th>
-            <th>ISO</th>
-            <th>BABIP</th>
-            <th>AVG</th>
-            <th>OBP</th>
-            <th>SLG</th>
-            <th>wOBA</th>
-            <th>BsR</th>
-            <th>WAR</th>
+            <th onclick="sortTable(0,'batting-table')">Player Name</th>
+            <th onclick="sortTable(1,'batting-table')">Games</th>
+            <th onclick="sortTable(2,'batting-table')">PA</th>
+            <th onclick="sortTable(3,'batting-table')">HR</th>
+            <th onclick="sortTable(4,'batting-table')">SB</th>
+            <th onclick="sortTable(5,'batting-table')">BB%</th>
+            <th onclick="sortTable(6,'batting-table')">K%</th>
+            <th onclick="sortTable(7,'batting-table')">ISO</th>
+            <th onclick="sortTable(8,'batting-table')">BABIP</th>
+            <th onclick="sortTable(9,'batting-table')">AVG</th>
+            <th onclick="sortTable(10,'batting-table')">OBP</th>
+            <th onclick="sortTable(11,'batting-table')">SLG</th>
+            <th onclick="sortTable(12,'batting-table')">wOBA</th>
+            <th onclick="sortTable(13,'batting-table')">BsR</th>
+            <th onclick="sortTable(14,'batting-table')">WAR</th>
         </tr>
     </thead>
     <tbody>
@@ -187,36 +186,88 @@
     </tbody>
 </table>
 
-<h2>Player Pitching Statistics for the {{ team.yearID }} {{team.team_name}} </h2>
-    <table class="stats-table">
-        <thead>
-            <tr>
-                <th> Name </th>
-                <th> IP </th>
-                <th> K/9 </th>
-                <th> BB/9 </th>
-                <th> HR/9 </th>
-                <th> BABIP </th>
-                <th> LOB% </th>
-                <th> ERA </th>
-                <th> FIP </th>
-            </tr>
-        </thead>
-        <tbody>
+<h3>Pitching Statistics </h3>
+<table class="stats-table sortable-table" id="pitching-table">
+    <thead>
+        <tr>
+            <th onclick="sortTable(0,'pitching-table')"> Name </th>
+            <th onclick="sortTable(1,'pitching-table')"> IP </th>
+            <th onclick="sortTable(2,'pitching-table')"> K/9 </th>
+            <th onclick="sortTable(3,'pitching-table')"> BB/9 </th>
+            <th onclick="sortTable(4,'pitching-table')"> HR/9 </th>
+            <th onclick="sortTable(5,'pitching-table')"> BABIP </th>
+            <th onclick="sortTable(6,'pitching-table')"> LOB% </th>
+            <th onclick="sortTable(7,'pitching-table')"> ERA </th>
+            <th onclick="sortTable(8,'pitching-table')"> FIP </th>
+        </tr>
+    </thead>
+    <tbody>
 
-            {% for player_id,pitcher in pitching_data.items() %}
-            <tr>
-                <td> {{ pitcher.full_name }} </td>
-                <td> {{ '%0.1f'| format(pitcher.IP) }} </td>
-                <td> {{ '%0.1f'| format(pitcher.K9) }} </td>
-                <td> {{ '%0.1f'| format(pitcher.BB9) }} </td>
-                <td> {{ '%0.1f'| format(pitcher.HR9) }} </td>
-                <td> {{ '%0.3f'| format(pitcher.BABIP) }} </td>
-                <td> {{ '%0.1f'| format(pitcher.LOB * 100) }}% </td>
-                <td> {{ '%0.2f'| format(pitcher.ERA) }} </td>
-                <td> {{ '%0.2f'| format(pitcher.FIP) }} </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% for player_id,pitcher in pitching_data.items() %}
+        <tr>
+            <td>
+                <a href={{"https://www.baseball-reference.com/players/{}/{}.shtml".format(player_id[0],player_id)}}
+                    target="_blank">
+                    {{pitcher.full_name }}
+                </a>
+            </td>
+            <td> {{ '%0.1f'| format(pitcher.IP) }} </td>
+            <td> {{ '%0.1f'| format(pitcher.K9) }} </td>
+            <td> {{ '%0.1f'| format(pitcher.BB9) }} </td>
+            <td> {{ '%0.1f'| format(pitcher.HR9) }} </td>
+            <td> {{ '%0.3f'| format(pitcher.BABIP) }} </td>
+            <td> {{ '%0.1f'| format(pitcher.LOB * 100) }}% </td>
+            <td> {{ '%0.2f'| format(pitcher.ERA) }} </td>
+            <td> {{ '%0.2f'| format(pitcher.FIP) }} </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    function sortTable(columnIndex, tableId) {
+        const table = document.getElementById(tableId);
+        const headers = table.tHead.rows[0].cells; // Get all header cells
+        const rows = Array.from(table.tBodies[0].rows);
+        const isAscending = headers[columnIndex].getAttribute("data-sort") !== "asc";
+
+        // Helper function to extract numeric values
+        const parseValue = (value) => {
+            // Remove percentage sign and parse as float
+            if (value.includes("%")) {
+                return parseFloat(value.replace("%", ""));
+            }
+            // Parse as number if possible; otherwise, return original value
+            return isNaN(value) ? value.toLowerCase() : parseFloat(value);
+        };
+
+        // Sort rows based on the column
+        rows.sort((rowA, rowB) => {
+            const cellA = parseValue(rowA.cells[columnIndex].innerText);
+            const cellB = parseValue(rowB.cells[columnIndex].innerText);
+
+            if (!isNaN(cellA) && !isNaN(cellB)) {
+                // Compare numbers
+                return isAscending ? cellA - cellB : cellB - cellA;
+            } else {
+                // Compare strings
+                return isAscending
+                    ? cellA.localeCompare(cellB)
+                    : cellB.localeCompare(cellA);
+            }
+        });
+
+        // Re-append rows in the sorted order
+        const tbody = table.tBodies[0];
+        rows.forEach(row => tbody.appendChild(row));
+
+        // Clear previous sort indicators
+        Array.from(headers).forEach(header => header.removeAttribute("data-sort"));
+
+        // Set the sort direction for the clicked header
+        headers[columnIndex].setAttribute("data-sort", isAscending ? "asc" : "desc");
+
+        // Update sorting direction
+        table.setAttribute(`data-sort-column-${columnIndex}`, isAscending ? "asc" : "desc");
+    }
+</script>
 {% endblock %}

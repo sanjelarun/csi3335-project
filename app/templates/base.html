@@ -1,20 +1,22 @@
 <!doctype html>
 <html>
-    <head>
-        {% if title %}
-        <title>{{ title }} - MLB Roster</title>
-        {% else %}
-        <title>MLB Roster</title>
-        {% endif %}
 
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- Include jQuery -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!-- StyleSheet -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    </head>
-    <body>
+<head>
+    {% if title %}
+    <title>{{ title }} - MLB Roster</title>
+    {% else %}
+    <title>MLB Roster</title>
+    {% endif %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- StyleSheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
     <div style="    
         display: flex;
         justify-content: space-evenly;
@@ -23,16 +25,16 @@
         background-color: #041E42;
         height: 100px;
         ">
-        <h3>Immaculate Party Time MLB Player Roster</h3>
+        <h2 style="color:white">Immaculate Party Time MLB Player Roster</h2>
         <div>
             {% if current_user.u_ADMIN %}
-                <button onclick="window.location.href='/users'">Users</button>
+            <button onclick="window.location.href='/users'">Users</button>
             {% endif %}
             {% if not current_user.is_anonymous %}
-                <button onclick="window.location.href='/findTeam'">Find Your Team</button>
-                <button onclick="window.location.href='/immaculateGrid'">Immaculate Grid Solver</button>
-                <button onclick="window.location.href='/queries'">History</button>
-                <button onclick="window.location.href='/logout'">Logout</button>
+            <button onclick="window.location.href='/findTeam'">Find Your Team</button>
+            <button onclick="window.location.href='/immaculateGrid'">Immaculate Grid Solver</button>
+            <button onclick="window.location.href='/queries'">History</button>
+            <button onclick="window.location.href='/logout'">Logout</button>
             {% endif %}
         </div>
         <image src="{{ url_for('static', filename='images/mlb.png') }}" style="width: 150px;border-radius: 5%;"></image>
@@ -68,4 +70,5 @@
         </p>
     </div>
 </body>
+
 </html>
