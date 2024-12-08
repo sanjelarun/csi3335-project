@@ -123,6 +123,7 @@
         RF: "box-rightfield",
         OF: "box-outfield"
     };
+    let createOF = false;
 
     const playerBoxesContainer = document.getElementById('player-boxes');
     playerBoxesContainer.innerHTML = '';
@@ -132,15 +133,17 @@
     const cfHasData = positionsData['CF'] && positionsData['CF'].length > 0;
     const rfHasData = positionsData['RF'] && positionsData['RF'].length > 0;
 
-    // Remove the "OF" box if any of the individual outfield positions have data
     if (!lfHasData && !cfHasData && !rfHasData) {
         // Create the "OF" box if none of the outfield positions have data
-        createPositionBox('OF', positionsData['OF']);
+        createOF = true;
     }
 
-    // Populate each position's box
     for (const [position, players] of Object.entries(positionsData)) {
-        if (position === 'OF') continue; // Skip creating the "OF" box here if it's handled above
+        if (position === 'OF' && createOF == false){
+            continue;
+        }else if((position === 'RF' || position == 'CF' || position == 'LF') && createOF == true){
+            continue;
+        }
 
         const boxId = positionMap[position];
         const box = document.createElement('div');
@@ -161,26 +164,6 @@
         playerBoxesContainer.appendChild(box);
     }
 });
-
-function createPositionBox(position, players) {
-    const boxId = positionMap[position];
-    const box = document.createElement('div');
-    box.id = boxId;
-    box.classList.add('player-box');
-    const header = document.createElement('div');
-    header.classList.add('position-header');
-    header.innerHTML = `<span class="position-label">${position}</span>`;
-    box.appendChild(header);
-
-    const playerList = document.createElement('ul');
-    players.forEach(player => {
-        const listItem = document.createElement('li');
-        listItem.innerHTML = `${player.nameFirst} ${player.nameLast} - ${getStatValue(player)}`;
-        playerList.appendChild(listItem);
-    });
-    box.appendChild(playerList);
-    document.getElementById('player-boxes').appendChild(box);
-}
 
 function getStatValue(player) {
     const stat = document.getElementById('stat').value;
