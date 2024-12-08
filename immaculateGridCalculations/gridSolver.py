@@ -460,8 +460,26 @@ def getNonUSBirthCountry():
         db.session.query(
             People.playerID.label("playerID")
         )
-        .filter(People.birthCountry != "USA")
+        .filter(People.birthCountry != 'USA')
     )
+
+# Gets players who were born in the specified country
+def getSpecificBirthCountry(birthCountry):
+    if birthCountry == 'United States':
+        birthCountry = 'USA'
+    elif birthCountry == 'Canada':
+        birthCountry = 'CAN'
+    elif birthCountry == 'Puerto Rico':
+        birthCountry = 'P.R.'
+    elif birthCountry == 'Dominican Republic':
+        birthCountry = 'D.R.'
+    return (
+        db.session.query(
+            People.playerID.label("playerID")
+        )
+        .filter(People.birthCountry == birthCountry)
+    )
+
 
 
 # Gets all players who have only played on one team
@@ -593,6 +611,8 @@ def solveGrid(questions):
             subquery = getPlayerAward("Rookie Of The Year Award")
         elif "World Series Champ" in currentQuestion:
             subquery = getWorldSeriesChamps()
+        elif "United States" or "Canada" or "Dominican Republic" or "Puerto Rico" in currentQuestion:
+            subquery = getSpecificBirthCountry(currentQuestion)
         elif "Born Outside US 50 States and DC" in currentQuestion:
             subquery = getNonUSBirthCountry()
         else:
