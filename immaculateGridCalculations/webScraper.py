@@ -7,8 +7,11 @@ from bs4 import BeautifulSoup
 
 def scrapeImmaculateGridQuestions(url):
     # Make a request for the HTML info
+    assert(not any(x in url for x in ["basketball", "hockey", "soccer","football"])),"Grid must use baseball!"
     r = requests.get(url)
+    assert(r.status_code == 200), "URL is invalid!"
     soup = BeautifulSoup(r.content, 'html.parser')
+
 
     # Fetches the question elements that we need based on HTML data
     s = soup.find('div',
@@ -158,6 +161,8 @@ def getPlayerAnswers(playerList: list) -> list:
 #   - list of the best possible player answers for the specified grid
 def solveOptimalGrid(url: str)-> list:
     gridNum = url[url.find("grid-") + 5:]
+
+    # Guarantees that url is valid. If it isn't, current grid is used.
     if(url.find("grid-") == -1 or not gridNum.isnumeric()):
         gridNum = ''
     return (getPlayerAnswers(getBestAnswers(loadGrid(gridNum))))

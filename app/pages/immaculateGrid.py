@@ -13,34 +13,37 @@ def ShowImmaculateGrid():
     url = ""
     questions = None
     solution = None
+    try:
+        if form.validate_on_submit():
+            url = form.url.data
+            questions = scrapeImmaculateGridQuestions(url)
+            if(form.solveCheckbox.data):
+                solution = solveOptimalGrid(url)
+            else:
+                solution = solveGrid(questions)
+            for i in range(3):  # 3 rows
+                for j in range(3):  # 3 columns
+                    q_questions = questions[j] + " & " + questions[i + 3]
+                    q_solutions = solution[i * 3 + j]
 
-    if form.validate_on_submit():
-        url = form.url.data
-        questions = scrapeImmaculateGridQuestions(url)
-        if(form.solveCheckbox.data):
-            solution = solveOptimalGrid(url)
-        else:
-            solution = solveGrid(questions)
-        for i in range(3):  # 3 rows
-            for j in range(3):  # 3 columns
-                q_questions = questions[j] + " & " + questions[i + 3]
-                q_solutions = solution[i * 3 + j]
+                    query = Queries(user_ID=current_user.get_id(), q_QUESTIONS=q_questions, q_SOLUTIONS=q_solutions)
+                    db.session.add(query)
+                    db.session.commit()
 
-                query = Queries(user_ID=current_user.get_id(), q_QUESTIONS=q_questions, q_SOLUTIONS=q_solutions)
-                db.session.add(query)
-                db.session.commit()
+            for i in range(3):  # 3 rows
+                for j in range(3):  # 3 columns
+                    q_questions = questions[j] + " & " + questions[i + 3]
+                    q_solutions = solution[i * 3 + j]
 
-        for i in range(3):  # 3 rows
-            for j in range(3):  # 3 columns
-                q_questions = questions[j] + " & " + questions[i + 3]
-                q_solutions = solution[i * 3 + j]
+                    query = Queries(user_ID=current_user.get_id(), q_QUESTIONS=q_questions, q_SOLUTIONS=q_solutions)
+                    db.session.add(query)
+                    db.session.commit()
 
-                query = Queries(user_ID=current_user.get_id(), q_QUESTIONS=q_questions, q_SOLUTIONS=q_solutions)
-                db.session.add(query)
-                db.session.commit()
-
-        print("URL:", url)
-        print("Questions:", questions)
-        ("Solution:", solution)
+            print("URL:", url)
+            print("Questions:", questions)
+            ("Solution:", solution)
+    except Exception as e:
+        print(e)
+        return render_template('immaculateGrid.html', title='Immaculate Grid Solver', form=form, url = "Invalid! Make sure the URL is a baseball immaculate grid!")
 
     return render_template('immaculateGrid.html', title='Immaculate Grid Solver', form=form, url = url,questions = questions, solution = solution)
