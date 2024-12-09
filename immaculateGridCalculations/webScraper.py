@@ -95,10 +95,12 @@ def pickNextLowestPlayer(dupes, scoreList, bestAnswers):
             # If the player found was already picked in the current solution,
             # skip that player and redo
             if (optimizeFirst in dict(bestAnswers).keys()):
-                item.pop(0)
+                print(optimizeFirst)
+                del scoreList[item[0]][optimizeFirst] # Remove player from being pulled
                 continue
             elif (optimizeSecond in dict(bestAnswers).keys()):
-                item.pop(1)
+                print(optimizeFirst)
+                del scoreList[item[1]][optimizeSecond] # Remove player from being pulled
                 continue
 
             # Compare the scores of the two new players found.
@@ -109,7 +111,7 @@ def pickNextLowestPlayer(dupes, scoreList, bestAnswers):
                 item.pop(0)
             elif scoreList[item[0]][optimizeFirst]> scoreList[item[1]][optimizeSecond]:
                 bestAnswers[item[1]] = [optimizeSecond, scoreList[item[1]][optimizeSecond]]
-                del scoreList[item[1]][optimizeFirst] # Remove player from being pulled
+                del scoreList[item[1]][optimizeSecond] # Remove player from being pulled
                 item.pop(1)
 
 # Gets the best answers for the given table according to the immaculate grid.
@@ -133,6 +135,7 @@ def getBestAnswers(jsonTable: list) -> list:
         dupes.append([i for i, x in enumerate(bestAnswers) if x[0] == plr])
         del i[plr] # Remove the inserted player to prevent duplicate pulls later
     pickNextLowestPlayer(dupes, scoreList, bestAnswers)
+
     return bestAnswers
 
 
